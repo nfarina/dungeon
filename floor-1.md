@@ -1,0 +1,311 @@
+# Floor 1: "The Tutorial Floor"
+
+A HeroQuest-shaped dungeon crawl for three regular people (Lucas, Ethan, Vicki) and one AI announcer (Nick). Physical board: HeroQuest First Light, Side A, using the Quest 1 room layout. Target: one hour, table to boss.
+
+> **Announcer voice, for reference.** Cheerful, corporate, slightly menacing, deeply unbothered by your suffering. "Welcome, Crawlers! Floor 1 is a *learning* floor. Most of you will survive it. Statistically."
+
+---
+
+## 1. What changes from HeroQuest
+
+Keep everything from HeroQuest that isn't listed here (movement 2d6, combat dice, line of sight, doors, furniture blocking, monsters act after all heroes).
+
+| HeroQuest | Floor 1 |
+|---|---|
+| Four hero classes | Three humans with identical stats. You are literally you. Loot makes you different. |
+| One-shot spells, wizard only | **Scrolls** (one use, anyone) and **Spellbooks** (permanent, cooldown, need Mind 4+). |
+| Search for treasure, once per room | Gone. Monsters drop loot when killed. Chests and racks are visible furniture with a fixed draw. |
+| Search for traps | Kept, but a found trap gets a **trap token** placed on the board. A Torch does this passively. |
+| Hero dies at 0 Body | Hero is **Downed**. See 1.4. |
+| Gold spent between quests | Gold spent at the **Stairwell Shop** between floors (Nick generates the shop with the next floor). |
+
+### 1.1 Stats
+
+Every player starts with:
+
+| Attack | Defend | Health | Mind | Move |
+|---|---|---|---|---|
+| 2 dice | 2 dice | 6 | 3 | 2d6 |
+
+Attack and Defend are numbers of combat dice. Heroes block on white shields, monsters block on black shields, exactly like HeroQuest.
+
+**Mind** does three things on this floor:
+- Reading a Spellbook needs Mind 4 or more. Nobody starts there. Whoever finds Mind gear becomes the caster. That's the whole specialization system for spells.
+- Picking a lock: roll dice equal to your Mind. Any skull opens it. Failing is loud (see the room notes).
+- Later floors: resisting mind attacks, reading higher spellbooks.
+
+### 1.2 Equipment slots
+
+| Slot | Count |
+|---|---|
+| Main hand | 1 |
+| Off hand | 1 (empty if main hand is two-handed) |
+| Body | 1 |
+| Head | 1 |
+| Feet | 1 |
+| Trinket | 2 |
+| Backpack | unlimited, but backpack cards do nothing |
+
+Swap one item between slots and backpack at the start of your turn, free. Consumables can be used from the backpack at any time on your turn without costing your action.
+
+Slots are the equipment specialization system. A two-handed axe means no shield. A chainmail bib means you're slow. Nobody has to be told to specialize; the slots do it.
+
+### 1.3 Cooldowns
+
+Any card with **Cooldown N** gets a d6 set to N when used. At the start of your turn, turn every cooldown die on your cards down by one. At 0, remove the die: the card is ready. Using a spell costs your action (you still move).
+
+Cooldown replaces "save it for the boss." A Spark you don't cast is a Spark you wasted.
+
+### 1.4 Downed
+
+At 0 Health you're Downed: lie the figure down, you skip your turns, monsters ignore you. Any player who ends their move adjacent to you can spend their action to get you up with 1 Health. If nobody does by the end of the next full round, the announcer awards you a **Participation Trophy** and you respawn at the entrance with all your gear and 3 Health. The loot you were carrying is fine. Your dignity is not.
+
+### 1.5 Trading
+
+On your turn, hand any card to an adjacent player. Free. Trading is how the right person ends up with the glasses.
+
+### 1.6 Turn order at the table
+
+1. Each hero: turn down cooldowns, then move and one action (attack, cast, search for traps, open chest, disarm, use rack) in either order.
+2. Announcer runs monsters using the rules in section 4.3, so the boys can predict them and the simulator can copy them.
+3. Loot rolls happen the moment a monster dies.
+
+---
+
+## 2. Players
+
+Three cards, portrait of the real person, identical base stats. Each player picks **one** Starting Kit card before the floor. The kit is "what you happened to have on you."
+
+| Starting Kit | Slot | Effect |
+|---|---|---|
+| **Phone (11% battery)** | Trinket | Once per floor, before opening a door, ask the announcer what's in the room. They have to tell you. |
+| **Hockey Stick** | Main hand | Attack +1. The first time you roll zero skulls with it, it snaps: discard it. |
+| **Multitool** | Trinket | Disarm an adjacent revealed trap as your action. Two uses. Tick the boxes. |
+| **Snack Bag** | Backpack | Two Juice Boxes (heal 3 each, one use). |
+| **Homework Glasses** | Head | Mind +1. Someone can read Spellbooks from turn one. |
+
+Five kits for three people. Whoever takes the glasses is volunteering to be the nerd. Whoever takes the stick is volunteering to be in front.
+
+---
+
+## 3. Floor layout
+
+Rooms are numbered so you can map them onto the Quest 1 layout yourself. I don't have First Light's Quest 1 map memorized, so assign numbers to physical rooms with this rule: **rooms 1, 2, 5 and 9 must be on the path from the entrance to the exit**, and the other five branch off it. The floor is clearable in an hour if the party only does the required rooms; the optional rooms are where the good loot is, and the announcer should say so.
+
+| # | Room | Monsters | Furniture | Trap | Required |
+|---|---|---|---|---|---|
+| 1 | **Welcome Center** | 2 Goblins | Sign: "Floor 1: Please Enjoy Responsibly" | none | yes |
+| 2 | **Break Room** | 1 Orc, 1 Goblin | Table: 1 Pockets draw | Pit trap in the doorway | yes |
+| 3 | **Storage** | 2 Skeletons | Locked chest: 1 Big Gear draw | none | no |
+| 4 | **Goblin Daycare** | 3 Goblins (fully armed adults who are just very short) | Tiny chairs | none | no |
+| 5 | **Armory** | 1 Orc, 1 Zombie | Weapon rack: 1 Gear draw | Spear trap on the square in front of the rack | yes |
+| 6 | **The Cage** | 1 Abomination | Cage with a goose in it | none | no |
+| 7 | **Latrine** | 2 Zombies | The toilet | Falling block at the door | no |
+| 8 | **Library** | 1 Skeleton, 1 Goblin | Bookshelf: 1 Big Gear draw if reader has Mind 4+, else 1 Gear draw | none | no |
+| 9 | **Manager's Office** | The Floor Manager, 2 Orcs | Desk, stairwell down | none | yes (boss) |
+
+**Corridors:** one pit trap somewhere on the required path, and one secret door that shortcuts to Room 9. The secret door is found by searching or by walking past it with a Torch.
+
+**Room 3 chest:** open with the Skeleton Key, chop it with the Fire Axe, or pick it (roll Mind dice, any skull). A failed pick makes the chest scream, and one Goblin from the nearest uncleared room comes running.
+
+**Room 6 cage:** open it as an action. The goose is a Companion card (section 7). It goes with whoever opened the cage. It does not like them.
+
+**Room 7 toilet:** any player may spend an action to reach into the toilet. One Pockets draw. Also an achievement (section 7). The announcer should be audibly disgusted.
+
+**Room 9 door:** locked. Open it with the Skeleton Key, the Fire Axe, or by knocking. If you knock, the two Orcs open it and each get a free attack on the knocker before the round starts. There is always a way in; it's just not always a good way.
+
+**Monster count:** 7 Goblins, 4 Orcs, 3 Skeletons, 3 Zombies, 1 Abomination, 1 boss. Required path only: 9 monsters plus the boss. Substitute whatever cutouts the box actually has; only the stats matter.
+
+---
+
+## 4. Monsters
+
+Stats follow HeroQuest so the dice math stays known. Loot is rolled on a normal d6 the moment the monster dies, by the player who killed it.
+
+| Monster | Att | Def | HP | Mind | Move | Loot roll (d6) | Card flavor |
+|---|---|---|---|---|---|---|---|
+| **Goblin** | 2 | 1 | 1 | 1 | 10 | 1-3 nothing, 4-6 Pockets | "Unpaid intern. Has pockets. Full of stuff that isn't his." |
+| **Orc** | 3 | 2 | 1 | 2 | 8 | 1-2 nothing, 3-5 Pockets, 6 Gear | "Middle management. Hits hard, dies to a table leg." |
+| **Skeleton** | 2 | 2 | 1 | 0 | 6 | 1-4 nothing, 5-6 Pockets | "No pockets. No brain. Immune to Sleep. Occasionally a coin falls out." |
+| **Zombie** | 2 | 3 | 1 | 0 | 5 | 1-3 nothing, 4-5 Pockets, 6 Gear | "Was somebody once. Still wearing their stuff. Immune to Sleep." |
+| **Abomination** | 3 | 3 | 2 | 3 | 6 | 1-3 Gear, 4-6 Big Gear | "Big. Sad. Guards a goose for reasons it will not explain." |
+| **The Floor Manager** | 3 | 3 | 4 | 4 | 6 | Boss Box + Big Gear | See 4.2 |
+
+### 4.1 Combat sanity check
+
+Rough expected values, no gear, so you know where the dials are before the simulator exists:
+
+| Matchup | Result |
+|---|---|
+| Hero (2 dice) attacks Goblin | kills it about 67% of the time |
+| Hero (2 dice) attacks Orc | kills it about 55% of the time |
+| Goblin attacks Hero (2 defend) | about 0.56 damage per attack |
+| Orc attacks Hero (2 defend) | about 0.9 damage per attack |
+| Hero (2 dice) attacks the Floor Manager | about 0.5 net damage per attack |
+
+Three heroes at 6 Health each is 18 Health against roughly 25 monster attacks on the full floor, plus Juice Boxes. Heroes will get Downed once or twice. That's the intended amount of danger for a first floor. The boss takes the party about three rounds without gear, two with.
+
+### 4.2 The Floor Manager
+
+Use the biggest cutout in the box. A gargoyle named Greg.
+
+- **Performance Review** (Cooldown 2): 2 attack dice at any hero in line of sight. Greg uses it on whichever hero is carrying the most equipment.
+- **Delegation:** while either Orc is alive, Greg defends with 4 dice instead of 3. Kill the staff first.
+- On death: the killer opens the **Boss Box**. Everyone gets the Big Gear draw split by the announcer.
+
+### 4.3 Monster behavior (for the announcer and, later, the simulator)
+
+1. A monster moves toward the nearest hero it can reach, by shortest path.
+2. If it ends adjacent to more than one hero, it attacks the one with the fewest Defend dice. Ties: the one with the lowest Health.
+3. It never walks onto a revealed trap. It happily walks onto an unrevealed one (see Shove).
+4. Monsters don't leave their room unless the room's door is open and a hero is in line of sight, or something pulls them (Whistle, failed lockpick).
+5. The boss uses Performance Review whenever it's off cooldown, otherwise attacks in melee.
+
+---
+
+## 5. Traps
+
+HeroQuest's traps, with tokens.
+
+| Trap | Trigger | Effect | Disarm |
+|---|---|---|---|
+| **Pit** | Step on it | 1 damage, end movement. Costs an action to climb out. Rope: climb out free, or cross a revealed pit. | Multitool or Trap Kit. Or just walk around it once it's revealed. |
+| **Spear** | Step on it | Roll 1 combat die: skull = 2 damage, otherwise 1. | Multitool or Trap Kit. |
+| **Falling Block** | Open the door | 2 damage to the opener unless they roll a white shield on 1 die. Block then fills the doorway; enter from the other side or spend an action clearing it. | Only by triggering it. The Football Helmet eats the damage. |
+
+**Searching for traps** costs your action and reveals every trap in your room or corridor line of sight. Put tokens down. A **Torch** in the off hand does the same thing automatically when you enter a room.
+
+Monsters can be pushed onto traps (Shove), and the trap goes off on them. This is the best thing on the floor and the boys will find it.
+
+---
+
+## 6. Loot
+
+Three shuffled decks. "Draw Pockets" means take the top card of the Pockets deck. Not everything gets found. That's the point.
+
+Design rule for every card: it does something for anyone, and something better for someone. No item is only good for one build, and nothing on this floor is better than +2 to anything.
+
+### 6.1 Pockets deck (16 cards)
+
+Junk and consumables. What a goblin has on him.
+
+| Card | Qty | Effect |
+|---|---|---|
+| **Juice Box** | 4 | Heal 3. One use. |
+| **Energy Drink** | 2 | +1 attack die on your next attack this turn. One use. The card says "DO NOT GIVE TO CHILDREN" and the announcer should read that aloud. |
+| **Gold** | 4 | 1, 1, 2, 3 gold. Spend at the Stairwell Shop. |
+| **Firecracker** | 1 | 1 attack die against every adjacent monster. One use. |
+| **Bandage** | 1 | Heal 1, or get an adjacent Downed player up without spending your action. One use. |
+| **Rope** | 1 | Trinket. Pits are free for you. Pull an adjacent player out of a pit as a free action. |
+| **Whistle of Doubtful Value** | 1 | Trinket. Action: every monster in an adjacent room with an open door comes to you. Pulls one Orc out of the boss room at a time if you're clever, or everything at once if you're not. |
+| **Scroll: Sleep** | 1 | One monster in line of sight skips its next 2 activations. Not Skeletons or Zombies. |
+| **Scroll: Heal** | 1 | Heal 4 to you or an adjacent player. |
+
+### 6.2 Gear deck (14 cards)
+
+| Card | Slot | Effect |
+|---|---|---|
+| **Broken Table Leg** | Main hand | Attack +1. "It's a club. Don't overthink it." |
+| **Kitchen Knife** | Main hand | Attack +1 against monsters with 1 HP. When you kill something with it, move 2 extra squares. Sneaky. |
+| **Trash Can Lid** | Off hand | Defend +1. |
+| **Frying Pan** | Off hand | Defend +1. Action: throw it at a monster in line of sight for 2 attack dice. Then it's on the floor over there. |
+| **Goblin-Chewed Leather Jacket** | Body | Defend +1. |
+| **Orc Monocle** | Head | Mind +1. The orc did not need it. Stacks with the glasses. |
+| **Stolen Sneakers** | Feet | Move +2. |
+| **Lucky Rabbit's Foot** | Trinket | Once per floor, reroll one die. The rabbit would like it back. |
+| **Trap Kit** | Trinket | Disarm an adjacent revealed trap as your action. Three uses. |
+| **Torch** | Off hand | Reveal every trap in a room the moment you enter it. Reveal secret doors you walk past. |
+| **Goblin Ear Necklace** | Trinket | Goblins won't attack you if there's any other hero they can reach. Word gets around. |
+| **Scroll: Firebolt** | | 3 attack dice at any monster in line of sight. One use. |
+| **Scroll: Stone Skin** | | Defend +2 until the start of your next turn. One use. |
+| **Scroll: Smoke Bomb** | | No monster can attack anyone this round. One use. |
+
+### 6.3 Big Gear deck (8 cards)
+
+| Card | Slot | Effect |
+|---|---|---|
+| **Fire Axe** | Both hands | Attack +2. Opens any locked chest or door as your action. No off hand. |
+| **Goblin Shortbow** | Both hands | Attack 2 dice at any monster in line of sight. Can't be used on an adjacent monster. Replaces your Attack instead of adding to it. |
+| **Orc Chainmail Bib** | Body | Defend +2. Move: subtract 2 from your roll. Can't wear Sneakers with it (they don't fit under). |
+| **Football Helmet** | Head | The first time each floor a trap would damage you, it doesn't. |
+| **Skeleton Key** | Trinket | Opens one locked chest or door. Then it crumbles. |
+| **Spellbook: Spark** | Learned | Mind 4+. 2 attack dice at a monster in line of sight. Cooldown 2. |
+| **Spellbook: Shove** | Learned | Mind 4+. Push a monster in line of sight up to 3 squares directly away from you. Into a trap: it triggers. Into a wall or another monster: 1 damage. Cooldown 2. |
+| **Spellbook: Patch Up** | Learned | Mind 4+. Heal 2 to you or an adjacent player. Cooldown 3. |
+
+**Learning a Spellbook** costs your action and needs Mind 4 or more at that moment. Once learned, it's yours: put it in front of you, it doesn't use a slot, and it stays with you across floors. A learned book can't be traded. Scrolls can.
+
+**Future hook:** every learned spell card gets five tick boxes. Fill them by casting and the spell levels up on the next floor (Nick generates the level 2 card). Not on Floor 1, but print the boxes now.
+
+---
+
+## 7. Loot Boxes
+
+Envelopes. Each has a printed label with the achievement name and its trigger on the outside, so players can see what they're chasing. The contents are secret until earned. The announcer reads the achievement name out loud, every time, in the voice.
+
+| Box | Tier | Trigger | Contents |
+|---|---|---|---|
+| **First Blood** | Bronze | First monster killed on the floor | 3 gold, 1 Juice Box |
+| **Found It With Your Face** | Silver | First player to trigger a trap | Football Helmet |
+| **You Monster** | Bronze | Kill all three goblins in the Daycare | 2 gold and a card that just says "You did that. We all saw." Trinket, no effect. |
+| **Why Would You Do That** | Bronze | Reach into the toilet | 1 Energy Drink, 1 Gold (2). Sticky. |
+| **Nerd** | Gold | First player to learn a Spellbook | Scroll: Firebolt, Orc Monocle |
+| **Sharing Is Caring** | Silver | Give an item to another player | Lucky Rabbit's Foot |
+| **Trap Chef** | Gold | A monster dies from a trap | Spellbook: Shove (if already found, Fire Axe) |
+| **Cartographer** | Silver | Open every door on the floor | 5 gold |
+| **Sir Reginald** | Companion | Open the cage in Room 6 | The goose. See below. |
+| **Boss Box** | Platinum | Kill the Floor Manager | The Class Menu, plus Spellbook: Nope |
+
+Box contents that duplicate a card already in a deck: pull that card out of the deck when you assemble the envelope, so there's exactly one in the world.
+
+**Sir Reginald (Companion card):** an ill-tempered goose. Moves with the player who freed him, occupies no square. Once per turn, 1 attack die at a monster adjacent to his person. When a monster attacks his person, roll 1 die: on a skull, it attacks the goose instead. The goose has 2 Health. If the goose dies, everyone is sad and the announcer takes a moment. He does not come back.
+
+**Spellbook: Nope** (Mind 4+, Cooldown 3): after a monster rolls an attack against anyone in your room, cancel it. The announcer sighs.
+
+**The Class Menu:** a printed card that says "Congratulations on surviving Floor 1. You may now select a Class at the stairwell. This offer is non-transferable and the company is not responsible for what you choose." Then the real class-picking conversation happens at the table, and Nick has a day or two to generate Floor 2. If you'd rather hold classes until after Floor 2 like the book, the Menu says "Floor 2" and this box holds 5 gold instead.
+
+---
+
+## 8. Pacing budget
+
+| Segment | Minutes |
+|---|---|
+| Setup, kit picks, announcer intro | 8 |
+| Rooms 1, 2, 5 and corridors | 25 |
+| One or two optional rooms | 12 |
+| Boss | 12 |
+| Boss Box, tally, cleanup | 5 |
+
+Sixty-two minutes if it goes to plan, which it won't. Cut for time by having the announcer "close" an optional room ("Floor maintenance has sealed the Latrine. You're welcome."). Never cut the boss.
+
+---
+
+## 9. What has to be generated
+
+Counts for the card pipeline. Poker size, nine per letter sheet.
+
+| Asset | Count |
+|---|---|
+| Player cards (portrait of the real person, stat boxes, slot outline) | 3 |
+| Starting Kit cards | 5 |
+| Monster cards (stats, loot table, one line of flavor) | 6 |
+| Pockets deck | 16 |
+| Gear deck | 14 |
+| Big Gear deck | 8 |
+| Loot Box exclusives (Nope, Companion, Class Menu, "You did that") | 4 |
+| Loot Box envelope labels | 10 |
+| Trap tokens (pit, spear, block, revealed-secret-door) | 8 |
+| Room signs (optional, but the Daycare deserves one) | 9 |
+| Cooldown dice: any d6s. Gold: coins from the HeroQuest box or printed tokens. | |
+
+Card template types: Player, Monster, Item (slot, effect, flavor, art), Spell (cooldown box, tick boxes, Mind requirement), Consumable, Companion, Envelope label. Seven HTML templates, one data file.
+
+---
+
+## 10. Decisions for Nick
+
+- **Which cutouts does the box actually have?** The roster above assumes goblin, orc, skeleton, zombie, something big, and something bigger. Rename to match.
+- **Class pick after Floor 1 or Floor 2?** The Boss Box is written for either.
+- **Is the Daycare too much?** It's the exact bit from the book, and it's the room the boys will talk about for a week. Your call on Vicki's reaction.
+- **Goose name.** Sir Reginald is a placeholder. The boys should name him, which also means they'll care when he's at 1 Health.
+- **Player portraits.** Real photos into a fantasy style, or drawn from a description? Real photos are funnier on the first floor, where the joke is that you're just you.
