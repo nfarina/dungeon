@@ -5,6 +5,10 @@
   "private": true,
   "scripts": {
     "sim": "bun run src/run.ts",
-    "map": "bun run src/tools/drawmap.ts"
+    "map": "bun run src/tools/mapserve.ts",
+    "drawmap": "bun run src/tools/drawmap.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.0"
   }
 }

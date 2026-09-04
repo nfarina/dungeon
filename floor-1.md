@@ -16,7 +16,8 @@ Keep everything from HeroQuest that isn't listed here (movement 2d6, combat dice
 | One-shot spells, wizard only | **Scrolls** (one use, anyone) and **Spellbooks** (permanent, cooldown, need Mind 4+). |
 | Search for treasure, once per room | Gone. Monsters drop loot when killed. Chests and racks are visible furniture with a fixed draw. |
 | Search for traps | Kept, but a found trap gets a **trap token** placed on the board. A Torch does this passively. |
-| Hero dies at 0 Body | Hero is **Downed**. See 1.4. |
+| Hero dies at 0 Body | Hero is **Downed** for one round, then dead for the floor. Dead heroes become **Viewers** and play the Fan deck. See 1.4 and section 8. |
+| No clock | A **floor cap**, and an **Emergency Floor Reset** when the boss door opens. See 1.7. |
 | Gold spent between quests | Gold spent at the **Stairwell Shop** between floors (Nick generates the shop with the next floor). |
 
 ### 1.1 Stats
@@ -56,9 +57,13 @@ Any card with **Cooldown N** gets a d6 set to N when used. At the start of your 
 
 Cooldown replaces "save it for the boss." A Spark you don't cast is a Spark you wasted.
 
-### 1.4 Downed
+### 1.4 Downed, then dead
 
-At 0 Health you're Downed: lie the figure down, you skip your turns, monsters ignore you. Any player who ends their move adjacent to you can spend their action to get you up with 1 Health. If nobody does by the end of the next full round, the announcer awards you a **Participation Trophy** and you respawn at the entrance with all your gear and 3 Health. The loot you were carrying is fine. Your dignity is not.
+At 0 Health you're **Downed**: lie the figure down. You skip your turns and monsters ignore you. Any player who ends their move adjacent to you can spend their action to get you up with 1 Health. A Bandage does it without spending the action. Patch Up does it from a square away.
+
+If you're still down at the end of the **next full round**, you're dead for the floor. The announcer awards a Participation Trophy, your figure comes off the board, and your cards stay in front of you. Nothing is lost, you just can't use it. Your body and everything you were carrying come down the stairs with the party, revived at a cost to be decided when Floor 2 is generated.
+
+Death is the thing to avoid at all costs. It is not the end of your evening: see section 8, Viewers. If all three heroes are dead, the floor collapses immediately. Nobody is left to watch.
 
 ### 1.5 Trading
 
@@ -69,6 +74,19 @@ On your turn, hand any card to an adjacent player. Free. Trading is how the righ
 1. Each hero: turn down cooldowns, then move and one action (attack, cast, search for traps, open chest, disarm, use rack) in either order.
 2. Announcer runs monsters using the rules in section 4.3, so the boys can predict them and the simulator can copy them.
 3. Loot rolls happen the moment a monster dies.
+4. End of round: turn the countdown die down one. At zero, the collapse deals its damage (1.7). Viewers draw.
+
+### 1.7 The clock
+
+Two timers, one die. Put a d12 where everyone can see it.
+
+- **Floor cap: 26 rounds.** Announced at the start and counted down out loud every round. It exists so the party can't clear every room at leisure. In most games it never actually binds. A threat, not a guillotine.
+- **Emergency Floor Reset: 5 rounds.** The moment the Manager's Office door opens, the countdown drops to 5, or stays put if it's already lower. The die visibly slamming from 12 to 5 is the drama beat. Announcer: "Attention, Crawlers. The Floor Manager has initiated an Emergency Floor Reset. This is a standard retention measure and is not a reflection on your performance. You have five rounds. Cheers!"
+- **The collapse is a ramp.** When the count hits zero the floor starts coming down. At the end of each round, every hero still on the floor takes 1, 1, 2, 2, then 3 damage. After the fifth round, nobody left up there is walking down the stairs.
+- **You can leave without killing Greg.** Any hero on the stairwell square at the end of a round has escaped. Escaping with the boss alive forfeits the Boss Box. Say this out loud before the fight, so the last three rounds are a decision and not arithmetic.
+- **What the collapse means.** Heroes who reached the stairs continue to Floor 2 as they are. Heroes who died, in the collapse or before it, are revived on Floor 2 at a cost decided when that floor is generated. Greg, if alive, remembers all of this.
+
+These numbers came from the simulator using an invented map and free respawns. They need a re-run against the real Side A layout with the one-round death window before they're trusted. Expect the fuse to move by a round or two.
 
 ---
 
@@ -78,7 +96,7 @@ Three cards, portrait of the real person, identical base stats. Each player pick
 
 | Starting Kit | Slot | Effect |
 |---|---|---|
-| **Phone (11% battery)** | Trinket | Once per floor, before opening a door, ask the announcer what's in the room. They have to tell you. |
+| **Phone (11% battery)** | Trinket | Twice per floor, before opening a door, ask the announcer what's in the room. They have to tell you. Tick the boxes. |
 | **Hockey Stick** | Main hand | Attack +1. The first time you roll zero skulls with it, it snaps: discard it. |
 | **Multitool** | Trinket | Disarm an adjacent revealed trap as your action. Two uses. Tick the boxes. |
 | **Snack Bag** | Backpack | Two Juice Boxes (heal 3 each, one use). |
@@ -98,21 +116,25 @@ Rooms are numbered so you can map them onto the Quest 1 layout yourself. I don't
 | 2 | **Break Room** | 1 Orc, 1 Goblin | Table: 1 Pockets draw | Pit trap in the doorway | yes |
 | 3 | **Storage** | 2 Skeletons | Locked chest: 1 Big Gear draw | none | no |
 | 4 | **Goblin Daycare** | 3 Goblins (fully armed adults who are just very short) | Tiny chairs | none | no |
-| 5 | **Armory** | 1 Orc, 1 Zombie | Weapon rack: 1 Gear draw | Spear trap on the square in front of the rack | yes |
+| 5 | **Armory** | 1 Orc, 1 Zombie | Weapon rack: 1 Gear draw plus **Spellbook: Spark** | Spear trap on the square in front of the rack | yes |
 | 6 | **The Cage** | 1 Abomination | Cage with a goose in it | none | no |
 | 7 | **Latrine** | 2 Zombies | The toilet | Falling block at the door | no |
 | 8 | **Library** | 1 Skeleton, 1 Goblin | Bookshelf: 1 Big Gear draw if reader has Mind 4+, else 1 Gear draw | none | no |
-| 9 | **Manager's Office** | The Floor Manager, 2 Orcs | Desk, stairwell down | none | yes (boss) |
+| 9 | **Manager's Office** | The Floor Manager, 2 Orcs | Desk, stairwell down | Pit trap between the door and the desk | yes (boss) |
 
-**Corridors:** one pit trap somewhere on the required path, and one secret door that shortcuts to Room 9. The secret door is found by searching or by walking past it with a Torch.
+**Corridors:** one pit trap somewhere on the required path (so five traps on the floor, counting the Office), and one secret door that shortcuts to Room 9. The secret door is found by searching or by walking past it with a Torch.
 
 **Room 3 chest:** open with the Skeleton Key, chop it with the Fire Axe, or pick it (roll Mind dice, any skull). A failed pick makes the chest scream, and one Goblin from the nearest uncleared room comes running.
+
+**Room 5 rack:** two draws. One is the top card of the Gear deck; the other is always Spellbook: Spark, pulled from the Big Gear deck during setup. Every party walks past a spellbook on the required path. Whether anyone can read it is their problem.
 
 **Room 6 cage:** open it as an action. The goose is a Companion card (section 7). It goes with whoever opened the cage. It does not like them.
 
 **Room 7 toilet:** any player may spend an action to reach into the toilet. One Pockets draw. Also an achievement (section 7). The announcer should be audibly disgusted.
 
 **Room 9 door:** locked. Open it with the Skeleton Key, the Fire Axe, or by knocking. If you knock, the two Orcs open it and each get a free attack on the knocker before the round starts. There is always a way in; it's just not always a good way.
+
+**Room 9 pit:** Greg had a pit installed in front of his desk last week for visitor management and hasn't told the Orcs. They don't know it's there until one of them finds out. Anything Shoved, Whistled, or otherwise persuaded across it goes in, and most things on this floor have 1 Health.
 
 **Monster count:** 7 Goblins, 4 Orcs, 3 Skeletons, 3 Zombies, 1 Abomination, 1 boss. Required path only: 9 monsters plus the boss. Substitute whatever cutouts the box actually has; only the stats matter.
 
@@ -125,9 +147,9 @@ Stats follow HeroQuest so the dice math stays known. Loot is rolled on a normal 
 | Monster | Att | Def | HP | Mind | Move | Loot roll (d6) | Card flavor |
 |---|---|---|---|---|---|---|---|
 | **Goblin** | 2 | 1 | 1 | 1 | 10 | 1-3 nothing, 4-6 Pockets | "Unpaid intern. Has pockets. Full of stuff that isn't his." |
-| **Orc** | 3 | 2 | 1 | 2 | 8 | 1-2 nothing, 3-5 Pockets, 6 Gear | "Middle management. Hits hard, dies to a table leg." |
-| **Skeleton** | 2 | 2 | 1 | 0 | 6 | 1-4 nothing, 5-6 Pockets | "No pockets. No brain. Immune to Sleep. Occasionally a coin falls out." |
-| **Zombie** | 2 | 3 | 1 | 0 | 5 | 1-3 nothing, 4-5 Pockets, 6 Gear | "Was somebody once. Still wearing their stuff. Immune to Sleep." |
+| **Orc** | 3 | 2 | 1 | 2 | 8 | 1-2 nothing, 3-4 Pockets, 5-6 Gear | "Middle management. Hits hard, dies to a table leg." |
+| **Skeleton** | 2 | 2 | 1 | 0 | 6 | 1-4 nothing, 5 Pockets, 6 Gear | "No pockets. No brain. Immune to Sleep. Occasionally a coin falls out." |
+| **Zombie** | 2 | 3 | 1 | 0 | 5 | 1-3 nothing, 4 Pockets, 5-6 Gear | "Was somebody once. Still wearing their stuff. Immune to Sleep." |
 | **Abomination** | 3 | 3 | 2 | 3 | 6 | 1-3 Gear, 4-6 Big Gear | "Big. Sad. Guards a goose for reasons it will not explain." |
 | **The Floor Manager** | 3 | 3 | 4 | 4 | 6 | Boss Box + Big Gear | See 4.2 |
 
@@ -138,16 +160,16 @@ Rough expected values, no gear, so you know where the dials are before the simul
 | Matchup | Result |
 |---|---|
 | Hero (2 dice) attacks Goblin | kills it about 67% of the time |
-| Hero (2 dice) attacks Orc | kills it about 55% of the time |
+| Hero (2 dice) attacks Orc | kills it about 59% of the time |
 | Goblin attacks Hero (2 defend) | about 0.56 damage per attack |
 | Orc attacks Hero (2 defend) | about 0.9 damage per attack |
-| Hero (2 dice) attacks the Floor Manager | about 0.5 net damage per attack |
+| Hero (2 dice) attacks the Floor Manager | about 0.67 net damage per attack |
 
-Three heroes at 6 Health each is 18 Health against roughly 25 monster attacks on the full floor, plus Juice Boxes. Heroes will get Downed once or twice. That's the intended amount of danger for a first floor. The boss takes the party about three rounds without gear, two with.
+Three heroes at 6 Health each is 18 Health against roughly 25 monster attacks on the full floor, plus Juice Boxes. Heroes will get Downed once or twice, and with a one-round rescue window most of those should become a scramble rather than a death. Greg goes down in about two rounds once the Orcs are dead, even without gear. He is a softer boss than he looks; Delegation and the clock are what make the fight. The first simulator run used free respawns and never lost a game, so none of this is confirmed for the death rule yet.
 
 ### 4.2 The Floor Manager
 
-Use the biggest cutout in the box. A gargoyle named Greg.
+Use the dragon. His name is Greg.
 
 - **Performance Review** (Cooldown 2): 2 attack dice at any hero in line of sight. Greg uses it on whichever hero is carrying the most equipment.
 - **Delegation:** while either Orc is alive, Greg defends with 4 dice instead of 3. Kill the staff first.
@@ -157,9 +179,10 @@ Use the biggest cutout in the box. A gargoyle named Greg.
 
 1. A monster moves toward the nearest hero it can reach, by shortest path.
 2. If it ends adjacent to more than one hero, it attacks the one with the fewest Defend dice. Ties: the one with the lowest Health.
-3. It never walks onto a revealed trap. It happily walks onto an unrevealed one (see Shove).
+3. It never walks onto a trap it knows about. It happily walks onto one it doesn't (see Shove, and Greg's pit). A trap counts as known to monsters once it's been revealed or triggered.
 4. Monsters don't leave their room unless the room's door is open and a hero is in line of sight, or something pulls them (Whistle, failed lockpick).
 5. The boss uses Performance Review whenever it's off cooldown, otherwise attacks in melee.
+6. Viewer cards (section 8) override any of the above for the round they're played.
 
 ---
 
@@ -169,7 +192,7 @@ HeroQuest's traps, with tokens.
 
 | Trap | Trigger | Effect | Disarm |
 |---|---|---|---|
-| **Pit** | Step on it | 1 damage, end movement. Costs an action to climb out. Rope: climb out free, or cross a revealed pit. | Multitool or Trap Kit. Or just walk around it once it's revealed. |
+| **Pit** | Step on it | 1 damage, end movement. Costs an action to climb out. Rope: climb out free, or cross a revealed pit. Monsters take the damage too, and most of them have 1 Health. | Multitool or Trap Kit. Or just walk around it once it's revealed. |
 | **Spear** | Step on it | Roll 1 combat die: skull = 2 damage, otherwise 1. | Multitool or Trap Kit. |
 | **Falling Block** | Open the door | 2 damage to the opener unless they roll a white shield on 1 die. Block then fills the doorway; enter from the other side or spend an action clearing it. | Only by triggering it. The Football Helmet eats the damage. |
 
@@ -220,7 +243,7 @@ Junk and consumables. What a goblin has on him.
 | **Scroll: Stone Skin** | | Defend +2 until the start of your next turn. One use. |
 | **Scroll: Smoke Bomb** | | No monster can attack anyone this round. One use. |
 
-### 6.3 Big Gear deck (8 cards)
+### 6.3 Big Gear deck (9 cards, 7 in the deck)
 
 | Card | Slot | Effect |
 |---|---|---|
@@ -232,6 +255,9 @@ Junk and consumables. What a goblin has on him.
 | **Spellbook: Spark** | Learned | Mind 4+. 2 attack dice at a monster in line of sight. Cooldown 2. |
 | **Spellbook: Shove** | Learned | Mind 4+. Push a monster in line of sight up to 3 squares directly away from you. Into a trap: it triggers. Into a wall or another monster: 1 damage. Cooldown 2. |
 | **Spellbook: Patch Up** | Learned | Mind 4+. Heal 2 to you or an adjacent player. Cooldown 3. |
+| **Sponsored Cape** | Trinket | Once per floor, when you would die, you're Downed with 1 Health instead. The logo is enormous. |
+
+Spark starts the floor in the Armory rack and the Fire Axe starts in the Trap Chef envelope, so seven cards are actually shuffled.
 
 **Learning a Spellbook** costs your action and needs Mind 4 or more at that moment. Once learned, it's yours: put it in front of you, it doesn't use a slot, and it stays with you across floors. A learned book can't be traded. Scrolls can.
 
@@ -250,11 +276,12 @@ Envelopes. Each has a printed label with the achievement name and its trigger on
 | **You Monster** | Bronze | Kill all three goblins in the Daycare | 2 gold and a card that just says "You did that. We all saw." Trinket, no effect. |
 | **Why Would You Do That** | Bronze | Reach into the toilet | 1 Energy Drink, 1 Gold (2). Sticky. |
 | **Nerd** | Gold | First player to learn a Spellbook | Scroll: Firebolt, Orc Monocle |
-| **Sharing Is Caring** | Silver | Give an item to another player | Lucky Rabbit's Foot |
-| **Trap Chef** | Gold | A monster dies from a trap | Spellbook: Shove (if already found, Fire Axe) |
-| **Cartographer** | Silver | Open every door on the floor | 5 gold |
+| **Sharing Is Caring** | Bronze | Give an item to another player | 2 gold. This fires on turn one of every game. It's a handout that teaches trading, so it's priced like one. |
+| **Trap Chef** | Gold | A monster dies from a trap | Fire Axe |
+| **Cartographer** | Silver | Open the doors to seven of the nine rooms | 5 gold |
 | **Sir Reginald** | Companion | Open the cage in Room 6 | The goose. See below. |
-| **Boss Box** | Platinum | Kill the Floor Manager | The Class Menu, plus Spellbook: Nope |
+| **Backseat Driver** | Bronze | A Viewer's card causes a monster's death | 3 gold for the Viewer, delivered on Floor 2 |
+| **Boss Box** | Platinum | Kill the Floor Manager | Spellbook: Nope, 5 gold, and the Save-the-Date |
 
 Box contents that duplicate a card already in a deck: pull that card out of the deck when you assemble the envelope, so there's exactly one in the world.
 
@@ -262,11 +289,48 @@ Box contents that duplicate a card already in a deck: pull that card out of the 
 
 **Spellbook: Nope** (Mind 4+, Cooldown 3): after a monster rolls an attack against anyone in your room, cancel it. The announcer sighs.
 
-**The Class Menu:** a printed card that says "Congratulations on surviving Floor 1. You may now select a Class at the stairwell. This offer is non-transferable and the company is not responsible for what you choose." Then the real class-picking conversation happens at the table, and Nick has a day or two to generate Floor 2. If you'd rather hold classes until after Floor 2 like the book, the Menu says "Floor 2" and this box holds 5 gold instead.
+**The Save-the-Date:** a printed card. "Congratulations on surviving Floor 1. Class selection is available at the bottom of Floor 2. This offer is non-transferable and the company is not responsible for what you choose." Classes get picked after Floor 2, like the book, so Floor 2 is still "you, but with stuff."
 
 ---
 
-## 8. Pacing budget
+## 8. Viewers and the Fan deck
+
+When a hero dies, that player becomes a **Viewer**. They're out as a hero and in as the audience, and the audience in this dungeon has opinions.
+
+**How it works**
+
+- On becoming a Viewer, shuffle the Fan deck and draw 2.
+- At the end of every round, draw 1. Hand limit 3; discard down.
+- During a round, play at most one card, at any moment, including in the middle of a monster's activation. Two Viewers each get one play.
+- Viewers can talk as much as they like. They cannot roll hero dice, and the living don't have to listen.
+- Cards are mostly silly and a little useful. Several can be used against the living. That's between the Viewer and the living.
+
+The power level is deliberately a fraction of a living hero. A Viewer should be having fun, not more fun than the people still in the dungeon.
+
+**Fan deck (14 cards)**
+
+| Card | Effect |
+|---|---|
+| **Banana Peel** | Place on any empty square. The first figure to enter it stops there and falls over. A monster loses its attack this round. A hero takes no damage but the announcer describes it in detail. |
+| **Boo!** | One monster must spend its movement moving away from the nearest hero. It can still attack if it ends adjacent to someone. |
+| **Applause** | One hero rerolls one die. Play after the roll. |
+| **Wardrobe Malfunction** | One monster's pants fall down. Defend -1 this round. |
+| **Lighting Cue** | Reveal every trap in one room or corridor. Place tokens. |
+| **Fog Machine** | No ranged attacks or spells this round, by anyone. Yes, including Performance Review. Yes, including Spark. |
+| **Hype Train** | Every hero gets Move +2 this round. |
+| **Heckle** | A monster about to attack instead attacks a different hero of your choice that it could reach. Usable for good or evil. |
+| **Slow Clap** | One monster skips its movement this round. It can still attack if already adjacent. |
+| **Loose Floorboard** | Move one trap token one square in any direction. Unrevealed traps count; ask the announcer where. |
+| **Poke** | 1 attack die at any monster on the board, from the sky. It defends normally. Nobody knows where it came from. |
+| **Fan Mail** | Name an achievement nobody has earned. If a living hero earns it this round, you open the envelope and read it aloud. No mechanical effect. Enormous emotional effect. |
+| **Sponsor Message** | The announcer must deliver a fifteen-second advertisement for a product of your choice. A hero of your choice heals 1 while everyone endures it. |
+| **Confetti** | Nothing happens. The announcer must say something sincerely nice about a hero of your choice. Best played at the worst possible moment. |
+
+Poke and Heckle are the two that can swing a fight. If a Viewer is enjoying the floor more than the living are, cut those two first.
+
+---
+
+## 9. Pacing budget
 
 | Segment | Minutes |
 |---|---|
@@ -276,11 +340,11 @@ Box contents that duplicate a card already in a deck: pull that card out of the 
 | Boss | 12 |
 | Boss Box, tally, cleanup | 5 |
 
-Sixty-two minutes if it goes to plan, which it won't. Cut for time by having the announcer "close" an optional room ("Floor maintenance has sealed the Latrine. You're welcome."). Never cut the boss.
+Sixty-two minutes if it goes to plan, which it won't. The floor cap does most of the cutting for you. If it isn't, the announcer can still "close" an optional room ("Floor maintenance has sealed the Latrine. You're welcome."). Never cut the boss.
 
 ---
 
-## 9. What has to be generated
+## 10. What has to be generated
 
 Counts for the card pipeline. Poker size, nine per letter sheet.
 
@@ -291,21 +355,26 @@ Counts for the card pipeline. Poker size, nine per letter sheet.
 | Monster cards (stats, loot table, one line of flavor) | 6 |
 | Pockets deck | 16 |
 | Gear deck | 14 |
-| Big Gear deck | 8 |
-| Loot Box exclusives (Nope, Companion, Class Menu, "You did that") | 4 |
-| Loot Box envelope labels | 10 |
-| Trap tokens (pit, spear, block, revealed-secret-door) | 8 |
+| Big Gear deck | 9 |
+| Loot Box exclusives (Nope, Companion, Save-the-Date, "You did that") | 4 |
+| Loot Box envelope labels | 11 |
+| Fan deck | 14 |
+| Trap tokens (pit, spear, block, revealed-secret-door) | 9 |
 | Room signs (optional, but the Daycare deserves one) | 9 |
-| Cooldown dice: any d6s. Gold: coins from the HeroQuest box or printed tokens. | |
+| Countdown die: a d12. Cooldown dice: any d6s. Gold: coins from the HeroQuest box or printed tokens. | |
 
-Card template types: Player, Monster, Item (slot, effect, flavor, art), Spell (cooldown box, tick boxes, Mind requirement), Consumable, Companion, Envelope label. Seven HTML templates, one data file.
+Card template types: Player, Monster, Item (slot, effect, flavor, art), Spell (cooldown box, tick boxes, Mind requirement), Consumable, Companion, Fan (the Item layout with its own color and back), Envelope label. Eight HTML templates, one data file.
 
 ---
 
-## 10. Decisions for Nick
+## 11. Decisions for Nick
 
-- **Which cutouts does the box actually have?** The roster above assumes goblin, orc, skeleton, zombie, something big, and something bigger. Rename to match.
-- **Class pick after Floor 1 or Floor 2?** The Boss Box is written for either.
-- **Is the Daycare too much?** It's the exact bit from the book, and it's the room the boys will talk about for a week. Your call on Vicki's reaction.
-- **Goose name.** Sir Reginald is a placeholder. The boys should name him, which also means they'll care when he's at 1 Health.
-- **Player portraits.** Real photos into a fantasy style, or drawn from a description? Real photos are funnier on the first floor, where the joke is that you're just you.
+Settled: the boss is the dragon, classes are picked after Floor 2, the Daycare stays, the goose is Sir Reginald until the boys rename him, and player portraits are real photos in a fantasy style.
+
+Still open:
+
+- **The real map.** Type Side A's Quest 1 into the simulator's map file and re-run. Every timer number above depends on corridor length.
+- **The death window.** One full round Downed before death is the main difficulty dial. If the re-run shows too many deaths, try two rounds before softening any monster.
+- **Fan deck power.** Aimed at "annoying and occasionally decisive." Poke and Heckle are the cards to cut if it overshoots.
+- **Floor 2 revival cost.** Decided at generation time. Candidates: lose your gold, lose one equipped item of Greg's choosing, start Floor 2 at half Health, or a sponsorship you didn't ask for.
+- **What the sim can't see.** Nobody in the simulator searches, uses the Whistle, or plays a Viewer card. Deck-draw counts from it are real; item-usage counts are lower bounds.

@@ -24,8 +24,8 @@ export type Config = {
   collapseGrace: number;
   /** How fast the ceiling escalates: gentle = 1,1,2,2,3 -- steep = 1,2,3,4,5. */
   collapseEscalation: "gentle" | "steep";
-  /** Where a Participation Trophy respawn puts you. */
-  respawnMode: "entrance" | "nearest-cleared" | "teammate";
+  /** Section 8: dead players become Viewers and play the Fan deck. */
+  fanDeck: boolean;
   /** Do the heroes know the count from turn 1? */
   timerKnown: boolean;
   /** Rounds of slack heroes leave themselves before bailing for the stairs. */
@@ -38,8 +38,6 @@ export type Config = {
   kits: string[];
   heroNames: string[];
   /** Rule variants we may want to test. */
-  respawnHp: number;
-  respawnAtEntrance: boolean;
   reviveHp: number;
   heroHp: number;
   heroAtk: number;
@@ -62,15 +60,13 @@ export const DEFAULT_CONFIG: Config = {
   collapseAfterDoor: 6,
   collapseGrace: 5,
   collapseEscalation: "gentle",
-  respawnMode: "entrance",
+  fanDeck: true,
   timerKnown: true,
   panicMargin: 1,
   optionalRooms: [4, 8],
   competence: 0.7,
   kits: ["Glasses", "HockeyStick", "SnackBag"],
   heroNames: ["Vicki", "Ethan", "Lucas"],
-  respawnHp: 3,
-  respawnAtEntrance: true,
   reviveHp: 1,
   heroHp: 6,
   heroAtk: 2,
@@ -91,7 +87,7 @@ export type Hero = {
   pack: Item[];
   learned: { item: Item; cd: number }[];
   gold: number;
-  downed: boolean; downedRound: number; exited: boolean;
+  downed: boolean; downedRound: number; exited: boolean; dead: boolean;
   inPit: boolean;
   trapImmuneUsed: boolean;
   rerollUsed: boolean;
@@ -107,7 +103,7 @@ export type Monster = {
 };
 
 export type Result = {
-  outcome: "win" | "escaped-no-boss" | "collapsed" | "stalled";
+  outcome: "win" | "escaped-no-boss" | "collapsed" | "stalled" | "wiped";
   rounds: number;
   bossKilled: boolean;
   bossKilledRound: number | null;
@@ -121,6 +117,8 @@ export type Result = {
   bossFightRounds: number | null;
   heroHpAtBossKill: number | null;
   goldFound: number;
+  /** Heroes who died for the floor (rule 1.4). */
+  heroesDead: number;
   learnedSpell: boolean;
   trapsTriggered: number;
   heroesLost: number;
@@ -166,7 +164,8 @@ export class Game {
   lastDownRound: number | null = null;
   urgent = false;
   stuck = 0;
-  stats = { downs: 0, respawns: 0, kills: 0, traps: 0, gold: 0 };
+  stats = { downs: 0, respawns: 0, deaths: 0, kills: 0, traps: 0, gold: 0 };
+  fanShield = 0; fanReroll = 0;
   minPartyHp = 99;
   heroHpAtBossKill: number | null = null;
   route: number[];
@@ -202,7 +201,7 @@ export class Game {
         name, pos: { ...spots[i] }, hp: this.cfg.heroHp, maxHp: this.cfg.heroHp,
         equip: { main: null, off: null, body: null, head: null, feet: null },
         trinkets: [null, null], pack: [], learned: [], gold: 0,
-        downed: false, downedRound: -99, exited: false, inPit: false,
+        downed: false, downedRound: -99, exited: false, dead: false, inPit: false,
         trapImmuneUsed: false, rerollUsed: false, energy: 0, stoneSkin: false,
         goose: 0, deaths: 0,
       };
@@ -228,13 +227,12 @@ export class Game {
     }
   }
 
-  roomCells(id: number): Pt[] {
-    const r = this.board.rooms.get(id)!;
-    const out: Pt[] = [];
-    for (let y = r.rect.y0; y <= r.rect.y1; y++)
-      for (let x = r.rect.x0; x <= r.rect.x1; x++) out.push({ x, y });
-    return out;
-  }
+  roomCells(id: number): Pt[] { return this.board.cellsOf(id); }
+
+  /** Heroes still on the floor and still breathing. */
+  living() { return this.heroes.filter(h => !h.dead && !h.exited); }
+  /** Living, standing, targetable. */
+  standing() { return this.heroes.filter(h => !h.dead && !h.exited && !h.downed); }
 
   // --- derived stats -------------------------------------------------------
 
@@ -312,7 +310,7 @@ export class Game {
   award(name: string, contents: Item[]) {
     if (this.achievements.has(name)) return;
     this.achievements.add(name);
-    const h = this.heroes.filter(x => !x.exited)[0] ?? this.heroes[0];
+    const h = this.living()[0] ?? this.heroes[0];
     for (const c of contents) this.give(h, clone(c));
   }
 
@@ -324,7 +322,7 @@ export class Game {
       openDoors: this.openDoors, foundSecrets: this.foundSecrets,
       canOpenDoors: true, canUnlock,
       occupied: (x, y) => this.monsters.some(m => m.alive && m.pos.x === x && m.pos.y === y)
-        || (!ignoreHeroes && this.heroes.some(o => o !== h && !o.exited && !o.downed && o.pos.x === x && o.pos.y === y)),
+        || (!ignoreHeroes && this.standing().some(o => o !== h && o.pos.x === x && o.pos.y === y)),
       avoid: (x, y) => this.revealedTraps.has(`${x},${y}`) && !this.spentTraps.has(`${x},${y}`),
     };
   }
@@ -333,7 +331,7 @@ export class Game {
       openDoors: this.openDoors, foundSecrets: this.foundSecrets,
       canOpenDoors: false, canUnlock: false,
       occupied: (x, y) => this.monsters.some(o => o.alive && o !== m && o.pos.x === x && o.pos.y === y)
-        || this.heroes.some(h => !h.exited && !h.downed && h.pos.x === x && h.pos.y === y),
+        || this.standing().some(h => h.pos.x === x && h.pos.y === y),
       // rule 3: never walks onto a revealed trap
       avoid: undefined,
     };
@@ -345,14 +343,18 @@ export class Game {
     while (this.round < this.cfg.maxRounds) {
       this.round++;
       this.goalFieldCache.clear();
+      this.fanShield = 0; this.fanReroll = 0;
       this.tradePhase();
+      this.fanDeckPhase();
       for (const h of this.heroes) this.heroTurn(h);
       this.monsterPhase();
       this.endOfRound();
-      const alive = this.heroes.filter(h => !h.exited);
+      const alive = this.living();
       this.minPartyHp = Math.min(this.minPartyHp,
         alive.length ? alive.reduce((a, h) => a + Math.max(0, h.hp), 0) : this.minPartyHp);
-      if (this.heroes.every(h => h.exited)) return this.result("done");
+      // "If all three heroes are dead, the floor collapses immediately."
+      if (this.heroes.every(h => h.dead)) return this.result("wiped");
+      if (this.heroes.every(h => h.exited || h.dead)) return this.result("done");
 
       const begins = this.collapseBegins();
       if (begins !== null && this.round >= begins) {
@@ -366,17 +368,18 @@ export class Game {
       }
       const dl = this.hardDeadline();
       if (dl !== null && this.round >= dl) {
-        this.heroesLost = this.heroes.filter(h => !h.exited).length;
+        this.heroesLost = this.living().length;
         return this.result("collapsed");
       }
     }
     return this.result("stalled");
   }
 
-  private result(kind: "done" | "collapsed" | "stalled"): Result {
+  private result(kind: "done" | "collapsed" | "stalled" | "wiped"): Result {
     const boss = this.bossKilledRound !== null;
     const outcome: Result["outcome"] =
-      kind === "collapsed" ? "collapsed" : kind === "stalled" ? "stalled" : boss ? "win" : "escaped-no-boss";
+      kind === "wiped" ? "wiped" : kind === "collapsed" ? "collapsed"
+      : kind === "stalled" ? "stalled" : boss ? "win" : "escaped-no-boss";
     const exitRound = kind === "done" ? this.round : null;
     return {
       outcome, rounds: this.round, bossKilled: boss, bossKilledRound: this.bossKilledRound,
@@ -399,6 +402,7 @@ export class Game {
         ? this.bossKilledRound - this.bossEngagedRound + 1 : null,
       heroHpAtBossKill: this.heroHpAtBossKill,
       goldFound: this.stats.gold,
+      heroesDead: this.heroes.filter(h => h.dead).length,
       learnedSpell: this.heroes.some(h => h.learned.length > 0),
       trapsTriggered: this.stats.traps,
     };
@@ -415,12 +419,11 @@ export class Game {
   private endOfRound() {
     this.checkAchievements();
     for (const h of this.heroes) {
-      if (h.downed && this.round - h.downedRound >= 1) {
-        // Participation Trophy: respawn at the entrance.
-        h.downed = false; h.hp = this.cfg.respawnHp; h.deaths++;
-        this.stats.respawns++;
-        h.pos = this.respawnSpot(h);
-        h.inPit = false;
+      // Rule 1.4: still down at the end of the next full round and you are dead
+      // for the floor. The figure comes off the board; your cards stay in front
+      // of you, unusable, and your body rides the stairs down with the party.
+      if (h.downed && !h.dead && this.round - h.downedRound >= 1) {
+        h.downed = false; h.dead = true; h.deaths++; this.stats.deaths++;
       }
     }
   }
@@ -431,10 +434,10 @@ export class Game {
    * Modelled as: it gets there if the two are in the same room or within 4 squares.
    */
   private tradePhase() {
-    const readers = this.heroes.filter(h => !h.exited && !h.downed && this.mind(h) >= 4);
+    const readers = this.standing().filter(h => this.mind(h) >= 4);
     if (!readers.length) return;
     for (const h of this.heroes) {
-      if (h.exited) continue;
+      if (h.exited || h.dead) continue;
       const books = h.pack.filter(i => i.slot === "learned");
       for (const b of books) {
         const to = readers.find(r => r !== h &&
@@ -447,37 +450,32 @@ export class Game {
     }
   }
 
-  private respawnSpot(h: Hero): Pt {
-    if (this.cfg.respawnMode === "entrance") return { ...FLOOR1.entrance };
-    if (this.cfg.respawnMode === "teammate") {
-      const mate = this.heroes.find(o => o !== h && !o.exited && !o.downed);
-      if (mate) {
-        for (const d of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
-          const p = { x: mate.pos.x + d[0], y: mate.pos.y + d[1] };
-          if (this.board.isFloor(p.x, p.y) && !this.monsters.some(m => m.alive && same(m.pos, p))
-            && !this.heroes.some(o => !o.exited && !o.downed && same(o.pos, p))) return p;
-        }
+  /**
+   * Section 8. A Viewer draws from the Fan deck and plays at most one card a
+   * round. Rather than model all fourteen, this abstracts the deck to its
+   * mechanical share: roughly half the cards do nothing a simulator can see
+   * (Confetti, Fan Mail, Sponsor Message's advert), and the rest either take an
+   * attack off the table (Banana Peel, Slow Clap, Boo!, Heckle, Fog Machine),
+   * hand a hero a reroll (Applause, Wardrobe Malfunction, Poke) or heal 1.
+   */
+  private fanDeckPhase() {
+    if (!this.cfg.fanDeck) return;
+    for (let v = this.heroes.filter(h => h.dead).length; v > 0; v--) {
+      if (this.rng.next() > 0.5) continue;          // a flavour card, or a held hand
+      const r = this.rng.next();
+      if (r < 0.45) this.fanShield++;
+      else if (r < 0.8) this.fanReroll++;
+      else {
+        const hurt = this.standing().sort((a, b) => a.hp - b.hp)[0];
+        if (hurt) hurt.hp = Math.min(hurt.maxHp, hurt.hp + 1);
       }
-      return { ...FLOOR1.entrance };
     }
-    // nearest-cleared: the doorway of the nearest room the party has already emptied
-    let best: Pt = { ...FLOOR1.entrance }, bd = Infinity;
-    const lead = this.heroes.find(o => o !== h && !o.exited && !o.downed);
-    if (!lead) return best;
-    for (const id of [...this.board.rooms.keys()]) {
-      if (id === 9 || !this.roomDone(id)) continue;
-      const r = this.board.rooms.get(id)!;
-      const c = { x: (r.rect.x0 + r.rect.x1) >> 1, y: (r.rect.y0 + r.rect.y1) >> 1 };
-      const d = dist1(c, lead.pos);
-      if (d < bd && this.board.isFloor(c.x, c.y)) { bd = d; best = c; }
-    }
-    return best;
   }
 
   // --- hero turn -----------------------------------------------------------
 
   private heroTurn(h: Hero) {
-    if (h.exited) return;
+    if (h.exited || h.dead) return;
     for (const l of h.learned) if (l.cd > 0) l.cd--;
     h.stoneSkin = false;
     if (h.downed) return;
@@ -497,11 +495,14 @@ export class Game {
     this.urgent = (this.cfg.timerKnown && dl !== null && timeLeft <= budget + 4)
       || this.collapseFrom !== null;
     // desperate: no chance of killing Greg in time -- run past him for the stairs.
+    const lastOneStanding = this.standing().length <= 1 && this.bossKilledRound === null
+      && this.monsters.some(m => m.alive && m.room === 9);
     const fleeing = (this.cfg.timerKnown && dl !== null && timeLeft <= budget - 2)
-      || (this.collapseFrom !== null && this.bossKilledRound === null && timeLeft <= 2);
+      || (this.collapseFrom !== null && this.bossKilledRound === null && timeLeft <= 2)
+      || lastOneStanding;
 
     // Reviving a downed friend beats almost everything.
-    const down = this.heroes.find(o => o.downed && !o.exited);
+    const down = this.heroes.find(o => o.downed && !o.exited && !o.dead);
     if (down && !fleeing) {
       if (adjacent(h.pos, down.pos)) { this.revive(h, down); return; }
       const f = this.walkField(h);
@@ -590,7 +591,7 @@ export class Game {
   /** The party moves as a group toward the nearest room it still owes a visit. */
   private currentRoom(): number {
     if (this.roomTargetCache?.round === this.round) return this.roomTargetCache.id;
-    const lead = this.heroes.find(h => !h.exited && !h.downed) ?? this.heroes[0];
+    const lead = this.standing()[0] ?? this.living()[0] ?? this.heroes[0];
     const f = field(this.board, lead.pos, { ...this.heroPolicy(lead), occupied: () => false, avoid: undefined });
     const required = [1, 2, 5];
     const open = this.route.filter(id =>
@@ -598,8 +599,7 @@ export class Game {
       (!this.roomDone(id) || (!this.urgent && this.board.rooms.get(id)!.interact && !this.usedInteract.has(id))));
     let best = 9, bd = Infinity;
     for (const id of open) {
-      const r = this.board.rooms.get(id)!;
-      const c = { x: (r.rect.x0 + r.rect.x1) >> 1, y: (r.rect.y0 + r.rect.y1) >> 1 };
+      const c = this.board.center(id);
       const d = f.dist[this.board.idx(c.x, c.y)];
       if (d < bd) { bd = d; best = id; }
     }
@@ -675,7 +675,7 @@ export class Game {
     if (target) return target.pos;
     const room = this.currentRoom();
     const rd = this.board.rooms.get(room)!;
-    if (!this.roomDone(room)) return { x: (rd.rect.x0 + rd.rect.x1) >> 1, y: (rd.rect.y0 + rd.rect.y1) >> 1 };
+    if (!this.roomDone(room)) return this.board.center(room);
     if (rd.interact && !this.usedInteract.has(room) && !this.urgent) return rd.interact.at;
     return this.stairsCell();
   }
@@ -709,7 +709,7 @@ export class Game {
     for (let y = 0; y < this.board.h; y++) for (let x = 0; x < this.board.w; x++) {
       const i = this.board.idx(x, y);
       if (f.dist[i] > budget) continue;
-      if (this.heroes.some(o => o !== h && !o.exited && !o.downed && o.pos.x === x && o.pos.y === y)) continue;
+      if (this.standing().some(o => o !== h && o.pos.x === x && o.pos.y === y)) continue;
       const g = gf.dist[i];
       if (g >= 0x3fffffff) continue;
       const s = g * 100 + f.dist[i];    // closest to goal, then fewest steps
@@ -867,6 +867,10 @@ export class Game {
       h.rerollUsed = true;
       skulls = rollSkulls(this.rng, dice);
     }
+    if (skulls === 0 && this.fanReroll > 0) {      // Applause, from the cheap seats
+      this.fanReroll--;
+      skulls = rollSkulls(this.rng, dice);
+    }
     let defDice = m.def.def;
     if (m.def.boss && this.monsters.some(o => o.alive && o.room === 9 && !o.def.boss)) defDice += 1; // Delegation
     const shields = rollShields(this.rng, defDice, true);
@@ -962,11 +966,11 @@ export class Game {
       if (!m.active) {
         const doorOpen = this.board.doors.some((d, i) =>
           (this.board.roomIdAt(d.a) === m.room || this.board.roomIdAt(d.b) === m.room) && !!this.openDoors[i]);
-        const seen = this.heroes.some(h => !h.exited && !h.downed && los(this.board, m.pos, h.pos, this.openDoors));
+        const seen = this.standing().some(h => los(this.board, m.pos, h.pos, this.openDoors));
         if (doorOpen && seen) m.active = true;
         else continue;
       }
-      const targets = this.heroes.filter(h => !h.exited && !h.downed);
+      const targets = this.standing();
       if (!targets.length) continue;
 
       if (m.def.boss && m.cd === 0) {
@@ -1058,9 +1062,11 @@ export class Game {
   }
 
   private monsterAttack(m: Monster, h: Hero, diceOverride?: number) {
+    // A Viewer takes one attack off the table (Banana Peel, Slow Clap, Boo!).
+    if (this.fanShield > 0) { this.fanShield--; return; }
     // Goose: soaks a hit on a skull.
     if (h.goose > 0 && rollSkulls(this.rng, 1) > 0) { h.goose--; return; }
-    const nope = this.heroes.flatMap(x => x.learned).find(l => l.item.spell?.id === "nope" && l.cd === 0);
+    const nope = this.living().flatMap(x => x.learned).find(l => l.item.spell?.id === "nope" && l.cd === 0);
     if (nope && h.hp <= 2) { nope.cd = 3; return; }
     const skulls = rollSkulls(this.rng, diceOverride ?? m.def.atk);
     const shields = rollShields(this.rng, this.def(h), false);

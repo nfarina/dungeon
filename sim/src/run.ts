@@ -11,7 +11,7 @@ export type Batch = {
   finishRounds: number[];          // rounds taken by runs that finished (boss dead + out)
   p: (q: number) => number;
   mean: number;
-  meanDowns: number; meanRespawns: number;
+  meanDowns: number; meanRespawns: number; meanDead: number; wipeRate: number; anyDeadRate: number;
   meanBossRounds: number; meanHpAtBoss: number;
   closeRate: number;               // finished with <= 2 rounds to spare
   cakewalkRate: number;            // finished with >= 6 rounds to spare
@@ -67,6 +67,9 @@ export function batch(n: number, base: Partial<Config> = {}, seed = 42): Batch {
     p, mean: avg(rounds),
     meanDowns: avg(rs.map(r => r.downs)),
     meanRespawns: avg(rs.map(r => r.respawns)),
+    meanDead: avg(rs.map(r => r.heroesDead)),
+    wipeRate: rs.filter(r => r.outcome === "wiped").length / n,
+    anyDeadRate: rs.filter(r => r.heroesDead > 0).length / n,
     meanBossRounds: avg(rs.map(r => r.bossFightRounds).filter(x => x !== null) as number[]),
     meanHpAtBoss: avg(rs.map(r => r.heroHpAtBossKill).filter(x => x !== null) as number[]),
     closeRate: margins.length ? margins.filter(m => m <= 2).length / rs.length : 0,
@@ -110,10 +113,11 @@ const N = Number(process.argv[3] ?? 4000);
 if (cmd === "baseline") {
   console.log(`\n=== NO TIMER — how long does the floor actually take? (${N} runs) ===\n`);
   const b = batch(N, { collapseRound: null });
-  console.log(`boss killed        ${pct(b.bossKillRate)}   (never fails: heroes respawn forever)`);
+  console.log(`boss killed        ${pct(b.bossKillRate)}`);
+  console.log(`party wiped        ${pct(b.wipeRate)}   (all three dead — rule 1.4)`);
   console.log(`stalled >80 rounds ${pct(b.stallRate)}`);
   console.log(`rounds to clear    mean ${f1(b.mean)}  p10 ${b.p(0.10)}  p25 ${b.p(0.25)}  median ${b.p(0.5)}  p75 ${b.p(0.75)}  p90 ${b.p(0.90)}  p95 ${b.p(0.95)}`);
-  console.log(`downs per game     ${f1(b.meanDowns)}   respawns ${f1(b.meanRespawns)}`);
+  console.log(`downs per game     ${f1(b.meanDowns)}   deaths ${f1(b.meanDead)}   at least one death ${pct(b.anyDeadRate)}`);
   console.log(`boss fight length  ${f1(b.meanBossRounds)} rounds   party HP left at kill ${f1(b.meanHpAtBoss)} / 18`);
   console.log(`traps eaten        ${f1(b.meanTraps)}   somebody learned a spell in ${pct(b.learnRate)}`);
   console.log(`\nrounds-to-finish distribution:`);
@@ -145,9 +149,9 @@ const row = (label: string, b: Batch) =>
 const HEAD = `${"variant".padEnd(34)}    win  escape collapse |   nail  cakewalk |    HP  downs  lost\n${"-".repeat(34)}------------------------------|------------------|--------------------`;
 
 const row2 = (label: string, b: Batch) =>
-  `${label.padEnd(26)} ${pct(b.winRate).padStart(6)} ${pct(b.collapseRate).padStart(8)} ${pct(b.partialRate).padStart(8)} |` +
-  ` ${pct(b.feltItRate).padStart(7)} ${pct(b.calmRate).padStart(6)} | ${f1(b.meanMinHp).padStart(5)} ${f1(b.meanFinalHp).padStart(5)} ${f1(b.meanDowns).padStart(5)}`;
-const HEAD2 = `${"variant".padEnd(26)}    win collapse  partial |  feltit   calm | lowHP  endHP downs\n${"-".repeat(26)}----------------------------|----------------|-------------------`;
+  `${label.padEnd(26)} ${pct(b.winRate).padStart(6)} ${pct(b.collapseRate).padStart(8)} ${pct(b.wipeRate).padStart(6)} |` +
+  ` ${pct(b.feltItRate).padStart(7)} ${pct(b.calmRate).padStart(6)} | ${f1(b.meanDead).padStart(5)} ${pct(b.anyDeadRate).padStart(7)} ${f1(b.meanDowns).padStart(5)}`;
+const HEAD2 = `${"variant".padEnd(26)}    win collapse  wiped |  feltit   calm |  dead  ≥1dead downs\n${"-".repeat(26)}--------------------------|----------------|--------------------`;
 
 if (cmd === "variants") {
   console.log(`\n=== RULE VARIANTS (${N} runs each) ===\n`);
@@ -164,8 +168,7 @@ if (cmd === "variants") {
     ["boss-door fuse: 7 rounds", { collapseStart: "bossdoor", collapseAfterDoor: 7, collapseRound: 99 }],
     ["boss-door fuse: 9 rounds", { collapseStart: "bossdoor", collapseAfterDoor: 9, collapseRound: 99 }],
     ["boss-door fuse 7, soft (+4)", { collapseStart: "bossdoor", collapseAfterDoor: 7, collapseMode: "soft", collapseGrace: 4, collapseRound: 99 }],
-    ["respawn at teammate, hard @22", { collapseRound: 22, respawnMode: "teammate" }],
-    ["respawn nearest cleared, @22", { collapseRound: 22, respawnMode: "nearest-cleared" }],
+    ["no Fan deck (viewers idle)", { collapseRound: 22, fanDeck: false }],
   ];
   for (const [label, cfg] of V) console.log(row(label, batch(N, cfg)));
   console.log(`\nnail = won but it was in doubt (<=2 rounds spare, or out during the collapse,`);
@@ -213,7 +216,7 @@ if (cmd === "final") {
     ["C. cap 26 + door fuse 7", { collapseStart: "both", collapseRound: 26, collapseAfterDoor: 7 }],
     ["D. C + soft collapse (+4)", { collapseStart: "both", collapseRound: 26, collapseAfterDoor: 7, collapseMode: "soft", collapseGrace: 4 }],
     ["E. D + Greg 6 HP", { collapseStart: "both", collapseRound: 26, collapseAfterDoor: 7, collapseMode: "soft", collapseGrace: 4, bossHp: 6 }],
-    ["F. E + respawn at teammate", { collapseStart: "both", collapseRound: 26, collapseAfterDoor: 7, collapseMode: "soft", collapseGrace: 4, bossHp: 6, respawnMode: "teammate" }],
+    ["F. E + no Fan deck", { collapseStart: "both", collapseRound: 26, collapseAfterDoor: 7, collapseMode: "soft", collapseGrace: 4, bossHp: 6 }],
   ];
   for (const [label, cfg] of V) console.log(row(label, batch(N, cfg)));
 }
@@ -271,7 +274,7 @@ if (cmd === "softfuse") {
 export const RECOMMENDED: Partial<Config> = {
   lootRich: true, richRack: true, guaranteedSpellbook: true,
   collapseStart: "both", collapseRound: 26, collapseAfterDoor: 5,
-  collapseMode: "soft", collapseGrace: 5, collapseEscalation: "gentle",
+  collapseMode: "soft", collapseGrace: 4, collapseEscalation: "gentle",
   bossHp: 4,
 };
 
@@ -281,10 +284,12 @@ if (cmd === "report") {
   console.log(`\n=== ${process.argv[4] === "aswritten" ? "AS WRITTEN" : "RECOMMENDED RULESET"} — ${N} runs ===\n`);
   console.log(`outcome    win (Greg dead, everyone out)  ${pct(b.winRate)}`);
   console.log(`           escaped without killing Greg   ${pct(b.escapeRate)}`);
-  console.log(`           floor came down on somebody    ${pct(b.collapseRate)}  (of which ${pct(b.partialRate / Math.max(b.collapseRate, 1e-9))} had at least one hero make it out)`);
+  console.log(`           floor came down on somebody    ${pct(b.collapseRate)}`);
+  console.log(`           all three dead before that     ${pct(b.wipeRate)}`);
   console.log(`\ndrama      got out under the collapse     ${pct(b.feltItRate)}`);
   console.log(`           never felt the timer at all    ${pct(b.calmRate)}`);
   console.log(`           knockdowns per game            ${f1(b.meanDowns)}`);
+  console.log(`           deaths per game                ${f1(b.meanDead)}  (a death in ${pct(b.anyDeadRate)} of games)`);
   console.log(`           lowest party HP (of 18)        ${f1(b.meanMinHp)}`);
   console.log(`           party HP at the stairs         ${f1(b.meanFinalHp)}`);
   console.log(`\nOffice opened on turn ${f1(b.meanDoorRound)} on average.`);

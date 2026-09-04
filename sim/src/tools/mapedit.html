@@ -1,0 +1,975 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Floor Map Editor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#eceee7; --surface:#fbfbf8; --sunk:#e3e6dc; --ink:#171a16; --ink-2:#3d443a;
+  --muted:#6c7268; --line:#d3d7ca; --line-2:#bcc1b1; --amber:#a8710d; --amber-soft:#f0e2c2;
+  --danger:#b4442a; --ok:#0f7f5e;
+  --stone:#c3c7ba; --corridor:#f3f4ee; --wall:#2a2f27;
+}
+@media (prefers-color-scheme:dark){:root{
+  --paper:#14160f; --surface:#1c1f18; --sunk:#232720; --ink:#e9ebe1; --ink-2:#c3c8b9;
+  --muted:#949a8b; --line:#333829; --line-2:#454b3a; --amber:#dda63f; --amber-soft:#3a3117;
+  --danger:#d4694a; --ok:#2fa07d;
+  --stone:#272b22; --corridor:#2e332a; --wall:#8d9683;
+}}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:var(--paper); color:var(--ink); overflow:hidden;
+  font:14px/1.45 "IBM Plex Mono",ui-monospace,Menlo,monospace;
+  -webkit-text-size-adjust:100%; -webkit-tap-highlight-color:transparent;
+}
+h1,h2,h3,.disp{font-family:"Barlow Condensed","Arial Narrow",sans-serif; margin:0}
+button,select,input,textarea{font:inherit; color:inherit}
+button{
+  background:var(--surface); border:1px solid var(--line-2); border-radius:4px;
+  padding:6px 10px; cursor:pointer; touch-action:manipulation;
+}
+button:hover{background:var(--sunk)}
+button.on{background:var(--amber); border-color:var(--amber); color:#fff}
+@media (prefers-color-scheme:dark){button.on{color:#14160f}}
+button:disabled{opacity:.4; cursor:default}
+button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--amber); outline-offset:2px}
+
+#app{display:grid; grid-template-rows:auto 1fr; height:100%}
+
+header{
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  padding:8px 12px; border-bottom:1px solid var(--line-2); background:var(--surface);
+}
+header h1{font-size:19px; font-weight:700; letter-spacing:.02em; text-transform:uppercase; white-space:nowrap}
+header .sp{flex:1}
+#status{font-size:11.5px; color:var(--muted); white-space:nowrap}
+#status.good{color:var(--ok)} #status.bad{color:var(--danger)}
+.seg{display:flex; border:1px solid var(--line-2); border-radius:4px; overflow:hidden}
+.seg button{border:0; border-radius:0; border-right:1px solid var(--line-2)}
+.seg button:last-child{border-right:0}
+
+.body{display:grid; grid-template-columns:186px 1fr 268px; min-height:0}
+aside{background:var(--surface); overflow-y:auto; -webkit-overflow-scrolling:touch}
+aside.left{border-right:1px solid var(--line-2)}
+aside.right{border-left:1px solid var(--line-2)}
+.pane{padding:10px 12px; border-bottom:1px solid var(--line)}
+.pane h2{
+  font-size:11px; font-weight:600; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--muted); margin-bottom:8px;
+}
+
+/* layers */
+.layer{
+  display:flex; align-items:center; gap:6px; padding:5px 6px; border-radius:4px;
+  cursor:pointer; user-select:none;
+}
+.layer:hover{background:var(--sunk)}
+.layer.sel{background:var(--amber-soft); box-shadow:inset 2px 0 0 var(--amber)}
+.layer .nm{flex:1; font-size:12.5px}
+.layer.locked .nm{color:var(--muted)}
+.tg{
+  width:24px; height:24px; padding:0; display:grid; place-items:center;
+  background:transparent; border:0; font-size:13px; opacity:.35; border-radius:3px;
+}
+.tg.on{opacity:1}
+.tg:hover{background:var(--line)}
+
+/* tools */
+.tools{display:flex; flex-wrap:wrap; gap:5px}
+.tools button{padding:5px 9px; font-size:12px}
+.swatch{width:11px; height:11px; border-radius:2px; border:1px solid var(--wall); display:inline-block; margin-right:6px; vertical-align:-1px}
+.hint{font-size:11.5px; color:var(--muted); line-height:1.45; margin-top:8px}
+
+/* map */
+main{position:relative; min-width:0; min-height:0; overflow:auto; padding:14px; display:grid; place-items:start center}
+svg{display:block; touch-action:none; max-width:100%; user-select:none}
+.gridline{stroke:var(--line-2); stroke-width:.5; opacity:.5}
+.wall{stroke:var(--wall); stroke-width:2.4; stroke-linecap:square}
+.rlabel{font-family:"Barlow Condensed",sans-serif; font-weight:600; fill:var(--ink); paint-order:stroke; stroke:var(--corridor); stroke-width:3px}
+.rid{font-family:"IBM Plex Mono",monospace; fill:var(--muted)}
+.glyph{font-size:15px; text-anchor:middle; dominant-baseline:central; pointer-events:none}
+.selring{fill:none; stroke:var(--amber); stroke-width:2.5; pointer-events:none}
+
+/* inspector */
+.field{margin-bottom:9px}
+.field label{display:block; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:3px}
+.field input,.field textarea,.field select{
+  width:100%; padding:5px 7px; background:var(--paper); border:1px solid var(--line-2);
+  border-radius:3px; font-size:12.5px;
+}
+.field textarea{resize:vertical; min-height:44px}
+.row{display:flex; gap:6px; align-items:center}
+.chk{display:flex; align-items:center; gap:7px; font-size:12.5px; cursor:pointer; padding:3px 0}
+.issues{list-style:none; margin:0; padding:0; font-size:11.5px; line-height:1.5}
+.issues li{padding:4px 0 4px 16px; position:relative; color:var(--ink-2)}
+.issues li::before{content:"▲"; position:absolute; left:0; color:var(--danger); font-size:9px; top:6px}
+.issues li.ok::before{content:"✓"; color:var(--ok)}
+.mono-sm{font-size:11px; color:var(--muted); word-break:break-all}
+
+/* DM turn tracker */
+.clock{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+.die{
+  width:58px; height:58px; border:2px solid var(--ink); border-radius:8px; display:grid; place-items:center;
+  font-family:"Barlow Condensed",sans-serif; font-size:32px; font-weight:700; background:var(--surface);
+}
+.die.warn{border-color:var(--amber); color:var(--amber)}
+.die.fire{border-color:var(--danger); color:var(--danger); background:var(--amber-soft)}
+.roster{list-style:none; margin:0; padding:0}
+.roster li{
+  display:flex; gap:8px; align-items:baseline; padding:6px 7px; border-radius:4px; cursor:pointer; font-size:12.5px;
+}
+.roster li:hover{background:var(--sunk)}
+.roster li.done{opacity:.45; text-decoration:line-through}
+.roster li.req{box-shadow:inset 2px 0 0 var(--amber)}
+.roster .n{color:var(--muted); width:14px; flex:none}
+.roster .m{margin-left:auto; color:var(--muted); font-size:11px; white-space:nowrap}
+
+dialog{
+  border:1px solid var(--line-2); border-radius:6px; background:var(--surface); color:var(--ink);
+  max-width:min(680px,92vw); width:100%; padding:0;
+}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog .pane:last-child{border-bottom:0}
+dialog textarea{width:100%; min-height:260px; font-size:11.5px; background:var(--paper); border:1px solid var(--line-2); border-radius:3px; padding:8px}
+
+@media (max-width:900px){
+  .body{grid-template-columns:1fr; grid-template-rows:auto auto 1fr}
+  aside{max-height:38vh}
+  aside.left{border-right:0; border-bottom:1px solid var(--line-2)}
+  aside.right{border-left:0; border-top:1px solid var(--line-2); order:3}
+  main{order:2}
+  .pane{padding:8px 12px}
+  #layerPane{display:flex; gap:4px; overflow-x:auto}
+  #layerPane .layer{flex:none}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>Floor Map</h1>
+    <select id="mapSel" title="Which floor"></select>
+    <div class="seg">
+      <button id="mEdit" class="on">Edit</button>
+      <button id="mDM">DM</button>
+    </div>
+    <span class="sp"></span>
+    <span id="status">&nbsp;</span>
+    <button id="undo" title="Undo (⌘Z)">Undo</button>
+    <button id="jsonBtn">JSON</button>
+    <button id="save">Save</button>
+  </header>
+
+  <div class="body">
+    <aside class="left">
+      <div class="pane">
+        <h2>Layers</h2>
+        <div id="layerPane"></div>
+      </div>
+      <div class="pane" id="presetPane">
+        <h2>Show</h2>
+        <div class="tools">
+          <button data-preset="dm">DM</button>
+          <button data-preset="players">Players</button>
+          <button data-preset="board">Board only</button>
+        </div>
+        <p class="hint">“Players” hides traps, monsters and secret doors — turn the iPad round.</p>
+      </div>
+    </aside>
+
+    <main><svg id="map"></svg></main>
+
+    <aside class="right">
+      <div class="pane" id="toolPane"></div>
+      <div class="pane" id="selPane"></div>
+      <div class="pane" id="clockPane" hidden></div>
+      <div class="pane" id="rosterPane"></div>
+      <div class="pane" id="issuePane"></div>
+    </aside>
+  </div>
+</div>
+
+<dialog id="jsonDlg">
+  <div class="pane"><h2>Map JSON</h2>
+    <p class="hint">Paste a map here to replace the current one, or copy this to move it between the iPad and your laptop.</p>
+    <textarea id="jsonTxt" spellcheck="false"></textarea>
+  </div>
+  <div class="pane row">
+    <button id="jsonCopy">Copy</button>
+    <button id="jsonApply">Load pasted</button>
+    <span class="sp" style="flex:1"></span>
+    <button id="jsonClose">Close</button>
+  </div>
+</dialog>
+
+<script id="baked-map" type="application/json">null</script>
+<script>
+"use strict";
+const ROOM_CHARS = "123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const charForRoom = id => ROOM_CHARS[id - 1] || "?";
+const roomForChar = c => { const i = ROOM_CHARS.indexOf(c); return i < 0 ? null : i + 1; };
+
+const FEATURES = {
+  entrance:{g:"🚪",n:"Entrance",blocks:false}, stairs:{g:"🪜",n:"Stairs down",blocks:false},
+  chest:{g:"🧰",n:"Chest",blocks:true},        rack:{g:"⚔️",n:"Weapon rack",blocks:true},
+  table:{g:"🍽",n:"Table",blocks:true},        shelf:{g:"📚",n:"Bookshelf",blocks:true},
+  toilet:{g:"🚽",n:"Toilet",blocks:true},      cage:{g:"🪿",n:"Cage",blocks:true},
+  blocker:{g:"▦",n:"Furniture",blocks:true},
+};
+const TRAPS = { pit:{g:"◍",n:"Pit"}, spear:{g:"✕",n:"Spear"} };
+const DOORS = { normal:"Door", locked:"Locked", secret:"Secret", block:"Falling block" };
+const MONSTERS = ["goblin","orc","skeleton","zombie","abomination","boss"];
+
+const LAYERS = [
+  {id:"board",     name:"Board",     hint:"What's printed on the cardboard. Trace it once, then lock it."},
+  {id:"sealed",    name:"Sealed off", hint:"Squares out of play for this floor only."},
+  {id:"doors",     name:"Doors",     hint:"Tap near the edge between two squares."},
+  {id:"furniture", name:"Furniture", hint:"Entrance, stairs and anything that blocks a square."},
+  {id:"traps",     name:"Traps",     hint:""},
+  {id:"rooms",     name:"Rooms",     hint:"Tap a room to name it and set its monsters."},
+];
+
+let map = null, name = "floor1", hasServer = false;
+let vis = {}, lock = {}, active = "board", tool = {};
+let sel = null, mode = "edit", undoStack = [], dirty = false;
+let paintMode = localStorage.getItem("dungeon.paintMode") || "rect";
+let drag = null;                      // {x0,y0,x1,y1} while dragging out a rectangle
+let play = { cleared:{}, opened:{}, round:1, count:26 };
+
+const $ = s => document.querySelector(s);
+const el = (t, a = {}, kids = []) => {
+  const n = document.createElement(t);
+  for (const [k, v] of Object.entries(a)) {
+    if (k === "class") n.className = v; else if (k === "html") n.innerHTML = v;
+    else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+    else if (v === true) n.setAttribute(k, ""); else if (v !== false && v != null) n.setAttribute(k, v);
+  }
+  for (const c of [].concat(kids)) n.append(c);
+  return n;
+};
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+function status(msg, cls = "") { const s = $("#status"); s.textContent = msg; s.className = cls; }
+
+/* ---------- map helpers ---------- */
+const at = (x, y) => (map.grid[y] && map.grid[y][x]) || "#";
+const sealedAt = (x, y) => !!(map.sealed && map.sealed[y] && map.sealed[y][x] === "x");
+const inB = (x, y) => x >= 0 && y >= 0 && x < map.w && y < map.h;
+/** Walkable: printed as room or corridor, and not sealed off this floor. */
+const open = (x, y) => inB(x, y) && at(x, y) !== "#" && !sealedAt(x, y);
+const regionAt = (x, y) => (!inB(x, y) || sealedAt(x, y)) ? "#" : at(x, y);
+
+function setCell(x, y, ch) {
+  if (!inB(x, y)) return;
+  const r = map.grid[y];
+  map.grid[y] = r.slice(0, x) + ch + r.slice(x + 1);
+}
+function setSealed(x, y, on) {
+  if (!inB(x, y)) return;
+  if (!map.sealed) map.sealed = Array.from({ length: map.h }, () => ".".repeat(map.w));
+  const r = map.sealed[y];
+  map.sealed[y] = r.slice(0, x) + (on ? "x" : ".") + r.slice(x + 1);
+}
+const DELTA = { N:[0,-1], S:[0,1], E:[1,0], W:[-1,0] };
+/** Doors are stored once per edge, always as the upper/left cell facing E or S. */
+function normDoor(x, y, dir) {
+  if (dir === "W") return { x: x - 1, y, dir: "E" };
+  if (dir === "N") return { x, y: y - 1, dir: "S" };
+  return { x, y, dir };
+}
+const findDoor = (x, y, dir) => {
+  const n = normDoor(x, y, dir);
+  return map.doors.findIndex(d => d.x === n.x && d.y === n.y && d.dir === n.dir);
+};
+const doorCells = d => [{ x:d.x, y:d.y }, { x:d.x + DELTA[d.dir][0], y:d.y + DELTA[d.dir][1] }];
+const featAt = (x, y) => map.features.findIndex(f => f.x === x && f.y === y);
+const trapAt = (x, y) => map.traps.findIndex(t => t.x === x && t.y === y);
+const roomMeta = id => map.rooms.find(r => r.id === id);
+const doorKey = d => `${d.x},${d.y},${d.dir}`;
+
+function roomCells(id) {
+  const ch = charForRoom(id), out = [];
+  for (let y = 0; y < map.h; y++) for (let x = 0; x < map.w; x++) if (at(x, y) === ch) out.push({ x, y });
+  return out;
+}
+function roomsInGrid() {
+  const s = new Set();
+  for (let y = 0; y < map.h; y++) for (const c of map.grid[y]) { const id = roomForChar(c); if (id) s.add(id); }
+  return [...s].sort((a, b) => a - b);
+}
+
+/* ---------- undo ---------- */
+function snapshot() {
+  undoStack.push(JSON.stringify(map));
+  if (undoStack.length > 60) undoStack.shift();
+  dirty = true; $("#undo").disabled = false;
+}
+function undo() {
+  if (!undoStack.length) return;
+  map = JSON.parse(undoStack.pop());
+  $("#undo").disabled = !undoStack.length;
+  sel = null; render();
+}
+
+/* ---------- load / save ---------- */
+async function boot() {
+  try {
+    const r = await fetch("/api/maps");
+    if (r.ok) {
+      hasServer = true;
+      const names = await r.json();
+      const sel = $("#mapSel");
+      sel.innerHTML = "";
+      for (const n of names) sel.append(el("option", { value:n }, n));
+      if (names.includes(name)) sel.value = name; else name = names[0];
+      await loadMap(name);
+      return;
+    }
+  } catch (e) { /* no server: standalone */ }
+  hasServer = false;
+  $("#save").textContent = "Save local";
+  $("#mapSel").hidden = true;
+  const baked = JSON.parse($("#baked-map").textContent || "null");
+  const stored = localStorage.getItem("dungeon.map." + name);
+  map = stored ? JSON.parse(stored) : (baked || blankMap());
+  afterLoad();
+}
+function blankMap() {
+  return { name:"New floor", w:26, h:19, grid:Array.from({length:19},()=> "#".repeat(26)),
+           rooms:[], doors:[], features:[], traps:[] };
+}
+async function loadMap(n) {
+  const r = await fetch("/api/map/" + n);
+  if (!r.ok) { status("could not load " + n, "bad"); return; }
+  map = await r.json(); name = n; afterLoad();
+}
+function afterLoad() {
+  // Each edge gets one canonical record: the upper/left square, facing E or S.
+  map.doors = (map.doors || []).map(d => ({ ...d, ...normDoor(d.x, d.y, d.dir) }));
+  undoStack = []; $("#undo").disabled = true; dirty = false; sel = null;
+  loadPlay();
+  for (const l of LAYERS) { if (!(l.id in vis)) vis[l.id] = true; if (!(l.id in lock)) lock[l.id] = false; }
+  lock.board = true;                    // the printed board is the thing you don't want to nudge
+  tool.board ??= "."; tool.sealed ??= "x"; tool.doors ??= "normal";
+  tool.furniture ??= "blocker"; tool.traps ??= "pit";
+  render(); status("loaded " + name, "good");
+}
+async function save() {
+  if (!hasServer) {
+    localStorage.setItem("dungeon.map." + name, JSON.stringify(map));
+    dirty = false; status("saved to this browser", "good"); return;
+  }
+  status("saving…");
+  const r = await fetch("/api/map/" + name, {
+    method:"PUT", headers:{ "content-type":"application/json" }, body: JSON.stringify(map),
+  });
+  const j = await r.json().catch(() => ({}));
+  if (r.ok) { dirty = false; status("saved " + j.saved, "good"); }
+  else status(j.error || "save failed", "bad");
+}
+
+/* ---------- play state (DM mode, per browser) ---------- */
+const playKey = () => "dungeon.play." + name;
+function loadPlay() {
+  try { play = JSON.parse(localStorage.getItem(playKey())) || play; }
+  catch { /* keep defaults */ }
+  play.cleared ??= {}; play.opened ??= {}; play.round ??= 1; play.count ??= 26;
+}
+function savePlay() { localStorage.setItem(playKey(), JSON.stringify(play)); }
+
+/* ---------- validation ---------- */
+function issues() {
+  const out = [];
+  const ent = map.features.find(f => f.kind === "entrance");
+  const stairs = map.features.find(f => f.kind === "stairs");
+  if (!ent) out.push("No entrance placed.");
+  else if (!open(ent.x, ent.y)) out.push("Entrance is on stone or a sealed square.");
+  if (!stairs) out.push("No stairs down placed.");
+
+  const inGrid = roomsInGrid();
+  for (const id of inGrid) if (!roomMeta(id)) out.push(`Room ${id} is painted but has no name or monsters.`);
+  for (const r of map.rooms) if (!inGrid.includes(r.id)) out.push(`“${r.name}” (room ${r.id}) has no squares painted.`);
+
+  for (const d of map.doors) {
+    const [a, b] = doorCells(d);
+    if (!open(a.x, a.y) || !open(b.x, b.y)) out.push(`Door at ${d.x},${d.y} has stone on one side.`);
+    else if (regionAt(a.x, a.y) === regionAt(b.x, b.y)) out.push(`Door at ${d.x},${d.y} joins two squares of the same room.`);
+  }
+  for (const f of map.features) if (!open(f.x, f.y)) out.push(`${FEATURES[f.kind]?.n || f.kind} at ${f.x},${f.y} is on stone.`);
+  for (const t of map.traps) if (!open(t.x, t.y)) out.push(`${TRAPS[t.kind]?.n || t.kind} trap at ${t.x},${t.y} is on stone.`);
+
+  // Reachability from the entrance, through open geometry and doors.
+  if (ent && open(ent.x, ent.y)) {
+    const seen = new Set([ent.x + "," + ent.y]), q = [ent];
+    while (q.length) {
+      const c = q.shift();
+      for (const [dir, [dx, dy]] of Object.entries(DELTA)) {
+        const nx = c.x + dx, ny = c.y + dy, k = nx + "," + ny;
+        if (seen.has(k) || !open(nx, ny)) continue;
+        const sameRegion = regionAt(c.x, c.y) === regionAt(nx, ny);
+        if (!sameRegion && findDoor(c.x, c.y, dir) < 0) continue;
+        seen.add(k); q.push({ x:nx, y:ny });
+      }
+    }
+    for (const id of inGrid)
+      if (!roomCells(id).some(c => seen.has(c.x + "," + c.y)))
+        out.push(`Room ${id} (${roomMeta(id)?.name || "?"}) can't be reached — needs a door.`);
+    if (stairs && !seen.has(stairs.x + "," + stairs.y)) out.push("The stairs can't be reached from the entrance.");
+  }
+  return out;
+}
+
+/* ---------- rendering ---------- */
+let CS = 26;                                  // cell size, recomputed to fit
+function render() {
+  if (!map) return;
+  const avail = Math.min($("main").clientWidth - 34, 1100);
+  CS = Math.max(15, Math.min(38, Math.floor(avail / (map.w || 26))));
+  drawMap(); drawLayers(); drawTools(); drawSel(); drawClock(); drawRoster(); drawIssues();
+  $("#mEdit").classList.toggle("on", mode === "edit");
+  $("#mDM").classList.toggle("on", mode === "dm");
+}
+
+const AREA_LAYERS = ["board", "sealed"];
+const isArea = l => AREA_LAYERS.includes(l);
+function toolFill() {
+  if (active === "sealed") return tool.sealed === "x" ? "var(--danger)" : "var(--corridor)";
+  const t = tool.board;
+  if (t === ".") return "var(--corridor)";
+  if (t === "#") return "var(--stone)";
+  const id = roomForChar(t);
+  return id ? roomTint(id) : "var(--corridor)";
+}
+const dragBox = () => drag && ({
+  x0: Math.min(drag.x0, drag.x1), y0: Math.min(drag.y0, drag.y1),
+  x1: Math.max(drag.x0, drag.x1), y1: Math.max(drag.y0, drag.y1),
+});
+
+function roomTint(id) {
+  const h = (id * 47) % 360;
+  return `hsl(${h} 32% ${matchMedia("(prefers-color-scheme: dark)").matches ? 22 : 88}%)`;
+}
+
+function drawMap() {
+  const W = map.w * CS, H = map.h * CS, P = 14;
+  const p = [];
+  p.push(`<g transform="translate(${P},${P})">`);
+
+  // squares
+  for (let y = 0; y < map.h; y++) for (let x = 0; x < map.w; x++) {
+    const ch = at(x, y), rid = roomForChar(ch), sealedC = sealedAt(x, y);
+    let fill = "var(--stone)";
+    if (vis.board && ch === ".") fill = "var(--corridor)";
+    else if (vis.board && rid) fill = play.cleared[rid] && mode === "dm" ? "var(--sunk)" : roomTint(rid);
+    p.push(`<rect x="${x * CS}" y="${y * CS}" width="${CS}" height="${CS}" fill="${fill}"/>`);
+    if (sealedC && vis.sealed)
+      p.push(`<rect x="${x * CS}" y="${y * CS}" width="${CS}" height="${CS}" fill="var(--danger)" opacity=".2"/>`
+           + `<path d="M${x*CS} ${y*CS}l${CS} ${CS}M${(x+1)*CS} ${y*CS}l${-CS} ${CS}" stroke="var(--danger)" stroke-width="1" opacity=".5"/>`);
+  }
+  // faint grid
+  for (let x = 0; x <= map.w; x++) p.push(`<line class="gridline" x1="${x*CS}" y1="0" x2="${x*CS}" y2="${H}"/>`);
+  for (let y = 0; y <= map.h; y++) p.push(`<line class="gridline" x1="0" y1="${y*CS}" x2="${W}" y2="${y*CS}"/>`);
+
+  // walls on every edge where the region changes, with doors punched through
+  const seg = (x1,y1,x2,y2) => p.push(`<line class="wall" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`);
+  for (let y = 0; y < map.h; y++) for (let x = 0; x < map.w; x++) {
+    if (!open(x, y)) continue;
+    for (const [dir, [dx, dy]] of [["E", DELTA.E], ["S", DELTA.S], ["W", DELTA.W], ["N", DELTA.N]]) {
+      const nx = x + dx, ny = y + dy;
+      if ((dir === "W" || dir === "N") && open(nx, ny)) continue;   // drawn by the other cell
+      const differs = !open(nx, ny) || regionAt(nx, ny) !== regionAt(x, y);
+      if (!differs) continue;
+      const di = findDoor(x, y, dir);
+      const X = x * CS, Y = y * CS;
+      const a = dir === "E" ? [X+CS,Y,X+CS,Y+CS] : dir === "S" ? [X,Y+CS,X+CS,Y+CS]
+              : dir === "W" ? [X,Y,X,Y+CS] : [X,Y,X+CS,Y];
+      if (di < 0 || !vis.doors) { seg(...a); continue; }
+      const d = map.doors[di];
+      if (d.kind === "secret" && mode === "dm" && !vis.traps) { seg(...a); continue; }  // hidden in player view
+      // wall with a gap, plus a door bar across it
+      const horiz = a[1] === a[3];
+      const mid = horiz ? [(a[0]+a[2])/2, a[1]] : [a[0], (a[1]+a[3])/2];
+      const g = CS * .34;
+      if (horiz) { seg(a[0],a[1],mid[0]-g,a[1]); seg(mid[0]+g,a[1],a[2],a[3]); }
+      else       { seg(a[0],a[1],a[0],mid[1]-g); seg(a[0],mid[1]+g,a[2],a[3]); }
+      const opened = play.opened[doorKey(normDoor(x, y, dir))] && mode === "dm";
+      const col = d.kind === "secret" ? "var(--muted)" : d.kind === "locked" ? "var(--danger)" : "var(--amber)";
+      const dash = d.kind === "secret" ? ' stroke-dasharray="3 3"' : "";
+      const bar = horiz
+        ? `<line x1="${mid[0]-g}" y1="${a[1]}" x2="${mid[0]+g}" y2="${a[1]}"`
+        : `<line x1="${a[0]}" y1="${mid[1]-g}" x2="${a[0]}" y2="${mid[1]+g}"`;
+      p.push(`${bar} stroke="${col}" stroke-width="${opened ? 2 : 5}" stroke-linecap="round"${dash}/>`);
+      if (d.trap === "block")
+        p.push(`<circle cx="${mid[0]}" cy="${mid[1]}" r="${CS*.16}" fill="var(--danger)"/>`);
+    }
+  }
+
+  // features and traps
+  if (vis.furniture) for (const f of map.features) {
+    const F = FEATURES[f.kind]; if (!F) continue;
+    if (F.blocks) p.push(`<rect x="${f.x*CS+2}" y="${f.y*CS+2}" width="${CS-4}" height="${CS-4}" fill="var(--sunk)" stroke="var(--line-2)" rx="2"/>`);
+    p.push(`<text class="glyph" x="${f.x*CS+CS/2}" y="${f.y*CS+CS/2+1}" style="font-size:${CS*.62}px">${F.g}</text>`);
+  }
+  if (vis.traps) for (const t of map.traps) {
+    p.push(`<circle cx="${t.x*CS+CS/2}" cy="${t.y*CS+CS/2}" r="${CS*.3}" fill="none" stroke="var(--danger)" stroke-width="2"/>`);
+    p.push(`<text class="glyph" x="${t.x*CS+CS/2}" y="${t.y*CS+CS/2+1}" fill="var(--danger)" style="font-size:${CS*.42}px">${TRAPS[t.kind].g}</text>`);
+  }
+
+  // room names + monster counts
+  if (vis.rooms) for (const id of roomsInGrid()) {
+    const cells = roomCells(id); if (!cells.length) continue;
+    const cx = cells.reduce((a,c)=>a+c.x,0)/cells.length;
+    const top = Math.min(...cells.map(c => c.y));
+    const m = roomMeta(id), X = (cx+.5)*CS, Y = (top+.5)*CS;
+    if (CS >= 20 && m) {
+      p.push(`<text class="rlabel" x="${X}" y="${Y}" text-anchor="middle" dominant-baseline="central" style="font-size:${Math.min(CS*.62,14)}px">${esc(m.name)}</text>`);
+      if (vis.traps && m.monsters.length)
+        p.push(`<text class="rid" x="${X}" y="${Y+CS*.62}" text-anchor="middle" style="font-size:${Math.min(CS*.44,10)}px">${esc(m.monsters.join(" "))}</text>`);
+    } else {
+      p.push(`<text class="rlabel" x="${X}" y="${Y}" text-anchor="middle" dominant-baseline="central" style="font-size:${CS*.6}px">${id}</text>`);
+    }
+  }
+
+  // rectangle being dragged out
+  const box = dragBox();
+  if (box) {
+    const X = box.x0 * CS, Y = box.y0 * CS;
+    const W2 = (box.x1 - box.x0 + 1) * CS, H2 = (box.y1 - box.y0 + 1) * CS;
+    p.push(`<rect x="${X}" y="${Y}" width="${W2}" height="${H2}" fill="${toolFill()}" opacity=".55"/>`);
+    p.push(`<rect x="${X + 1}" y="${Y + 1}" width="${W2 - 2}" height="${H2 - 2}" fill="none" stroke="var(--amber)" stroke-width="2" stroke-dasharray="5 3"/>`);
+    p.push(`<text class="rlabel" x="${X + W2 / 2}" y="${Y + H2 / 2}" text-anchor="middle" dominant-baseline="central" style="font-size:${Math.min(CS * .7, 16)}px">${box.x1 - box.x0 + 1}×${box.y1 - box.y0 + 1}</text>`);
+  }
+
+  // selection ring
+  if (sel?.type === "cell") p.push(`<rect class="selring" x="${sel.x*CS+1}" y="${sel.y*CS+1}" width="${CS-2}" height="${CS-2}" rx="2"/>`);
+  if (sel?.type === "room" && mode === "edit") {
+    // outline the room's outer edge only, rather than ringing every square
+    for (const c of roomCells(sel.id)) for (const [dir, [dx, dy]] of Object.entries(DELTA)) {
+      if (at(c.x + dx, c.y + dy) === at(c.x, c.y)) continue;
+      const X = c.x * CS, Y = c.y * CS;
+      const a = dir === "E" ? [X+CS,Y,X+CS,Y+CS] : dir === "S" ? [X,Y+CS,X+CS,Y+CS]
+              : dir === "W" ? [X,Y,X,Y+CS] : [X,Y,X+CS,Y];
+      p.push(`<line class="selring" x1="${a[0]}" y1="${a[1]}" x2="${a[2]}" y2="${a[3]}"/>`);
+    }
+  }
+
+  // ruler
+  p.push(`</g>`);
+  for (let x = 0; x < map.w; x += 5) p.push(`<text class="rid" x="${P+x*CS+CS/2}" y="${P-4}" text-anchor="middle" style="font-size:9px">${x}</text>`);
+  for (let y = 0; y < map.h; y += 5) p.push(`<text class="rid" x="${P-4}" y="${P+y*CS+CS/2}" text-anchor="end" dominant-baseline="central" style="font-size:9px">${y}</text>`);
+  const svg = $("#map");
+  svg.setAttribute("width", W + P * 2);
+  svg.setAttribute("height", H + P * 2);
+  svg.setAttribute("viewBox", `0 0 ${W + P * 2} ${H + P * 2}`);
+  svg.innerHTML = p.join("");
+  if (!bound) { bindMap(); bound = true; }
+}
+let bound = false;
+
+function drawLayers() {
+  const pane = $("#layerPane"); pane.innerHTML = "";
+  for (const L of LAYERS) {
+    const row = el("div", { class:"layer" + (active === L.id ? " sel" : "") + (lock[L.id] ? " locked" : ""),
+      onclick: () => { active = L.id; sel = null; render(); } });
+    row.append(
+      el("button", { class:"tg" + (vis[L.id] ? " on" : ""), title:"Show / hide",
+        onclick: e => { e.stopPropagation(); vis[L.id] = !vis[L.id]; render(); } }, vis[L.id] ? "👁" : "◌"),
+      el("span", { class:"nm" }, L.name),
+      el("button", { class:"tg" + (lock[L.id] ? " on" : ""), title:"Lock / unlock",
+        onclick: e => { e.stopPropagation(); lock[L.id] = !lock[L.id]; render(); } }, lock[L.id] ? "🔒" : "🔓"),
+    );
+    pane.append(row);
+  }
+}
+
+function tbtn(layer, val, label, extra) {
+  return el("button", { class: tool[layer] === val ? "on" : "", onclick: () => { tool[layer] = val; render(); } },
+    extra ? [extra, label] : label);
+}
+function sw(color) { return el("span", { class:"swatch", style:`background:${color}` }); }
+
+function drawTools() {
+  const pane = $("#toolPane"); pane.innerHTML = "";
+  const L = LAYERS.find(l => l.id === active);
+  pane.append(el("h2", {}, mode === "dm" ? "Layer" : "Tools — " + L.name));
+  if (mode === "dm") {
+    pane.append(el("p", { class:"hint" }, "Tap a room to mark it cleared, or a door to open it. Switch to Edit to change the map."));
+    return;
+  }
+  if (lock[active]) {
+    pane.append(el("p", { class:"hint" }, `${L.name} is locked. Unlock it in the layer list to edit.`));
+    return;
+  }
+  const t = el("div", { class:"tools" });
+  if (active === "board") {
+    t.append(tbtn("board", ".", "Corridor", sw("var(--corridor)")), tbtn("board", "#", "Stone", sw("var(--stone)")));
+    for (const id of roomsInGrid()) t.append(tbtn("board", charForRoom(id), String(id), sw(roomTint(id))));
+    t.append(el("button", { onclick: addRoom }, "+ Room"));
+  } else if (active === "sealed") {
+    t.append(tbtn("sealed", "x", "Seal off"), tbtn("sealed", ".", "Re-open"));
+  } else if (active === "doors") {
+    for (const [k, n] of Object.entries(DOORS)) t.append(tbtn("doors", k, n));
+    t.append(tbtn("doors", "erase", "Remove"));
+  } else if (active === "furniture") {
+    for (const [k, F] of Object.entries(FEATURES)) t.append(tbtn("furniture", k, " " + F.n, F.g));
+    t.append(tbtn("furniture", "erase", "Remove"));
+  } else if (active === "traps") {
+    for (const [k, T] of Object.entries(TRAPS)) t.append(tbtn("traps", k, " " + T.n, T.g));
+    t.append(tbtn("traps", "erase", "Remove"));
+  } else {
+    t.append(el("p", { class:"hint" }, "Tap a room on the map to edit it."));
+  }
+  pane.append(t);
+  if (isArea(active)) {
+    const setMode = m => { paintMode = m; localStorage.setItem("dungeon.paintMode", m); render(); };
+    pane.append(el("div", { class:"tools", style:"margin-top:9px" }, [
+      el("button", { class: paintMode === "rect" ? "on" : "", onclick: () => setMode("rect") }, "▭ Rectangle"),
+      el("button", { class: paintMode === "free" ? "on" : "", onclick: () => setMode("free") }, "✎ Freehand"),
+    ]));
+  }
+  if (L.hint) pane.append(el("p", { class:"hint" }, L.hint));
+  if (isArea(active))
+    pane.append(el("p", { class:"hint" }, paintMode === "rect"
+      ? "Drag out a block of squares and let go. Hold Shift to square it off. Esc cancels."
+      : "Drag to paint square by square."));
+  if (active === "board")
+    pane.append(el("p", { class:"hint" }, "Painting a room over another room moves the boundary."));
+}
+
+function addRoom() {
+  snapshot();
+  const used = new Set(map.rooms.map(r => r.id).concat(roomsInGrid()));
+  let id = 1; while (used.has(id)) id++;
+  map.rooms.push({ id, name:"Room " + id, required:false, monsters:[] });
+  map.rooms.sort((a, b) => a.id - b.id);
+  tool.board = charForRoom(id); active = "board"; sel = { type:"room", id };
+  render();
+}
+
+/* ---------- inspector ---------- */
+function drawSel() {
+  const pane = $("#selPane"); pane.innerHTML = "";
+  if (!sel) {
+    pane.append(el("h2", {}, "Floor"));
+    pane.append(field("Name", map.name, v => { map.name = v; dirty = true; }));
+    pane.append(field("Note", map.note || "", v => { map.note = v; dirty = true; }, "textarea"));
+    const size = el("div", { class:"row" });
+    size.append(numField("Width", map.w, v => resize(v, map.h)), numField("Height", map.h, v => resize(map.w, v)));
+    pane.append(size);
+    return;
+  }
+  if (sel.type === "room") {
+    const m = roomMeta(sel.id);
+    pane.append(el("h2", {}, `Room ${sel.id}`));
+    if (mode === "dm") {
+      if (!m) { pane.append(el("p", { class:"hint" }, "Not described yet.")); return; }
+      pane.append(el("p", { class:"disp", style:"font-size:20px" }, m.name));
+      pane.append(el("p", { class:"mono-sm", style:"margin:4px 0 8px" },
+        m.monsters.length ? m.monsters.join(" · ") : "no monsters"));
+      if (m.note) pane.append(el("p", { class:"hint" }, m.note));
+      pane.append(checkbox("Cleared", !!play.cleared[sel.id],
+        v => { play.cleared[sel.id] = v; savePlay(); render(); }));
+      return;
+    }
+    if (!m) { pane.append(el("p", { class:"hint" }, "Painted but not described yet."),
+      el("button", { onclick: () => { snapshot(); map.rooms.push({ id:sel.id, name:"Room "+sel.id, required:false, monsters:[] }); render(); } }, "Describe it")); return; }
+    pane.append(field("Name", m.name, v => { m.name = v; dirty = true; }, "input", true));
+    pane.append(checkbox("On the required path", m.required, v => { m.required = v; dirty = true; render(); }));
+    pane.append(field("Monsters (comma separated)", m.monsters.join(", "),
+      v => { m.monsters = v.split(",").map(s => s.trim().toLowerCase()).filter(Boolean); dirty = true; render(); }));
+    const bad = m.monsters.filter(x => !MONSTERS.includes(x));
+    if (bad.length) pane.append(el("p", { class:"hint", style:"color:var(--danger)" }, "Unknown: " + bad.join(", ") + ". Known: " + MONSTERS.join(", ")));
+    pane.append(field("DM note", m.note || "", v => { m.note = v; dirty = true; }, "textarea"));
+    pane.append(el("button", { onclick: () => {
+      if (!confirm(`Delete “${m.name}” and clear its squares?`)) return;
+      snapshot();
+      for (const c of roomCells(sel.id)) setCell(c.x, c.y, "#");
+      map.rooms = map.rooms.filter(r => r.id !== sel.id); sel = null; render();
+    } }, "Delete room"));
+    return;
+  }
+  // a square
+  const { x, y } = sel;
+  pane.append(el("h2", {}, `Square ${x}, ${y}`));
+  const rid = roomForChar(at(x, y));
+  pane.append(el("p", { class:"mono-sm" },
+    (rid ? `room ${rid} — ${roomMeta(rid)?.name || "unnamed"}` : at(x, y) === "." ? "corridor" : "stone")
+    + (sealedAt(x, y) ? " · sealed off" : "")));
+  const fi = featAt(x, y), ti = trapAt(x, y);
+  if (fi >= 0) pane.append(el("p", { class:"mono-sm" }, FEATURES[map.features[fi].kind].g + " " + FEATURES[map.features[fi].kind].n));
+  if (ti >= 0) pane.append(el("p", { class:"mono-sm" }, TRAPS[map.traps[ti].kind].g + " " + TRAPS[map.traps[ti].kind].n + " trap"));
+}
+function field(label, val, on, kind = "input", focus = false) {
+  const inp = el(kind === "textarea" ? "textarea" : "input", { value:kind === "textarea" ? false : val });
+  if (kind === "textarea") inp.value = val;
+  inp.addEventListener("input", () => on(inp.value));
+  if (focus) setTimeout(() => inp.focus(), 0);
+  return el("div", { class:"field" }, [el("label", {}, label), inp]);
+}
+function numField(label, val, on) {
+  const inp = el("input", { type:"number", min:"4", max:"40", value:val });
+  inp.addEventListener("change", () => on(Math.max(4, Math.min(40, +inp.value || val))));
+  return el("div", { class:"field", style:"flex:1" }, [el("label", {}, label), inp]);
+}
+function checkbox(label, val, on) {
+  const inp = el("input", { type:"checkbox" });
+  inp.checked = val; inp.addEventListener("change", () => on(inp.checked));
+  return el("label", { class:"chk" }, [inp, label]);
+}
+function resize(w, h) {
+  snapshot();
+  const g = [];
+  for (let y = 0; y < h; y++) {
+    const old = map.grid[y] || "";
+    g.push((old + "#".repeat(w)).slice(0, w));
+  }
+  map.grid = g; map.w = w; map.h = h;
+  if (map.sealed) map.sealed = Array.from({ length:h }, (_, y) => ((map.sealed[y] || "") + ".".repeat(w)).slice(0, w));
+  map.features = map.features.filter(f => inB(f.x, f.y));
+  map.traps = map.traps.filter(t => inB(t.x, t.y));
+  map.doors = map.doors.filter(d => inB(d.x, d.y));
+  render();
+}
+
+/* ---------- DM panes ---------- */
+function drawClock() {
+  const pane = $("#clockPane");
+  pane.hidden = mode !== "dm";
+  if (mode !== "dm") return;
+  pane.innerHTML = "";
+  pane.append(el("h2", {}, "The clock"));
+  const c = play.count;
+  const die = el("div", { class:"die" + (c <= 0 ? " fire" : c <= 5 ? " warn" : "") }, c <= 0 ? "0" : String(c));
+  const info = el("div", { style:"flex:1" });
+  info.append(el("div", { class:"disp", style:"font-size:19px" }, "Round " + play.round));
+  const dmg = [1,1,2,2,3][Math.min(4, -c)];
+  info.append(el("p", { class:"hint", style:"margin-top:2px" },
+    c > 0 ? `${c} round${c===1?"":"s"} to the collapse`
+          : c > -5 ? `Collapse — ${dmg} damage to everyone still up here`
+          : "The floor is gone."));
+  pane.append(el("div", { class:"clock" }, [die, info]));
+  const row = el("div", { class:"tools", style:"margin-top:9px" });
+  row.append(
+    el("button", { onclick: () => { play.round++; play.count--; savePlay(); render(); } }, "End round"),
+    el("button", { class:"on", onclick: () => { play.count = Math.min(play.count, 5); savePlay(); render(); } }, "Reset! (→5)"),
+    el("button", { onclick: () => { play.round = 1; play.count = 26; play.cleared = {}; play.opened = {}; savePlay(); render(); } }, "New floor"),
+  );
+  pane.append(row);
+}
+
+function drawRoster() {
+  const pane = $("#rosterPane"); pane.innerHTML = "";
+  pane.append(el("h2", {}, "Rooms"));
+  const ul = el("ul", { class:"roster" });
+  for (const id of roomsInGrid()) {
+    const m = roomMeta(id);
+    const li = el("li", { class:(play.cleared[id] && mode === "dm" ? "done " : "") + (m?.required ? "req" : ""),
+      onclick: () => {
+        if (mode === "dm") { play.cleared[id] = !play.cleared[id]; savePlay(); }
+        else { active = "rooms"; }
+        sel = { type:"room", id }; render();
+      } });
+    li.append(el("span", { class:"n" }, String(id)), el("span", {}, m?.name || "unnamed"),
+      el("span", { class:"m" }, m?.monsters.length ? m.monsters.join(" ") : ""));
+    ul.append(li);
+  }
+  pane.append(ul);
+}
+
+function drawIssues() {
+  const pane = $("#issuePane"); pane.innerHTML = "";
+  const list = issues();
+  pane.append(el("h2", {}, `Checks${list.length ? ` — ${list.length}` : ""}`));
+  const ul = el("ul", { class:"issues" });
+  if (!list.length) ul.append(el("li", { class:"ok" }, "Map is connected and complete."));
+  for (const i of list.slice(0, 14)) ul.append(el("li", {}, i));
+  if (list.length > 14) ul.append(el("li", { class:"ok" }, `…and ${list.length - 14} more`));
+  pane.append(ul);
+}
+
+/* ---------- map interaction ---------- */
+function bindMap() {
+  const svg = $("#map");
+  let painting = false, last = "";
+  const cellAt = ev => {
+    const r = svg.getBoundingClientRect();
+    const sx = (ev.clientX - r.left) / r.width * svg.viewBox.baseVal.width - 14;
+    const sy = (ev.clientY - r.top) / r.height * svg.viewBox.baseVal.height - 14;
+    return { fx: sx / CS, fy: sy / CS, x: Math.floor(sx / CS), y: Math.floor(sy / CS) };
+  };
+  const clampX = x => Math.max(0, Math.min(map.w - 1, x));
+  const clampY = y => Math.max(0, Math.min(map.h - 1, y));
+
+  svg.addEventListener("pointerdown", ev => {
+    const c = cellAt(ev);
+    if (!inB(c.x, c.y)) return;
+    ev.preventDefault(); svg.setPointerCapture(ev.pointerId);
+    if (mode === "edit" && !lock[active] && isArea(active) && paintMode === "rect") {
+      drag = { x0: c.x, y0: c.y, x1: c.x, y1: c.y };
+      drawMap();
+      return;
+    }
+    if (mode === "edit" && !lock[active]) {
+      snapshot();
+      painting = isArea(active);
+      last = "";
+    }
+    apply(c); last = c.x + "," + c.y;
+  });
+
+  svg.addEventListener("pointermove", ev => {
+    if (drag) {
+      const c = cellAt(ev);
+      let x1 = clampX(c.x), y1 = clampY(c.y);
+      if (ev.shiftKey) {                       // square it off
+        const n = Math.max(Math.abs(x1 - drag.x0), Math.abs(y1 - drag.y0));
+        x1 = clampX(drag.x0 + Math.sign(x1 - drag.x0) * n);
+        y1 = clampY(drag.y0 + Math.sign(y1 - drag.y0) * n);
+      }
+      if (x1 === drag.x1 && y1 === drag.y1) return;
+      drag.x1 = x1; drag.y1 = y1; drawMap();
+      return;
+    }
+    if (!painting) return;
+    const c = cellAt(ev);
+    if (!inB(c.x, c.y) || last === c.x + "," + c.y) return;
+    last = c.x + "," + c.y; apply(c, true);
+  });
+
+  svg.addEventListener("pointerup", () => {
+    if (drag) { const box = dragBox(); drag = null; fillBox(box); }
+    painting = false;
+  });
+  svg.addEventListener("pointercancel", () => { drag = null; painting = false; drawMap(); });
+}
+
+function apply(c, dragging = false) {
+  const { x, y, fx, fy } = c;
+  if (mode === "dm") {
+    // tap a door to open it, otherwise tap a room to mark it cleared
+    const d = nearestDoor(x, y, fx, fy);
+    if (d) { const k = doorKey(map.doors[d]); play.opened[k] = !play.opened[k]; savePlay(); render(); return; }
+    const rid = roomForChar(at(x, y));
+    if (rid) { play.cleared[rid] = !play.cleared[rid]; savePlay(); sel = { type:"room", id:rid }; }
+    else sel = { type:"cell", x, y };
+    render(); return;
+  }
+  if (lock[active]) { sel = { type:"cell", x, y }; render(); return; }
+
+  switch (active) {
+    case "board":   setCell(x, y, tool.board); break;
+    case "sealed":  setSealed(x, y, tool.sealed === "x"); break;
+    case "rooms": {
+      const rid = roomForChar(at(x, y));
+      sel = rid ? { type:"room", id:rid } : { type:"cell", x, y };
+      break;
+    }
+    case "doors": {
+      if (dragging) return;
+      // pick the edge the tap landed nearest to
+      const px = fx - x, py = fy - y;
+      const ranked = [["W", px], ["E", 1 - px], ["N", py], ["S", 1 - py]].sort((a, b) => a[1] - b[1]);
+      const wall = ranked.find(([d]) => {
+        const nx = x + DELTA[d][0], ny = y + DELTA[d][1];
+        return inB(nx, ny) && open(nx, ny) && regionAt(nx, ny) !== regionAt(x, y);
+      });
+      const dir = (wall || ranked[0])[0];
+      const n = normDoor(x, y, dir);
+      if (!inB(n.x, n.y) || !inB(n.x + DELTA[n.dir][0], n.y + DELTA[n.dir][1])) return;
+      const i = map.doors.findIndex(d => d.x === n.x && d.y === n.y && d.dir === n.dir);
+      if (tool.doors === "erase") { if (i >= 0) map.doors.splice(i, 1); break; }
+      const rec = { x:n.x, y:n.y, dir:n.dir,
+        kind: tool.doors === "block" ? "normal" : tool.doors,
+        ...(tool.doors === "block" ? { trap:"block" } : {}) };
+      if (i >= 0) map.doors[i] = rec; else map.doors.push(rec);
+      break;
+    }
+    case "furniture": {
+      const i = featAt(x, y);
+      if (i >= 0) map.features.splice(i, 1);
+      if (tool.furniture !== "erase") {
+        if (tool.furniture === "entrance" || tool.furniture === "stairs")
+          map.features = map.features.filter(f => f.kind !== tool.furniture);   // only one of each
+        map.features.push({ x, y, kind: tool.furniture });
+      }
+      break;
+    }
+    case "traps": {
+      const i = trapAt(x, y);
+      if (i >= 0) map.traps.splice(i, 1);
+      if (tool.traps !== "erase") map.traps.push({ x, y, kind: tool.traps });
+      break;
+    }
+  }
+  if (active !== "rooms") sel = { type:"cell", x, y };
+  dirty = true; render();
+}
+
+function fillBox(b) {
+  if (!b) return;
+  snapshot();
+  for (let y = b.y0; y <= b.y1; y++) for (let x = b.x0; x <= b.x1; x++) {
+    if (active === "board") setCell(x, y, tool.board);
+    else if (active === "sealed") setSealed(x, y, tool.sealed === "x");
+  }
+  sel = null; dirty = true; render();
+}
+
+function nearestDoor(x, y, fx, fy) {
+  const px = fx - x, py = fy - y;
+  for (const [dir, d] of [["W", px], ["E", 1 - px], ["N", py], ["S", 1 - py]].sort((a, b) => a[1] - b[1])) {
+    if (d > .3) break;
+    const i = findDoor(x, y, dir);
+    if (i >= 0) return i;
+  }
+  return null;
+}
+
+/* ---------- chrome ---------- */
+$("#mEdit").onclick = () => { mode = "edit"; sel = null; render(); };
+$("#mDM").onclick = () => { mode = "dm"; sel = null; render(); };
+$("#save").onclick = save;
+$("#undo").onclick = undo;
+$("#mapSel").onchange = e => loadMap(e.target.value);
+for (const b of document.querySelectorAll("[data-preset]")) b.onclick = () => {
+  const p = b.dataset.preset;
+  const set = o => { for (const L of LAYERS) vis[L.id] = o[L.id] ?? true; };
+  if (p === "dm") set({});
+  if (p === "players") set({ traps:false, sealed:false });
+  if (p === "board") set({ traps:false, furniture:false, rooms:false, sealed:false });
+  render();
+};
+$("#jsonBtn").onclick = () => { $("#jsonTxt").value = JSON.stringify(map, null, 2); $("#jsonDlg").showModal(); };
+$("#jsonClose").onclick = () => $("#jsonDlg").close();
+$("#jsonCopy").onclick = async () => {
+  try { await navigator.clipboard.writeText($("#jsonTxt").value); status("copied", "good"); }
+  catch { $("#jsonTxt").select(); status("select and copy", ""); }
+};
+$("#jsonApply").onclick = () => {
+  try {
+    const m = JSON.parse($("#jsonTxt").value);
+    if (!m.grid || !m.w || !m.h) throw new Error("needs grid, w and h");
+    snapshot(); map = m; sel = null; $("#jsonDlg").close(); render(); status("loaded pasted map", "good");
+  } catch (e) { status("bad JSON: " + e.message, "bad"); }
+};
+addEventListener("keydown", e => {
+  if (e.key === "Escape" && drag) { drag = null; drawMap(); return; }
+  if (e.key === "r" && !e.metaKey && !e.ctrlKey && isArea(active) && mode === "edit") {
+    paintMode = paintMode === "rect" ? "free" : "rect";
+    localStorage.setItem("dungeon.paintMode", paintMode); render(); return;
+  }
+  if ((e.metaKey || e.ctrlKey) && e.key === "z") { e.preventDefault(); undo(); }
+  if ((e.metaKey || e.ctrlKey) && e.key === "s") { e.preventDefault(); save(); }
+});
+addEventListener("resize", () => render());
+addEventListener("beforeunload", e => { if (dirty) { e.preventDefault(); e.returnValue = ""; } });
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => render());
+
+boot();
+</script>
+</body>
+</html>

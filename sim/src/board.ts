@@ -39,6 +39,10 @@ export type RoomDef = {
 export type FloorDef = {
   w: number;
   h: number;
+  /** Authored region grid, one string per row: '#' solid, '.' corridor, room char.
+   *  When present it wins over `corridors` + room rects, so rooms need not be
+   *  rectangles. See mapfile.ts. */
+  regionRows?: string[];
   corridors: Rect[];
   rooms: RoomDef[];
   doors: DoorDef[];
@@ -70,15 +74,24 @@ export class Board {
     this.w = def.w; this.h = def.h;
     this.region = new Int16Array(def.w * def.h).fill(SOLID);
     this.blocked = new Uint8Array(def.w * def.h);
-    for (const c of def.corridors)
-      for (let y = c.y0; y <= c.y1; y++)
-        for (let x = c.x0; x <= c.x1; x++) this.region[y * def.w + x] = CORRIDOR;
-    for (const r of def.rooms) {
-      this.rooms.set(r.id, r);
-      for (let y = r.rect.y0; y <= r.rect.y1; y++)
-        for (let x = r.rect.x0; x <= r.rect.x1; x++) this.region[y * def.w + x] = r.id;
-      for (const f of r.furniture) this.blocked[f.y * def.w + f.x] = 1;
+    if (def.regionRows) {
+      for (let y = 0; y < def.h; y++) for (let x = 0; x < def.w; x++) {
+        const c = def.regionRows[y]?.[x] ?? "#";
+        const room = ROOM_CHARS.indexOf(c);
+        this.region[y * def.w + x] = c === "." ? CORRIDOR : room >= 0 ? room + 1 : SOLID;
+      }
+      for (const r of def.rooms) this.rooms.set(r.id, r);
+    } else {
+      for (const c of def.corridors)
+        for (let y = c.y0; y <= c.y1; y++)
+          for (let x = c.x0; x <= c.x1; x++) this.region[y * def.w + x] = CORRIDOR;
+      for (const r of def.rooms) {
+        this.rooms.set(r.id, r);
+        for (let y = r.rect.y0; y <= r.rect.y1; y++)
+          for (let x = r.rect.x0; x <= r.rect.x1; x++) this.region[y * def.w + x] = r.id;
+      }
     }
+    for (const r of def.rooms) for (const f of r.furniture) this.blocked[f.y * def.w + f.x] = 1;
     this.doors = def.doors;
     const doorIdx = new Map<number, number>();
     def.doors.forEach((d, i) => {
@@ -112,6 +125,29 @@ export class Board {
     return -1;
   }
 
+  /** Every square belonging to a room, in reading order. */
+  cellsOf(id: number): Pt[] {
+    const out: Pt[] = [];
+    for (let y = 0; y < this.h; y++) for (let x = 0; x < this.w; x++)
+      if (this.region[y * this.w + x] === id) out.push({ x, y });
+    return out;
+  }
+
+  /** A walkable square near the middle of a room -- where the party heads for. */
+  center(id: number): Pt {
+    const cells = this.cellsOf(id);
+    if (!cells.length) return { x: 0, y: 0 };
+    const cx = cells.reduce((a, c) => a + c.x, 0) / cells.length;
+    const cy = cells.reduce((a, c) => a + c.y, 0) / cells.length;
+    let best = cells[0], bd = Infinity;
+    for (const c of cells) {
+      if (!this.isFloor(c.x, c.y)) continue;
+      const d = (c.x - cx) ** 2 + (c.y - cy) ** 2;
+      if (d < bd) { bd = d; best = c; }
+    }
+    return best;
+  }
+
   idx(x: number, y: number) { return y * this.w + x; }
   inBounds(x: number, y: number) { return x >= 0 && y >= 0 && x < this.w && y < this.h; }
   regionAt(x: number, y: number) { return this.inBounds(x, y) ? this.region[this.idx(x, y)] : SOLID; }
@@ -120,6 +156,7 @@ export class Board {
   door(a: Pt, b: Pt): DoorDef | undefined { return this.doorAt.get(edgeKey(a, b)); }
 }
 
+export const ROOM_CHARS = "123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 export const NEIGHBORS: Pt[] = [{ x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 }];
 export const dist1 = (a: Pt, b: Pt) => Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
 export const adjacent = (a: Pt, b: Pt) => dist1(a, b) === 1;
