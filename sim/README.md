@@ -23,12 +23,21 @@ place, so a Save in the browser lands in the same file the simulator reads. It
 prints a LAN address as well — open that on the iPad and it works there, at the
 table, with the DM view and the round counter.
 
-**Layers.** The **Board** layer is what's printed on the cardboard: rooms,
-corridors, stone. Trace First Light's Side A into it once and lock it — every
-floor after this one reuses it. Everything above is per-floor: **Sealed off**
-(squares out of play this quest), **Doors**, **Furniture**, **Traps**, and
-**Rooms** (names, monsters, DM notes). Each layer has its own show/hide and
-lock, and only the selected unlocked layer takes taps.
+**Layers.** Three ideas, kept apart on purpose:
+
+- **Possible rooms** — what is printed on the cardboard: the corridors and every
+  room the board *has*. Traced once from Side A and locked; every floor built on
+  this board side reuses it untouched.
+- **Rooms this floor** — which possible rooms are actually in play, and what they
+  are called. Tap a possible room to put it in play and name it.
+- **Solid stone** — a possible room you don't name is stone this floor (on the
+  table, the black blocking tiles go over it), so unused rooms need no marking
+  at all. This layer is only for the extra case: stone laid over corridor
+  squares or part of a room.
+
+Then **Doors**, **Furniture** and **Traps**. Each layer has its own show/hide and
+lock, and only the selected unlocked layer takes taps. On the two area layers,
+drag out a rectangle (Shift squares it off, Esc cancels, R toggles freehand).
 
 **Checks** runs continuously: it flood-fills from the entrance through open
 geometry and doors, and tells you about rooms with no way in, doors with stone
@@ -45,21 +54,36 @@ you turn the screen round.
 ## The map format
 
 `src/content/floor1.map.json` is the single source of truth — the editor, the
-simulator and (eventually) the card renderer all read it. It is meant to be
-hand-editable:
+simulator and (eventually) the card renderer all read it. It has two halves,
+because they change at different rates:
 
 ```json
-"grid": [
-  "######.######.######.#####",
-  "#11111.#44444.#33333.#####",
+"board": {
+  "name": "HeroQuest First Light — Side A",
+  "w": 26, "h": 19,
+  "grid": [
+    "..........................",
+    ".AAAABBBBCCC..DDDEEEEFFFF.",
 ```
 
-`#` is stone, `.` is corridor, `1`-`9` and `A`-`Z` are room ids. `sealed` is an
-optional same-shaped mask where `x` means "out of play this floor". Doors sit on
-**edges**, not squares, so they are listed separately and each edge is named
-once, from its upper/left square, facing `E` or `S`. Everything that sits on a
-square — entrance, stairs, chest, rack, table, shelf, toilet, cage, plain
-furniture — is a `feature`; traps are their own list.
+`.` is corridor and each letter is one **possible room**. There is no stone on
+the printed board, and the outer edge is corridor. This half is traced once.
+
+```json
+"floor": {
+  "rooms": [ { "at": "G", "id": 1, "name": "Welcome Center", ... } ],
+```
+
+`at` says which possible room this floor is using. **A possible room the floor
+doesn't name is solid stone** — that is the whole "which rooms are in play"
+mechanism, and it means an unused room needs no marking. `stone` is an optional
+same-shaped mask (`x`) for the leftover case: blocking corridor squares or part
+of a room.
+
+Doors sit on **edges**, not squares, so they are listed separately and each edge
+is named once, from its upper/left square, facing `E` or `S`. Everything that
+sits on a square — entrance, stairs, chest, rack, table, shelf, toilet, cage,
+plain furniture — is a `feature`; traps are their own list.
 
 ## What is modelled faithfully
 
@@ -73,10 +97,11 @@ spellbook learning, and card-to-nerd trading.
 
 ## What is NOT modelled — read this before trusting a number
 
-1. **The map is invented.** `src/content/floor1.map.json` is a plausible 26x19
-   HeroQuest-shaped floor satisfying the section 3 constraint, not First Light's
-   real Quest 1 layout. Every turn-count answer scales with corridor length.
-   Trace the real board in the editor and re-run; nothing else needs to change.
+1. **The board is real; the floor on it is a guess.** `board` was traced from a
+   photo of the printed Side A (26x19, corridor edge, 22 possible rooms) and
+   should be right. But which possible room is the Welcome Center, where the
+   doors go, and where the entrance and stairs sit are all a first pass — check
+   them against the quest sheet. Turn counts move with the route length.
 2. **Heroes are a heuristic, not your family.** They focus fire, drink at low
    health, revive each other, skip side rooms when the clock is short, and mostly
    remember to kill Greg's Orcs first. They do not do anything clever or anything

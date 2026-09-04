@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "sim": "bun run src/run.ts",
-    "map": "bun run src/tools/mapserve.ts",
+    "map": "bun --watch run src/tools/mapserve.ts",
     "drawmap": "bun run src/tools/drawmap.ts"
   },
   "devDependencies": {

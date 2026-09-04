@@ -44,9 +44,11 @@ const server = Bun.serve({
         let body: MapFile;
         try { body = await req.json() as MapFile; }
         catch { return json({ error: "invalid JSON" }, 400); }
-        if (!body?.grid?.length || !body.w || !body.h) return json({ error: "map is missing grid/w/h" }, 400);
-        if (body.grid.length !== body.h || body.grid.some(r => r.length !== body.w))
-          return json({ error: `grid is not ${body.w}x${body.h}` }, 400);
+        const b = body?.board;
+        if (!b?.grid?.length || !b.w || !b.h) return json({ error: "map is missing board.grid/w/h" }, 400);
+        if (b.grid.length !== b.h || b.grid.some((r: string) => r.length !== b.w))
+          return json({ error: `board grid is not ${b.w}x${b.h}` }, 400);
+        if (!body.floor) return json({ error: "map is missing a floor" }, 400);
         await Bun.write(file, formatMapJson(body));
         return json({ ok: true, saved: `src/content/${name}.map.json`, at: new Date().toISOString() });
       }

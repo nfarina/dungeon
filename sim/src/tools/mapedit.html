@@ -210,9 +210,8 @@ dialog textarea{width:100%; min-height:260px; font-size:11.5px; background:var(-
 <script id="baked-map" type="application/json">null</script>
 <script>
 "use strict";
-const ROOM_CHARS = "123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const charForRoom = id => ROOM_CHARS[id - 1] || "?";
-const roomForChar = c => { const i = ROOM_CHARS.indexOf(c); return i < 0 ? null : i + 1; };
+const ROOM_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+const isRoomChar = c => ROOM_CHARS.includes(c);
 
 const FEATURES = {
   entrance:{g:"🚪",n:"Entrance",blocks:false}, stairs:{g:"🪜",n:"Stairs down",blocks:false},
@@ -226,12 +225,12 @@ const DOORS = { normal:"Door", locked:"Locked", secret:"Secret", block:"Falling 
 const MONSTERS = ["goblin","orc","skeleton","zombie","abomination","boss"];
 
 const LAYERS = [
-  {id:"board",     name:"Board",     hint:"What's printed on the cardboard. Trace it once, then lock it."},
-  {id:"sealed",    name:"Sealed off", hint:"Squares out of play for this floor only."},
+  {id:"board",     name:"Possible rooms", hint:"What's printed on the cardboard: corridors and every room the board has. Trace it once, then lock it — every floor on this board side reuses it."},
+  {id:"inplay",    name:"Rooms this floor", hint:"Tap a possible room to put it in play and name it. Anything you don't use is stone."},
+  {id:"stone",     name:"Solid stone",  hint:"Extra blocking tiles over corridor squares. Unused rooms are already stone."},
   {id:"doors",     name:"Doors",     hint:"Tap near the edge between two squares."},
   {id:"furniture", name:"Furniture", hint:"Entrance, stairs and anything that blocks a square."},
   {id:"traps",     name:"Traps",     hint:""},
-  {id:"rooms",     name:"Rooms",     hint:"Tap a room to name it and set its monsters."},
 ];
 
 let map = null, name = "floor1", hasServer = false;
@@ -256,23 +255,33 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">"
 function status(msg, cls = "") { const s = $("#status"); s.textContent = msg; s.className = cls; }
 
 /* ---------- map helpers ---------- */
-const at = (x, y) => (map.grid[y] && map.grid[y][x]) || "#";
-const sealedAt = (x, y) => !!(map.sealed && map.sealed[y] && map.sealed[y][x] === "x");
-const inB = (x, y) => x >= 0 && y >= 0 && x < map.w && y < map.h;
-/** Walkable: printed as room or corridor, and not sealed off this floor. */
-const open = (x, y) => inB(x, y) && at(x, y) !== "#" && !sealedAt(x, y);
-const regionAt = (x, y) => (!inB(x, y) || sealedAt(x, y)) ? "#" : at(x, y);
+const B = () => map.board, F = () => map.floor;
+/** The printed board character at a square: '.' corridor or a possible-room letter. */
+const at = (x, y) => (B().grid[y] && B().grid[y][x]) || ".";
+const stoneAt = (x, y) => !!(F().stone && F().stone[y] && F().stone[y][x] === "x");
+const inB = (x, y) => x >= 0 && y >= 0 && x < B().w && y < B().h;
+/** The floor room using the possible room at this square, if any. */
+const roomAt = (x, y) => { const c = at(x, y); return isRoomChar(c) ? F().rooms.find(r => r.at === c) : null; };
+const inPlay = letter => F().rooms.some(r => r.at === letter);
+/** Walkable this floor: corridor, or a room that's in play — and not stoned over. */
+const open = (x, y) => {
+  if (!inB(x, y) || stoneAt(x, y)) return false;
+  const c = at(x, y);
+  return c === "." || (isRoomChar(c) && inPlay(c));
+};
+/** Region identity for wall drawing: "#" stone, "." corridor, or the room letter. */
+const regionAt = (x, y) => open(x, y) ? at(x, y) : "#";
 
 function setCell(x, y, ch) {
   if (!inB(x, y)) return;
-  const r = map.grid[y];
-  map.grid[y] = r.slice(0, x) + ch + r.slice(x + 1);
+  const r = B().grid[y];
+  B().grid[y] = r.slice(0, x) + ch + r.slice(x + 1);
 }
-function setSealed(x, y, on) {
+function setStone(x, y, on) {
   if (!inB(x, y)) return;
-  if (!map.sealed) map.sealed = Array.from({ length: map.h }, () => ".".repeat(map.w));
-  const r = map.sealed[y];
-  map.sealed[y] = r.slice(0, x) + (on ? "x" : ".") + r.slice(x + 1);
+  if (!F().stone) F().stone = Array.from({ length: B().h }, () => ".".repeat(B().w));
+  const r = F().stone[y];
+  F().stone[y] = r.slice(0, x) + (on ? "x" : ".") + r.slice(x + 1);
 }
 const DELTA = { N:[0,-1], S:[0,1], E:[1,0], W:[-1,0] };
 /** Doors are stored once per edge, always as the upper/left cell facing E or S. */
@@ -283,23 +292,24 @@ function normDoor(x, y, dir) {
 }
 const findDoor = (x, y, dir) => {
   const n = normDoor(x, y, dir);
-  return map.doors.findIndex(d => d.x === n.x && d.y === n.y && d.dir === n.dir);
+  return F().doors.findIndex(d => d.x === n.x && d.y === n.y && d.dir === n.dir);
 };
 const doorCells = d => [{ x:d.x, y:d.y }, { x:d.x + DELTA[d.dir][0], y:d.y + DELTA[d.dir][1] }];
-const featAt = (x, y) => map.features.findIndex(f => f.x === x && f.y === y);
-const trapAt = (x, y) => map.traps.findIndex(t => t.x === x && t.y === y);
-const roomMeta = id => map.rooms.find(r => r.id === id);
+const featAt = (x, y) => F().features.findIndex(f => f.x === x && f.y === y);
+const trapAt = (x, y) => F().traps.findIndex(t => t.x === x && t.y === y);
 const doorKey = d => `${d.x},${d.y},${d.dir}`;
 
-function roomCells(id) {
-  const ch = charForRoom(id), out = [];
-  for (let y = 0; y < map.h; y++) for (let x = 0; x < map.w; x++) if (at(x, y) === ch) out.push({ x, y });
+/** Squares belonging to one possible room. */
+function cellsOf(letter) {
+  const out = [];
+  for (let y = 0; y < B().h; y++) for (let x = 0; x < B().w; x++) if (at(x, y) === letter) out.push({ x, y });
   return out;
 }
-function roomsInGrid() {
-  const s = new Set();
-  for (let y = 0; y < map.h; y++) for (const c of map.grid[y]) { const id = roomForChar(c); if (id) s.add(id); }
-  return [...s].sort((a, b) => a - b);
+/** Every possible room the printed board has, in reading order. */
+function possibleRooms() {
+  const seen = new Set(), out = [];
+  for (const row of B().grid) for (const c of row) if (isRoomChar(c) && !seen.has(c)) { seen.add(c); out.push(c); }
+  return out;
 }
 
 /* ---------- undo ---------- */
@@ -339,8 +349,8 @@ async function boot() {
   afterLoad();
 }
 function blankMap() {
-  return { name:"New floor", w:26, h:19, grid:Array.from({length:19},()=> "#".repeat(26)),
-           rooms:[], doors:[], features:[], traps:[] };
+  return { board:{ name:"New board", w:26, h:19, grid:Array.from({length:19},()=> ".".repeat(26)) },
+           floor:{ name:"New floor", rooms:[], doors:[], features:[], traps:[] } };
 }
 async function loadMap(n) {
   const r = await fetch("/api/map/" + n);
@@ -349,12 +359,12 @@ async function loadMap(n) {
 }
 function afterLoad() {
   // Each edge gets one canonical record: the upper/left square, facing E or S.
-  map.doors = (map.doors || []).map(d => ({ ...d, ...normDoor(d.x, d.y, d.dir) }));
+  F().doors = (F().doors || []).map(d => ({ ...d, ...normDoor(d.x, d.y, d.dir) }));
   undoStack = []; $("#undo").disabled = true; dirty = false; sel = null;
   loadPlay();
   for (const l of LAYERS) { if (!(l.id in vis)) vis[l.id] = true; if (!(l.id in lock)) lock[l.id] = false; }
   lock.board = true;                    // the printed board is the thing you don't want to nudge
-  tool.board ??= "."; tool.sealed ??= "x"; tool.doors ??= "normal";
+  tool.board ??= "."; tool.stone ??= "x"; tool.doors ??= "normal";
   tool.furniture ??= "blocker"; tool.traps ??= "pit";
   render(); status("loaded " + name, "good");
 }
@@ -384,25 +394,28 @@ function savePlay() { localStorage.setItem(playKey(), JSON.stringify(play)); }
 /* ---------- validation ---------- */
 function issues() {
   const out = [];
-  const ent = map.features.find(f => f.kind === "entrance");
-  const stairs = map.features.find(f => f.kind === "stairs");
+  const ent = F().features.find(f => f.kind === "entrance");
+  const stairs = F().features.find(f => f.kind === "stairs");
   if (!ent) out.push("No entrance placed.");
-  else if (!open(ent.x, ent.y)) out.push("Entrance is on stone or a sealed square.");
+  else if (!open(ent.x, ent.y)) out.push("The entrance is on stone or an unused room.");
   if (!stairs) out.push("No stairs down placed.");
+  else if (!open(stairs.x, stairs.y)) out.push("The stairs are on stone or an unused room.");
 
-  const inGrid = roomsInGrid();
-  for (const id of inGrid) if (!roomMeta(id)) out.push(`Room ${id} is painted but has no name or monsters.`);
-  for (const r of map.rooms) if (!inGrid.includes(r.id)) out.push(`“${r.name}” (room ${r.id}) has no squares painted.`);
+  const seenId = new Map();
+  for (const r of F().rooms) {
+    if (!cellsOf(r.at).length) out.push(`“${r.name}” points at possible room ${r.at}, which isn't on the board.`);
+    if (seenId.has(r.id)) out.push(`Two rooms both numbered ${r.id}: “${seenId.get(r.id)}” and “${r.name}”.`);
+    seenId.set(r.id, r.name);
+  }
 
-  for (const d of map.doors) {
+  for (const d of F().doors) {
     const [a, b] = doorCells(d);
-    if (!open(a.x, a.y) || !open(b.x, b.y)) out.push(`Door at ${d.x},${d.y} has stone on one side.`);
+    if (!open(a.x, a.y) || !open(b.x, b.y)) out.push(`Door at ${d.x},${d.y} has stone or an unused room on one side.`);
     else if (regionAt(a.x, a.y) === regionAt(b.x, b.y)) out.push(`Door at ${d.x},${d.y} joins two squares of the same room.`);
   }
-  for (const f of map.features) if (!open(f.x, f.y)) out.push(`${FEATURES[f.kind]?.n || f.kind} at ${f.x},${f.y} is on stone.`);
-  for (const t of map.traps) if (!open(t.x, t.y)) out.push(`${TRAPS[t.kind]?.n || t.kind} trap at ${t.x},${t.y} is on stone.`);
+  for (const f of F().features) if (!open(f.x, f.y)) out.push(`${FEATURES[f.kind]?.n || f.kind} at ${f.x},${f.y} is on stone.`);
+  for (const t of F().traps) if (!open(t.x, t.y)) out.push(`${TRAPS[t.kind]?.n || t.kind} trap at ${t.x},${t.y} is on stone.`);
 
-  // Reachability from the entrance, through open geometry and doors.
   if (ent && open(ent.x, ent.y)) {
     const seen = new Set([ent.x + "," + ent.y]), q = [ent];
     while (q.length) {
@@ -410,87 +423,101 @@ function issues() {
       for (const [dir, [dx, dy]] of Object.entries(DELTA)) {
         const nx = c.x + dx, ny = c.y + dy, k = nx + "," + ny;
         if (seen.has(k) || !open(nx, ny)) continue;
-        const sameRegion = regionAt(c.x, c.y) === regionAt(nx, ny);
-        if (!sameRegion && findDoor(c.x, c.y, dir) < 0) continue;
+        if (regionAt(c.x, c.y) !== regionAt(nx, ny) && findDoor(c.x, c.y, dir) < 0) continue;
         seen.add(k); q.push({ x:nx, y:ny });
       }
     }
-    for (const id of inGrid)
-      if (!roomCells(id).some(c => seen.has(c.x + "," + c.y)))
-        out.push(`Room ${id} (${roomMeta(id)?.name || "?"}) can't be reached — needs a door.`);
+    for (const r of F().rooms)
+      if (!cellsOf(r.at).some(c => seen.has(c.x + "," + c.y)))
+        out.push(`“${r.name}” can't be reached — it needs a door.`);
     if (stairs && !seen.has(stairs.x + "," + stairs.y)) out.push("The stairs can't be reached from the entrance.");
   }
   return out;
 }
 
 /* ---------- rendering ---------- */
-let CS = 26;                                  // cell size, recomputed to fit
+let CS = 26, bound = false;
 function render() {
   if (!map) return;
   const avail = Math.min($("main").clientWidth - 34, 1100);
-  CS = Math.max(15, Math.min(38, Math.floor(avail / (map.w || 26))));
+  CS = Math.max(15, Math.min(38, Math.floor(avail / (B().w || 26))));
   drawMap(); drawLayers(); drawTools(); drawSel(); drawClock(); drawRoster(); drawIssues();
   $("#mEdit").classList.toggle("on", mode === "edit");
   $("#mDM").classList.toggle("on", mode === "dm");
 }
 
-const AREA_LAYERS = ["board", "sealed"];
+const AREA_LAYERS = ["board", "stone"];
 const isArea = l => AREA_LAYERS.includes(l);
+const dark = () => matchMedia("(prefers-color-scheme: dark)").matches;
+/** Colour for a room that is in play this floor, by its floor number. */
+const roomTint = id => `hsl(${(id * 47) % 360} 32% ${dark() ? 22 : 88}%)`;
+/** Colour for a possible room on the printed board, by its letter. */
+const boardTint = c => `hsl(${(ROOM_CHARS.indexOf(c) * 53) % 360} 18% ${dark() ? 27 : 82}%)`;
+
 function toolFill() {
-  if (active === "sealed") return tool.sealed === "x" ? "var(--danger)" : "var(--corridor)";
+  if (active === "stone") return tool.stone === "x" ? "var(--danger)" : "var(--corridor)";
   const t = tool.board;
-  if (t === ".") return "var(--corridor)";
-  if (t === "#") return "var(--stone)";
-  const id = roomForChar(t);
-  return id ? roomTint(id) : "var(--corridor)";
+  return t === "." ? "var(--corridor)" : isRoomChar(t) ? boardTint(t) : "var(--stone)";
 }
 const dragBox = () => drag && ({
   x0: Math.min(drag.x0, drag.x1), y0: Math.min(drag.y0, drag.y1),
   x1: Math.max(drag.x0, drag.x1), y1: Math.max(drag.y0, drag.y1),
 });
 
-function roomTint(id) {
-  const h = (id * 47) % 360;
-  return `hsl(${h} 32% ${matchMedia("(prefers-color-scheme: dark)").matches ? 22 : 88}%)`;
-}
-
 function drawMap() {
-  const W = map.w * CS, H = map.h * CS, P = 14;
+  const W = B().w * CS, H = B().h * CS, P = 14;
   const p = [];
   p.push(`<g transform="translate(${P},${P})">`);
 
   // squares
-  for (let y = 0; y < map.h; y++) for (let x = 0; x < map.w; x++) {
-    const ch = at(x, y), rid = roomForChar(ch), sealedC = sealedAt(x, y);
-    let fill = "var(--stone)";
-    if (vis.board && ch === ".") fill = "var(--corridor)";
-    else if (vis.board && rid) fill = play.cleared[rid] && mode === "dm" ? "var(--sunk)" : roomTint(rid);
-    p.push(`<rect x="${x * CS}" y="${y * CS}" width="${CS}" height="${CS}" fill="${fill}"/>`);
-    if (sealedC && vis.sealed)
-      p.push(`<rect x="${x * CS}" y="${y * CS}" width="${CS}" height="${CS}" fill="var(--danger)" opacity=".2"/>`
-           + `<path d="M${x*CS} ${y*CS}l${CS} ${CS}M${(x+1)*CS} ${y*CS}l${-CS} ${CS}" stroke="var(--danger)" stroke-width="1" opacity=".5"/>`);
+  for (let y = 0; y < B().h; y++) for (let x = 0; x < B().w; x++) {
+    const ch = at(x, y), room = roomAt(x, y), X = x * CS, Y = y * CS;
+    let fill = "var(--corridor)";
+    if (isRoomChar(ch)) {
+      // in play -> tinted by floor number; not in play -> stone this floor
+      fill = room ? (play.cleared[room.id] && mode === "dm" ? "var(--sunk)" : roomTint(room.id))
+                  : (vis.board ? boardTint(ch) : "var(--stone)");
+      if (!room && !vis.board) fill = "var(--stone)";
+    }
+    p.push(`<rect x="${X}" y="${Y}" width="${CS}" height="${CS}" fill="${fill}"/>`);
+    // an unused possible room is stone on the table: hatch it
+    if (isRoomChar(ch) && !room)
+      p.push(`<rect x="${X}" y="${Y}" width="${CS}" height="${CS}" fill="var(--stone)" opacity="${vis.board ? .72 : 1}"/>`
+           + `<path d="M${X} ${Y+CS}L${X+CS} ${Y}" stroke="var(--muted)" stroke-width="1" opacity=".45"/>`);
+    if (stoneAt(x, y) && vis.stone)
+      p.push(`<rect x="${X}" y="${Y}" width="${CS}" height="${CS}" fill="var(--danger)" opacity=".22"/>`
+           + `<path d="M${X} ${Y}l${CS} ${CS}M${X+CS} ${Y}l${-CS} ${CS}" stroke="var(--danger)" stroke-width="1" opacity=".55"/>`);
   }
-  // faint grid
-  for (let x = 0; x <= map.w; x++) p.push(`<line class="gridline" x1="${x*CS}" y1="0" x2="${x*CS}" y2="${H}"/>`);
-  for (let y = 0; y <= map.h; y++) p.push(`<line class="gridline" x1="0" y1="${y*CS}" x2="${W}" y2="${y*CS}"/>`);
+  for (let x = 0; x <= B().w; x++) p.push(`<line class="gridline" x1="${x*CS}" y1="0" x2="${x*CS}" y2="${H}"/>`);
+  for (let y = 0; y <= B().h; y++) p.push(`<line class="gridline" x1="0" y1="${y*CS}" x2="${W}" y2="${y*CS}"/>`);
 
-  // walls on every edge where the region changes, with doors punched through
+  // printed room outlines, so you can see the board under this floor's stone
+  if (vis.board) for (let y = 0; y < B().h; y++) for (let x = 0; x < B().w; x++) {
+    const c = at(x, y); if (!isRoomChar(c)) continue;
+    const X = x * CS, Y = y * CS;
+    for (const [dir, [dx, dy]] of Object.entries(DELTA)) {
+      if (at(x + dx, y + dy) === c) continue;
+      const a = dir === "E" ? [X+CS,Y,X+CS,Y+CS] : dir === "S" ? [X,Y+CS,X+CS,Y+CS]
+              : dir === "W" ? [X,Y,X,Y+CS] : [X,Y,X+CS,Y];
+      p.push(`<line x1="${a[0]}" y1="${a[1]}" x2="${a[2]}" y2="${a[3]}" stroke="var(--line-2)" stroke-width="1.2"/>`);
+    }
+  }
+
+  // walls where the playable region changes, with doors punched through
   const seg = (x1,y1,x2,y2) => p.push(`<line class="wall" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`);
-  for (let y = 0; y < map.h; y++) for (let x = 0; x < map.w; x++) {
+  for (let y = 0; y < B().h; y++) for (let x = 0; x < B().w; x++) {
     if (!open(x, y)) continue;
-    for (const [dir, [dx, dy]] of [["E", DELTA.E], ["S", DELTA.S], ["W", DELTA.W], ["N", DELTA.N]]) {
+    for (const [dir, [dx, dy]] of Object.entries(DELTA)) {
       const nx = x + dx, ny = y + dy;
-      if ((dir === "W" || dir === "N") && open(nx, ny)) continue;   // drawn by the other cell
-      const differs = !open(nx, ny) || regionAt(nx, ny) !== regionAt(x, y);
-      if (!differs) continue;
+      if ((dir === "W" || dir === "N") && open(nx, ny)) continue;
+      if (regionAt(nx, ny) === regionAt(x, y)) continue;
       const di = findDoor(x, y, dir);
       const X = x * CS, Y = y * CS;
       const a = dir === "E" ? [X+CS,Y,X+CS,Y+CS] : dir === "S" ? [X,Y+CS,X+CS,Y+CS]
               : dir === "W" ? [X,Y,X,Y+CS] : [X,Y,X+CS,Y];
       if (di < 0 || !vis.doors) { seg(...a); continue; }
-      const d = map.doors[di];
-      if (d.kind === "secret" && mode === "dm" && !vis.traps) { seg(...a); continue; }  // hidden in player view
-      // wall with a gap, plus a door bar across it
+      const d = F().doors[di];
+      if (d.kind === "secret" && mode === "dm" && !vis.traps) { seg(...a); continue; }
       const horiz = a[1] === a[3];
       const mid = horiz ? [(a[0]+a[2])/2, a[1]] : [a[0], (a[1]+a[3])/2];
       const g = CS * .34;
@@ -499,68 +526,64 @@ function drawMap() {
       const opened = play.opened[doorKey(normDoor(x, y, dir))] && mode === "dm";
       const col = d.kind === "secret" ? "var(--muted)" : d.kind === "locked" ? "var(--danger)" : "var(--amber)";
       const dash = d.kind === "secret" ? ' stroke-dasharray="3 3"' : "";
-      const bar = horiz
-        ? `<line x1="${mid[0]-g}" y1="${a[1]}" x2="${mid[0]+g}" y2="${a[1]}"`
-        : `<line x1="${a[0]}" y1="${mid[1]-g}" x2="${a[0]}" y2="${mid[1]+g}"`;
+      const bar = horiz ? `<line x1="${mid[0]-g}" y1="${a[1]}" x2="${mid[0]+g}" y2="${a[1]}"`
+                        : `<line x1="${a[0]}" y1="${mid[1]-g}" x2="${a[0]}" y2="${mid[1]+g}"`;
       p.push(`${bar} stroke="${col}" stroke-width="${opened ? 2 : 5}" stroke-linecap="round"${dash}/>`);
-      if (d.trap === "block")
-        p.push(`<circle cx="${mid[0]}" cy="${mid[1]}" r="${CS*.16}" fill="var(--danger)"/>`);
+      if (d.trap === "block") p.push(`<circle cx="${mid[0]}" cy="${mid[1]}" r="${CS*.16}" fill="var(--danger)"/>`);
     }
   }
 
-  // features and traps
-  if (vis.furniture) for (const f of map.features) {
-    const F = FEATURES[f.kind]; if (!F) continue;
-    if (F.blocks) p.push(`<rect x="${f.x*CS+2}" y="${f.y*CS+2}" width="${CS-4}" height="${CS-4}" fill="var(--sunk)" stroke="var(--line-2)" rx="2"/>`);
-    p.push(`<text class="glyph" x="${f.x*CS+CS/2}" y="${f.y*CS+CS/2+1}" style="font-size:${CS*.62}px">${F.g}</text>`);
+  if (vis.furniture) for (const f of F().features) {
+    const FF = FEATURES[f.kind]; if (!FF) continue;
+    if (FF.blocks) p.push(`<rect x="${f.x*CS+2}" y="${f.y*CS+2}" width="${CS-4}" height="${CS-4}" fill="var(--sunk)" stroke="var(--line-2)" rx="2"/>`);
+    p.push(`<text class="glyph" x="${f.x*CS+CS/2}" y="${f.y*CS+CS/2+1}" style="font-size:${CS*.62}px">${FF.g}</text>`);
   }
-  if (vis.traps) for (const t of map.traps) {
+  if (vis.traps) for (const t of F().traps) {
     p.push(`<circle cx="${t.x*CS+CS/2}" cy="${t.y*CS+CS/2}" r="${CS*.3}" fill="none" stroke="var(--danger)" stroke-width="2"/>`);
     p.push(`<text class="glyph" x="${t.x*CS+CS/2}" y="${t.y*CS+CS/2+1}" fill="var(--danger)" style="font-size:${CS*.42}px">${TRAPS[t.kind].g}</text>`);
   }
 
-  // room names + monster counts
-  if (vis.rooms) for (const id of roomsInGrid()) {
-    const cells = roomCells(id); if (!cells.length) continue;
-    const cx = cells.reduce((a,c)=>a+c.x,0)/cells.length;
-    const top = Math.min(...cells.map(c => c.y));
-    const m = roomMeta(id), X = (cx+.5)*CS, Y = (top+.5)*CS;
-    if (CS >= 20 && m) {
-      p.push(`<text class="rlabel" x="${X}" y="${Y}" text-anchor="middle" dominant-baseline="central" style="font-size:${Math.min(CS*.62,14)}px">${esc(m.name)}</text>`);
-      if (vis.traps && m.monsters.length)
-        p.push(`<text class="rid" x="${X}" y="${Y+CS*.62}" text-anchor="middle" style="font-size:${Math.min(CS*.44,10)}px">${esc(m.monsters.join(" "))}</text>`);
-    } else {
-      p.push(`<text class="rlabel" x="${X}" y="${Y}" text-anchor="middle" dominant-baseline="central" style="font-size:${CS*.6}px">${id}</text>`);
+  // labels: floor rooms get their name, unused possible rooms get their letter
+  for (const c of possibleRooms()) {
+    const cells = cellsOf(c); if (!cells.length) continue;
+    const cx = cells.reduce((a, k) => a + k.x, 0) / cells.length;
+    const top = Math.min(...cells.map(k => k.y));
+    const X = (cx + .5) * CS, Y = (top + .5) * CS;
+    const r = F().rooms.find(q => q.at === c);
+    if (r) {
+      if (CS >= 20) {
+        p.push(`<text class="rlabel" x="${X}" y="${Y}" text-anchor="middle" dominant-baseline="central" style="font-size:${Math.min(CS*.62,14)}px">${esc(r.name)}</text>`);
+        if (vis.traps && r.monsters.length)
+          p.push(`<text class="rid" x="${X}" y="${Y+CS*.62}" text-anchor="middle" style="font-size:${Math.min(CS*.44,10)}px">${esc(r.monsters.join(" "))}</text>`);
+      } else p.push(`<text class="rlabel" x="${X}" y="${Y}" text-anchor="middle" dominant-baseline="central" style="font-size:${CS*.6}px">${r.id}</text>`);
+    } else if (vis.board && active === "inplay" || vis.board && active === "board") {
+      p.push(`<text class="rid" x="${X}" y="${Y}" text-anchor="middle" dominant-baseline="central" style="font-size:${Math.min(CS*.6,15)}px" fill="var(--muted)">${c}</text>`);
     }
   }
 
-  // rectangle being dragged out
   const box = dragBox();
   if (box) {
     const X = box.x0 * CS, Y = box.y0 * CS;
     const W2 = (box.x1 - box.x0 + 1) * CS, H2 = (box.y1 - box.y0 + 1) * CS;
     p.push(`<rect x="${X}" y="${Y}" width="${W2}" height="${H2}" fill="${toolFill()}" opacity=".55"/>`);
-    p.push(`<rect x="${X + 1}" y="${Y + 1}" width="${W2 - 2}" height="${H2 - 2}" fill="none" stroke="var(--amber)" stroke-width="2" stroke-dasharray="5 3"/>`);
-    p.push(`<text class="rlabel" x="${X + W2 / 2}" y="${Y + H2 / 2}" text-anchor="middle" dominant-baseline="central" style="font-size:${Math.min(CS * .7, 16)}px">${box.x1 - box.x0 + 1}×${box.y1 - box.y0 + 1}</text>`);
+    p.push(`<rect x="${X+1}" y="${Y+1}" width="${W2-2}" height="${H2-2}" fill="none" stroke="var(--amber)" stroke-width="2" stroke-dasharray="5 3"/>`);
+    p.push(`<text class="rlabel" x="${X+W2/2}" y="${Y+H2/2}" text-anchor="middle" dominant-baseline="central" style="font-size:${Math.min(CS*.7,16)}px">${box.x1-box.x0+1}×${box.y1-box.y0+1}</text>`);
   }
 
-  // selection ring
   if (sel?.type === "cell") p.push(`<rect class="selring" x="${sel.x*CS+1}" y="${sel.y*CS+1}" width="${CS-2}" height="${CS-2}" rx="2"/>`);
   if (sel?.type === "room" && mode === "edit") {
-    // outline the room's outer edge only, rather than ringing every square
-    for (const c of roomCells(sel.id)) for (const [dir, [dx, dy]] of Object.entries(DELTA)) {
-      if (at(c.x + dx, c.y + dy) === at(c.x, c.y)) continue;
+    for (const c of cellsOf(sel.at)) for (const [dir, [dx, dy]] of Object.entries(DELTA)) {
+      if (at(c.x + dx, c.y + dy) === sel.at) continue;
       const X = c.x * CS, Y = c.y * CS;
       const a = dir === "E" ? [X+CS,Y,X+CS,Y+CS] : dir === "S" ? [X,Y+CS,X+CS,Y+CS]
               : dir === "W" ? [X,Y,X,Y+CS] : [X,Y,X+CS,Y];
       p.push(`<line class="selring" x1="${a[0]}" y1="${a[1]}" x2="${a[2]}" y2="${a[3]}"/>`);
     }
   }
-
-  // ruler
   p.push(`</g>`);
-  for (let x = 0; x < map.w; x += 5) p.push(`<text class="rid" x="${P+x*CS+CS/2}" y="${P-4}" text-anchor="middle" style="font-size:9px">${x}</text>`);
-  for (let y = 0; y < map.h; y += 5) p.push(`<text class="rid" x="${P-4}" y="${P+y*CS+CS/2}" text-anchor="end" dominant-baseline="central" style="font-size:9px">${y}</text>`);
+  for (let x = 0; x < B().w; x += 5) p.push(`<text class="rid" x="${P+x*CS+CS/2}" y="${P-4}" text-anchor="middle" style="font-size:9px">${x}</text>`);
+  for (let y = 0; y < B().h; y += 5) p.push(`<text class="rid" x="${P-4}" y="${P+y*CS+CS/2}" text-anchor="end" dominant-baseline="central" style="font-size:9px">${y}</text>`);
+
   const svg = $("#map");
   svg.setAttribute("width", W + P * 2);
   svg.setAttribute("height", H + P * 2);
@@ -568,7 +591,6 @@ function drawMap() {
   svg.innerHTML = p.join("");
   if (!bound) { bindMap(); bound = true; }
 }
-let bound = false;
 
 function drawLayers() {
   const pane = $("#layerPane"); pane.innerHTML = "";
@@ -590,7 +612,7 @@ function tbtn(layer, val, label, extra) {
   return el("button", { class: tool[layer] === val ? "on" : "", onclick: () => { tool[layer] = val; render(); } },
     extra ? [extra, label] : label);
 }
-function sw(color) { return el("span", { class:"swatch", style:`background:${color}` }); }
+const sw = color => el("span", { class:"swatch", style:`background:${color}` });
 
 function drawTools() {
   const pane = $("#toolPane"); pane.innerHTML = "";
@@ -606,22 +628,23 @@ function drawTools() {
   }
   const t = el("div", { class:"tools" });
   if (active === "board") {
-    t.append(tbtn("board", ".", "Corridor", sw("var(--corridor)")), tbtn("board", "#", "Stone", sw("var(--stone)")));
-    for (const id of roomsInGrid()) t.append(tbtn("board", charForRoom(id), String(id), sw(roomTint(id))));
-    t.append(el("button", { onclick: addRoom }, "+ Room"));
-  } else if (active === "sealed") {
-    t.append(tbtn("sealed", "x", "Seal off"), tbtn("sealed", ".", "Re-open"));
+    t.append(tbtn("board", ".", "Corridor", sw("var(--corridor)")));
+    for (const c of possibleRooms()) t.append(tbtn("board", c, c, sw(boardTint(c))));
+    t.append(el("button", { onclick: addPossibleRoom }, "+ Possible room"));
+  } else if (active === "inplay") {
+    t.append(el("p", { class:"hint" },
+      "Tap a possible room on the map to put it in play or take it out. Rooms you don't use are stone this floor."));
+  } else if (active === "stone") {
+    t.append(tbtn("stone", "x", "Add stone"), tbtn("stone", ".", "Clear"));
   } else if (active === "doors") {
     for (const [k, n] of Object.entries(DOORS)) t.append(tbtn("doors", k, n));
     t.append(tbtn("doors", "erase", "Remove"));
   } else if (active === "furniture") {
-    for (const [k, F] of Object.entries(FEATURES)) t.append(tbtn("furniture", k, " " + F.n, F.g));
+    for (const [k, FF] of Object.entries(FEATURES)) t.append(tbtn("furniture", k, " " + FF.n, FF.g));
     t.append(tbtn("furniture", "erase", "Remove"));
   } else if (active === "traps") {
     for (const [k, T] of Object.entries(TRAPS)) t.append(tbtn("traps", k, " " + T.n, T.g));
     t.append(tbtn("traps", "erase", "Remove"));
-  } else {
-    t.append(el("p", { class:"hint" }, "Tap a room on the map to edit it."));
   }
   pane.append(t);
   if (isArea(active)) {
@@ -636,18 +659,33 @@ function drawTools() {
     pane.append(el("p", { class:"hint" }, paintMode === "rect"
       ? "Drag out a block of squares and let go. Hold Shift to square it off. Esc cancels."
       : "Drag to paint square by square."));
-  if (active === "board")
-    pane.append(el("p", { class:"hint" }, "Painting a room over another room moves the boundary."));
 }
 
-function addRoom() {
+function addPossibleRoom() {
   snapshot();
-  const used = new Set(map.rooms.map(r => r.id).concat(roomsInGrid()));
-  let id = 1; while (used.has(id)) id++;
-  map.rooms.push({ id, name:"Room " + id, required:false, monsters:[] });
-  map.rooms.sort((a, b) => a.id - b.id);
-  tool.board = charForRoom(id); active = "board"; sel = { type:"room", id };
+  const used = new Set(possibleRooms());
+  const c = [...ROOM_CHARS].find(ch => !used.has(ch));
+  if (!c) { status("no room letters left", "bad"); return; }
+  tool.board = c; active = "board"; lock.board = false;
+  status(`painting possible room ${c} — drag out its shape`, "good");
   render();
+}
+
+function nextFreeId() {
+  const used = new Set(F().rooms.map(r => r.id));
+  let id = 1; while (used.has(id)) id++;
+  return id;
+}
+function putInPlay(letter) {
+  snapshot();
+  F().rooms.push({ at: letter, id: nextFreeId(), name: "Room " + nextFreeId(), required: false, monsters: [] });
+  F().rooms.sort((a, b) => a.id - b.id);
+  dirty = true;
+}
+function takeOutOfPlay(letter) {
+  snapshot();
+  F().rooms = F().rooms.filter(r => r.at !== letter);
+  dirty = true;
 }
 
 /* ---------- inspector ---------- */
@@ -655,57 +693,58 @@ function drawSel() {
   const pane = $("#selPane"); pane.innerHTML = "";
   if (!sel) {
     pane.append(el("h2", {}, "Floor"));
-    pane.append(field("Name", map.name, v => { map.name = v; dirty = true; }));
-    pane.append(field("Note", map.note || "", v => { map.note = v; dirty = true; }, "textarea"));
+    pane.append(field("Floor name", F().name, v => { F().name = v; dirty = true; }));
+    pane.append(field("Note", F().note || "", v => { F().note = v; dirty = true; }, "textarea"));
+    pane.append(el("h2", { style:"margin-top:14px" }, "Printed board"));
+    pane.append(field("Board name", B().name, v => { B().name = v; dirty = true; }));
     const size = el("div", { class:"row" });
-    size.append(numField("Width", map.w, v => resize(v, map.h)), numField("Height", map.h, v => resize(map.w, v)));
+    size.append(numField("Width", B().w, v => resize(v, B().h)), numField("Height", B().h, v => resize(B().w, v)));
     pane.append(size);
+    pane.append(el("p", { class:"hint" }, `${possibleRooms().length} possible rooms on this board · ${F().rooms.length} in play this floor`));
     return;
   }
   if (sel.type === "room") {
-    const m = roomMeta(sel.id);
-    pane.append(el("h2", {}, `Room ${sel.id}`));
+    const letter = sel.at, r = F().rooms.find(q => q.at === letter);
+    pane.append(el("h2", {}, `Possible room ${letter}`));
     if (mode === "dm") {
-      if (!m) { pane.append(el("p", { class:"hint" }, "Not described yet.")); return; }
-      pane.append(el("p", { class:"disp", style:"font-size:20px" }, m.name));
-      pane.append(el("p", { class:"mono-sm", style:"margin:4px 0 8px" },
-        m.monsters.length ? m.monsters.join(" · ") : "no monsters"));
-      if (m.note) pane.append(el("p", { class:"hint" }, m.note));
-      pane.append(checkbox("Cleared", !!play.cleared[sel.id],
-        v => { play.cleared[sel.id] = v; savePlay(); render(); }));
+      if (!r) { pane.append(el("p", { class:"hint" }, "Not in play this floor — solid stone.")); return; }
+      pane.append(el("p", { class:"disp", style:"font-size:20px" }, r.name));
+      pane.append(el("p", { class:"mono-sm", style:"margin:4px 0 8px" }, r.monsters.length ? r.monsters.join(" · ") : "no monsters"));
+      if (r.note) pane.append(el("p", { class:"hint" }, r.note));
+      pane.append(checkbox("Cleared", !!play.cleared[r.id], v => { play.cleared[r.id] = v; savePlay(); render(); }));
       return;
     }
-    if (!m) { pane.append(el("p", { class:"hint" }, "Painted but not described yet."),
-      el("button", { onclick: () => { snapshot(); map.rooms.push({ id:sel.id, name:"Room "+sel.id, required:false, monsters:[] }); render(); } }, "Describe it")); return; }
-    pane.append(field("Name", m.name, v => { m.name = v; dirty = true; }, "input", true));
-    pane.append(checkbox("On the required path", m.required, v => { m.required = v; dirty = true; render(); }));
-    pane.append(field("Monsters (comma separated)", m.monsters.join(", "),
-      v => { m.monsters = v.split(",").map(s => s.trim().toLowerCase()).filter(Boolean); dirty = true; render(); }));
-    const bad = m.monsters.filter(x => !MONSTERS.includes(x));
+    if (!r) {
+      pane.append(el("p", { class:"hint" }, "Not used this floor, so it's covered in solid stone."));
+      pane.append(el("button", { onclick: () => { putInPlay(letter); render(); } }, "Put in play"));
+      return;
+    }
+    pane.append(field("Name", r.name, v => { r.name = v; dirty = true; }, "input", true));
+    const idf = el("input", { type:"number", min:"1", max:"35", value:r.id });
+    idf.addEventListener("change", () => { r.id = Math.max(1, Math.min(35, +idf.value || r.id)); dirty = true; render(); });
+    pane.append(el("div", { class:"field" }, [el("label", {}, "Room number"), idf]));
+    pane.append(checkbox("On the required path", r.required, v => { r.required = v; dirty = true; render(); }));
+    pane.append(field("Monsters (comma separated)", r.monsters.join(", "),
+      v => { r.monsters = v.split(",").map(x => x.trim().toLowerCase()).filter(Boolean); dirty = true; render(); }));
+    const bad = r.monsters.filter(x => !MONSTERS.includes(x));
     if (bad.length) pane.append(el("p", { class:"hint", style:"color:var(--danger)" }, "Unknown: " + bad.join(", ") + ". Known: " + MONSTERS.join(", ")));
-    pane.append(field("DM note", m.note || "", v => { m.note = v; dirty = true; }, "textarea"));
-    pane.append(el("button", { onclick: () => {
-      if (!confirm(`Delete “${m.name}” and clear its squares?`)) return;
-      snapshot();
-      for (const c of roomCells(sel.id)) setCell(c.x, c.y, "#");
-      map.rooms = map.rooms.filter(r => r.id !== sel.id); sel = null; render();
-    } }, "Delete room"));
+    pane.append(field("DM note", r.note || "", v => { r.note = v; dirty = true; }, "textarea"));
+    pane.append(el("button", { onclick: () => { takeOutOfPlay(letter); sel = null; render(); } }, "Take out of play"));
     return;
   }
-  // a square
   const { x, y } = sel;
   pane.append(el("h2", {}, `Square ${x}, ${y}`));
-  const rid = roomForChar(at(x, y));
+  const c = at(x, y), r = roomAt(x, y);
   pane.append(el("p", { class:"mono-sm" },
-    (rid ? `room ${rid} — ${roomMeta(rid)?.name || "unnamed"}` : at(x, y) === "." ? "corridor" : "stone")
-    + (sealedAt(x, y) ? " · sealed off" : "")));
+    (isRoomChar(c) ? (r ? `room ${r.id} — ${r.name}` : `possible room ${c} — not in play, stone`) : "corridor")
+    + (stoneAt(x, y) ? " · stone laid over it" : "")));
   const fi = featAt(x, y), ti = trapAt(x, y);
-  if (fi >= 0) pane.append(el("p", { class:"mono-sm" }, FEATURES[map.features[fi].kind].g + " " + FEATURES[map.features[fi].kind].n));
-  if (ti >= 0) pane.append(el("p", { class:"mono-sm" }, TRAPS[map.traps[ti].kind].g + " " + TRAPS[map.traps[ti].kind].n + " trap"));
+  if (fi >= 0) pane.append(el("p", { class:"mono-sm" }, FEATURES[F().features[fi].kind].g + " " + FEATURES[F().features[fi].kind].n));
+  if (ti >= 0) pane.append(el("p", { class:"mono-sm" }, TRAPS[F().traps[ti].kind].g + " " + TRAPS[F().traps[ti].kind].n + " trap"));
 }
 function field(label, val, on, kind = "input", focus = false) {
-  const inp = el(kind === "textarea" ? "textarea" : "input", { value:kind === "textarea" ? false : val });
-  if (kind === "textarea") inp.value = val;
+  const inp = el(kind === "textarea" ? "textarea" : "input", {});
+  inp.value = val;
   inp.addEventListener("input", () => on(inp.value));
   if (focus) setTimeout(() => inp.focus(), 0);
   return el("div", { class:"field" }, [el("label", {}, label), inp]);
@@ -723,15 +762,12 @@ function checkbox(label, val, on) {
 function resize(w, h) {
   snapshot();
   const g = [];
-  for (let y = 0; y < h; y++) {
-    const old = map.grid[y] || "";
-    g.push((old + "#".repeat(w)).slice(0, w));
-  }
-  map.grid = g; map.w = w; map.h = h;
-  if (map.sealed) map.sealed = Array.from({ length:h }, (_, y) => ((map.sealed[y] || "") + ".".repeat(w)).slice(0, w));
-  map.features = map.features.filter(f => inB(f.x, f.y));
-  map.traps = map.traps.filter(t => inB(t.x, t.y));
-  map.doors = map.doors.filter(d => inB(d.x, d.y));
+  for (let y = 0; y < h; y++) g.push(((B().grid[y] || "") + ".".repeat(w)).slice(0, w));
+  B().grid = g; B().w = w; B().h = h;
+  if (F().stone) F().stone = Array.from({ length:h }, (_, y) => ((F().stone[y] || "") + ".".repeat(w)).slice(0, w));
+  F().features = F().features.filter(f => inB(f.x, f.y));
+  F().traps = F().traps.filter(t => inB(t.x, t.y));
+  F().doors = F().doors.filter(d => inB(d.x, d.y));
   render();
 }
 
@@ -752,32 +788,34 @@ function drawClock() {
           : c > -5 ? `Collapse — ${dmg} damage to everyone still up here`
           : "The floor is gone."));
   pane.append(el("div", { class:"clock" }, [die, info]));
-  const row = el("div", { class:"tools", style:"margin-top:9px" });
-  row.append(
+  pane.append(el("div", { class:"tools", style:"margin-top:9px" }, [
     el("button", { onclick: () => { play.round++; play.count--; savePlay(); render(); } }, "End round"),
     el("button", { class:"on", onclick: () => { play.count = Math.min(play.count, 5); savePlay(); render(); } }, "Reset! (→5)"),
     el("button", { onclick: () => { play.round = 1; play.count = 26; play.cleared = {}; play.opened = {}; savePlay(); render(); } }, "New floor"),
-  );
-  pane.append(row);
+  ]));
 }
 
 function drawRoster() {
   const pane = $("#rosterPane"); pane.innerHTML = "";
-  pane.append(el("h2", {}, "Rooms"));
+  pane.append(el("h2", {}, mode === "dm" ? "Rooms" : "Rooms this floor"));
   const ul = el("ul", { class:"roster" });
-  for (const id of roomsInGrid()) {
-    const m = roomMeta(id);
-    const li = el("li", { class:(play.cleared[id] && mode === "dm" ? "done " : "") + (m?.required ? "req" : ""),
+  for (const r of [...F().rooms].sort((a, b) => a.id - b.id)) {
+    const li = el("li", { class:(play.cleared[r.id] && mode === "dm" ? "done " : "") + (r.required ? "req" : ""),
       onclick: () => {
-        if (mode === "dm") { play.cleared[id] = !play.cleared[id]; savePlay(); }
-        else { active = "rooms"; }
-        sel = { type:"room", id }; render();
+        if (mode === "dm") { play.cleared[r.id] = !play.cleared[r.id]; savePlay(); }
+        else active = "inplay";
+        sel = { type:"room", at:r.at }; render();
       } });
-    li.append(el("span", { class:"n" }, String(id)), el("span", {}, m?.name || "unnamed"),
-      el("span", { class:"m" }, m?.monsters.length ? m.monsters.join(" ") : ""));
+    li.append(el("span", { class:"n" }, String(r.id)), el("span", {}, r.name),
+      el("span", { class:"m" }, r.monsters.join(" ")));
     ul.append(li);
   }
   pane.append(ul);
+  if (mode === "edit") {
+    const unused = possibleRooms().filter(c => !inPlay(c));
+    if (unused.length) pane.append(el("p", { class:"hint" },
+      `${unused.length} possible room${unused.length===1?"":"s"} not in play (stone): ${unused.join(" ")}`));
+  }
 }
 
 function drawIssues() {
@@ -801,45 +839,36 @@ function bindMap() {
     const sy = (ev.clientY - r.top) / r.height * svg.viewBox.baseVal.height - 14;
     return { fx: sx / CS, fy: sy / CS, x: Math.floor(sx / CS), y: Math.floor(sy / CS) };
   };
-  const clampX = x => Math.max(0, Math.min(map.w - 1, x));
-  const clampY = y => Math.max(0, Math.min(map.h - 1, y));
+  const clampX = x => Math.max(0, Math.min(B().w - 1, x));
+  const clampY = y => Math.max(0, Math.min(B().h - 1, y));
 
   svg.addEventListener("pointerdown", ev => {
     const c = cellAt(ev);
     if (!inB(c.x, c.y)) return;
     ev.preventDefault(); svg.setPointerCapture(ev.pointerId);
     if (mode === "edit" && !lock[active] && isArea(active) && paintMode === "rect") {
-      drag = { x0: c.x, y0: c.y, x1: c.x, y1: c.y };
-      drawMap();
-      return;
+      drag = { x0:c.x, y0:c.y, x1:c.x, y1:c.y }; drawMap(); return;
     }
-    if (mode === "edit" && !lock[active]) {
-      snapshot();
-      painting = isArea(active);
-      last = "";
-    }
+    if (mode === "edit" && !lock[active]) { snapshot(); painting = isArea(active); last = ""; }
     apply(c); last = c.x + "," + c.y;
   });
-
   svg.addEventListener("pointermove", ev => {
     if (drag) {
       const c = cellAt(ev);
       let x1 = clampX(c.x), y1 = clampY(c.y);
-      if (ev.shiftKey) {                       // square it off
+      if (ev.shiftKey) {
         const n = Math.max(Math.abs(x1 - drag.x0), Math.abs(y1 - drag.y0));
         x1 = clampX(drag.x0 + Math.sign(x1 - drag.x0) * n);
         y1 = clampY(drag.y0 + Math.sign(y1 - drag.y0) * n);
       }
       if (x1 === drag.x1 && y1 === drag.y1) return;
-      drag.x1 = x1; drag.y1 = y1; drawMap();
-      return;
+      drag.x1 = x1; drag.y1 = y1; drawMap(); return;
     }
     if (!painting) return;
     const c = cellAt(ev);
     if (!inB(c.x, c.y) || last === c.x + "," + c.y) return;
     last = c.x + "," + c.y; apply(c, true);
   });
-
   svg.addEventListener("pointerup", () => {
     if (drag) { const box = dragBox(); drag = null; fillBox(box); }
     painting = false;
@@ -847,74 +876,12 @@ function bindMap() {
   svg.addEventListener("pointercancel", () => { drag = null; painting = false; drawMap(); });
 }
 
-function apply(c, dragging = false) {
-  const { x, y, fx, fy } = c;
-  if (mode === "dm") {
-    // tap a door to open it, otherwise tap a room to mark it cleared
-    const d = nearestDoor(x, y, fx, fy);
-    if (d) { const k = doorKey(map.doors[d]); play.opened[k] = !play.opened[k]; savePlay(); render(); return; }
-    const rid = roomForChar(at(x, y));
-    if (rid) { play.cleared[rid] = !play.cleared[rid]; savePlay(); sel = { type:"room", id:rid }; }
-    else sel = { type:"cell", x, y };
-    render(); return;
-  }
-  if (lock[active]) { sel = { type:"cell", x, y }; render(); return; }
-
-  switch (active) {
-    case "board":   setCell(x, y, tool.board); break;
-    case "sealed":  setSealed(x, y, tool.sealed === "x"); break;
-    case "rooms": {
-      const rid = roomForChar(at(x, y));
-      sel = rid ? { type:"room", id:rid } : { type:"cell", x, y };
-      break;
-    }
-    case "doors": {
-      if (dragging) return;
-      // pick the edge the tap landed nearest to
-      const px = fx - x, py = fy - y;
-      const ranked = [["W", px], ["E", 1 - px], ["N", py], ["S", 1 - py]].sort((a, b) => a[1] - b[1]);
-      const wall = ranked.find(([d]) => {
-        const nx = x + DELTA[d][0], ny = y + DELTA[d][1];
-        return inB(nx, ny) && open(nx, ny) && regionAt(nx, ny) !== regionAt(x, y);
-      });
-      const dir = (wall || ranked[0])[0];
-      const n = normDoor(x, y, dir);
-      if (!inB(n.x, n.y) || !inB(n.x + DELTA[n.dir][0], n.y + DELTA[n.dir][1])) return;
-      const i = map.doors.findIndex(d => d.x === n.x && d.y === n.y && d.dir === n.dir);
-      if (tool.doors === "erase") { if (i >= 0) map.doors.splice(i, 1); break; }
-      const rec = { x:n.x, y:n.y, dir:n.dir,
-        kind: tool.doors === "block" ? "normal" : tool.doors,
-        ...(tool.doors === "block" ? { trap:"block" } : {}) };
-      if (i >= 0) map.doors[i] = rec; else map.doors.push(rec);
-      break;
-    }
-    case "furniture": {
-      const i = featAt(x, y);
-      if (i >= 0) map.features.splice(i, 1);
-      if (tool.furniture !== "erase") {
-        if (tool.furniture === "entrance" || tool.furniture === "stairs")
-          map.features = map.features.filter(f => f.kind !== tool.furniture);   // only one of each
-        map.features.push({ x, y, kind: tool.furniture });
-      }
-      break;
-    }
-    case "traps": {
-      const i = trapAt(x, y);
-      if (i >= 0) map.traps.splice(i, 1);
-      if (tool.traps !== "erase") map.traps.push({ x, y, kind: tool.traps });
-      break;
-    }
-  }
-  if (active !== "rooms") sel = { type:"cell", x, y };
-  dirty = true; render();
-}
-
 function fillBox(b) {
   if (!b) return;
   snapshot();
   for (let y = b.y0; y <= b.y1; y++) for (let x = b.x0; x <= b.x1; x++) {
     if (active === "board") setCell(x, y, tool.board);
-    else if (active === "sealed") setSealed(x, y, tool.sealed === "x");
+    else if (active === "stone") setStone(x, y, tool.stone === "x");
   }
   sel = null; dirty = true; render();
 }
@@ -929,6 +896,69 @@ function nearestDoor(x, y, fx, fy) {
   return null;
 }
 
+function apply(c, dragging = false) {
+  const { x, y, fx, fy } = c;
+  if (mode === "dm") {
+    const d = nearestDoor(x, y, fx, fy);
+    if (d !== null) { const k = doorKey(F().doors[d]); play.opened[k] = !play.opened[k]; savePlay(); render(); return; }
+    const r = roomAt(x, y);
+    if (r) { play.cleared[r.id] = !play.cleared[r.id]; savePlay(); sel = { type:"room", at:at(x, y) }; }
+    else sel = { type:"cell", x, y };
+    render(); return;
+  }
+  if (lock[active]) { sel = { type:"cell", x, y }; render(); return; }
+
+  switch (active) {
+    case "board": setCell(x, y, tool.board); break;
+    case "stone": setStone(x, y, tool.stone === "x"); break;
+    case "inplay": {
+      if (dragging) return;
+      const ch = at(x, y);
+      if (!isRoomChar(ch)) { sel = { type:"cell", x, y }; break; }
+      if (inPlay(ch)) sel = { type:"room", at:ch };
+      else { putInPlay(ch); sel = { type:"room", at:ch }; }
+      break;
+    }
+    case "doors": {
+      if (dragging) return;
+      const px = fx - x, py = fy - y;
+      const ranked = [["W", px], ["E", 1 - px], ["N", py], ["S", 1 - py]].sort((a, b) => a[1] - b[1]);
+      const wall = ranked.find(([d]) => {
+        const nx = x + DELTA[d][0], ny = y + DELTA[d][1];
+        return inB(nx, ny) && open(nx, ny) && regionAt(nx, ny) !== regionAt(x, y);
+      });
+      const dir = (wall || ranked[0])[0];
+      const n = normDoor(x, y, dir);
+      if (!inB(n.x, n.y) || !inB(n.x + DELTA[n.dir][0], n.y + DELTA[n.dir][1])) return;
+      const i = F().doors.findIndex(d => d.x === n.x && d.y === n.y && d.dir === n.dir);
+      if (tool.doors === "erase") { if (i >= 0) F().doors.splice(i, 1); break; }
+      const rec = { x:n.x, y:n.y, dir:n.dir,
+        kind: tool.doors === "block" ? "normal" : tool.doors,
+        ...(tool.doors === "block" ? { trap:"block" } : {}) };
+      if (i >= 0) F().doors[i] = rec; else F().doors.push(rec);
+      break;
+    }
+    case "furniture": {
+      const i = featAt(x, y);
+      if (i >= 0) F().features.splice(i, 1);
+      if (tool.furniture !== "erase") {
+        if (tool.furniture === "entrance" || tool.furniture === "stairs")
+          F().features = F().features.filter(f => f.kind !== tool.furniture);
+        F().features.push({ x, y, kind: tool.furniture });
+      }
+      break;
+    }
+    case "traps": {
+      const i = trapAt(x, y);
+      if (i >= 0) F().traps.splice(i, 1);
+      if (tool.traps !== "erase") F().traps.push({ x, y, kind: tool.traps });
+      break;
+    }
+  }
+  if (active !== "inplay") sel = { type:"cell", x, y };
+  dirty = true; render();
+}
+
 /* ---------- chrome ---------- */
 $("#mEdit").onclick = () => { mode = "edit"; sel = null; render(); };
 $("#mDM").onclick = () => { mode = "dm"; sel = null; render(); };
@@ -939,8 +969,8 @@ for (const b of document.querySelectorAll("[data-preset]")) b.onclick = () => {
   const p = b.dataset.preset;
   const set = o => { for (const L of LAYERS) vis[L.id] = o[L.id] ?? true; };
   if (p === "dm") set({});
-  if (p === "players") set({ traps:false, sealed:false });
-  if (p === "board") set({ traps:false, furniture:false, rooms:false, sealed:false });
+  if (p === "players") set({ traps:false, stone:false, board:false });
+  if (p === "board") set({ traps:false, furniture:false, stone:false });
   render();
 };
 $("#jsonBtn").onclick = () => { $("#jsonTxt").value = JSON.stringify(map, null, 2); $("#jsonDlg").showModal(); };
@@ -952,13 +982,14 @@ $("#jsonCopy").onclick = async () => {
 $("#jsonApply").onclick = () => {
   try {
     const m = JSON.parse($("#jsonTxt").value);
-    if (!m.grid || !m.w || !m.h) throw new Error("needs grid, w and h");
-    snapshot(); map = m; sel = null; $("#jsonDlg").close(); render(); status("loaded pasted map", "good");
+    if (!m.board?.grid || !m.floor) throw new Error("needs a board and a floor");
+    snapshot(); map = m; sel = null; $("#jsonDlg").close(); afterLoad(); status("loaded pasted map", "good");
   } catch (e) { status("bad JSON: " + e.message, "bad"); }
 };
 addEventListener("keydown", e => {
   if (e.key === "Escape" && drag) { drag = null; drawMap(); return; }
-  if (e.key === "r" && !e.metaKey && !e.ctrlKey && isArea(active) && mode === "edit") {
+  if (e.key === "r" && !e.metaKey && !e.ctrlKey && isArea(active) && mode === "edit"
+      && !/^(INPUT|TEXTAREA)$/.test(document.activeElement?.tagName || "")) {
     paintMode = paintMode === "rect" ? "free" : "rect";
     localStorage.setItem("dungeon.paintMode", paintMode); render(); return;
   }

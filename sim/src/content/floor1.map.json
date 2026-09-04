@@ -1,140 +1,175 @@
 {
-  "name": "Floor 1 — The Tutorial Floor",
-  "note": "Rooms 1, 2, 5 and 9 are on the required path. PLACEHOLDER GEOMETRY — replace with First Light's real Quest 1 layout.",
-  "w": 26,
-  "h": 19,
-  "grid": [
-    "######.######.######.#####",
-    "#11111.#44444.#33333.#####",
-    "#11111.#44444.#33333.#####",
-    "#11111.#44444.#33333.#####",
-    "#11111.#44444.#33333.#####",
-    "#11111.#44444.#33333.#####",
-    "..........................",
-    "#22222.#55555.######.#####",
-    "#22222.#55555.#88888.#####",
-    "#22222.#55555.#88888.#####",
-    "#22222.#55555.#88888.#####",
-    "#22222.#55555.#88888.#####",
-    "######.######.######.#####",
-    "...................999999#",
-    "#7777#.66666#.#####999999#",
-    "#7777#.66666#.#####999999#",
-    "#7777#.66666#.#####999999#",
-    "#7777#.66666#.#####999999#",
-    "#7777#.66666#.#####999999#"
-  ],
-  "rooms": [
-    {
-      "id": 1,
-      "name": "Welcome Center",
-      "required": true,
-      "monsters": [
-    "goblin",
-    "goblin"
-  ]
-    },
-    {
-      "id": 2,
-      "name": "Break Room",
-      "required": true,
-      "monsters": [
-    "orc",
-    "goblin"
-  ]
-    },
-    {
-      "id": 3,
-      "name": "Storage",
-      "required": false,
-      "monsters": [
-    "skeleton",
-    "skeleton"
-  ]
-    },
-    {
-      "id": 4,
-      "name": "Goblin Daycare",
-      "required": false,
-      "monsters": [
-    "goblin",
-    "goblin",
-    "goblin"
-  ]
-    },
-    {
-      "id": 5,
-      "name": "Armory",
-      "required": true,
-      "monsters": [
-    "orc",
-    "zombie"
-  ]
-    },
-    {
-      "id": 6,
-      "name": "The Cage",
-      "required": false,
-      "monsters": [
-    "abomination"
-  ]
-    },
-    {
-      "id": 7,
-      "name": "Latrine",
-      "required": false,
-      "monsters": [
-    "zombie",
-    "zombie"
-  ]
-    },
-    {
-      "id": 8,
-      "name": "Library",
-      "required": false,
-      "monsters": [
-    "skeleton",
-    "goblin"
-  ]
-    },
-    {
-      "id": 9,
-      "name": "Manager's Office",
-      "required": true,
-      "monsters": [
-    "boss",
-    "orc",
-    "orc"
-  ]
-    }
-  ],
-  "doors": [
-    { "x": 5, "y": 3, "dir": "E", "kind": "normal" },
-    { "x": 3, "y": 6, "dir": "S", "kind": "normal" },
-    { "x": 17, "y": 5, "dir": "S", "kind": "normal" },
-    { "x": 9, "y": 5, "dir": "S", "kind": "normal" },
-    { "x": 10, "y": 6, "dir": "S", "kind": "normal" },
-    { "x": 9, "y": 13, "dir": "S", "kind": "normal" },
-    { "x": 2, "y": 13, "dir": "S", "kind": "normal", "trap": "block" },
-    { "x": 19, "y": 9, "dir": "E", "kind": "normal" },
-    { "x": 20, "y": 12, "dir": "S", "kind": "locked" },
-    { "x": 18, "y": 13, "dir": "E", "kind": "secret" }
-  ],
-  "features": [
-    { "x": 6, "y": 0, "kind": "entrance" },
-    { "x": 2, "y": 9, "kind": "table" },
-    { "x": 17, "y": 3, "kind": "chest" },
-    { "x": 10, "y": 3, "kind": "blocker" },
-    { "x": 10, "y": 9, "kind": "rack" },
-    { "x": 9, "y": 16, "kind": "cage" },
-    { "x": 2, "y": 16, "kind": "toilet" },
-    { "x": 17, "y": 9, "kind": "shelf" },
-    { "x": 22, "y": 16, "kind": "stairs" },
-    { "x": 21, "y": 15, "kind": "blocker" }
-  ],
-  "traps": [
-    { "x": 6, "y": 5, "kind": "pit" },
-    { "x": 3, "y": 7, "kind": "pit" },
-    { "x": 10, "y": 10, "kind": "spear" }
-  ]
+  "board": {
+    "name": "HeroQuest First Light — Side A",
+    "w": 26,
+    "h": 19,
+    "grid": [
+      "..........................",
+      ".AAAABBBBCCC..DDDEEEEFFFF.",
+      ".AAAABBBBCCC..DDDEEEEFFFF.",
+      ".AAAABBBBCCC..DDDEEEEFFFF.",
+      ".GGGGHHHHCCC..DDDEEEEFFFF.",
+      ".GGGGHHHHCCC..DDDIIIIJJJJ.",
+      ".GGGGHHHH........IIIIJJJJ.",
+      ".GGGGHHHH.KKKKKK.IIIIJJJJ.",
+      ".GGGGHHHH.KKKKKK.IIIIJJJJ.",
+      "..........KKKKKK..........",
+      ".LLLLMMNN.KKKKKK.VVVVOOOO.",
+      ".LLLLMMNN.KKKKKK.VVVVOOOO.",
+      ".LLLLMMNN........VVVVOOOO.",
+      ".LLLLPPPPQQQ..RRRR...OOOO.",
+      ".SSSSPPPPQQQ..RRRRTTTUUUU.",
+      ".SSSSPPPPQQQ..RRRRTTTUUUU.",
+      ".SSSSPPPPQQQ..RRRRTTTUUUU.",
+      ".SSSSPPPPQQQ..RRRRTTTUUUU.",
+      ".........................."
+    ]
+  },
+  "floor": {
+    "name": "Floor 1 — The Tutorial Floor",
+    "note": "Board traced from a photo of the printed Side A: 26x19, outer edge is corridor, 22 possible rooms, no printed stone. The ROOM ASSIGNMENT below (which possible room is the Welcome Center, etc.) and the door placements are a first pass — check them against the quest sheet.",
+    "rooms": [
+      {
+        "at": "G",
+        "id": 1,
+        "name": "Welcome Center",
+        "required": true,
+        "monsters": [
+      "goblin",
+      "goblin"
+    ]
+      },
+      {
+        "at": "H",
+        "id": 2,
+        "name": "Break Room",
+        "required": true,
+        "monsters": [
+      "orc",
+      "goblin"
+    ]
+      },
+      {
+        "at": "L",
+        "id": 3,
+        "name": "Storage",
+        "required": false,
+        "monsters": [
+      "skeleton",
+      "skeleton"
+    ]
+      },
+      {
+        "at": "B",
+        "id": 4,
+        "name": "Goblin Daycare",
+        "required": false,
+        "monsters": [
+      "goblin",
+      "goblin",
+      "goblin"
+    ]
+      },
+      {
+        "at": "K",
+        "id": 5,
+        "name": "Armory",
+        "required": true,
+        "monsters": [
+      "orc",
+      "zombie"
+    ]
+      },
+      {
+        "at": "J",
+        "id": 6,
+        "name": "The Cage",
+        "required": false,
+        "monsters": [
+      "abomination"
+    ]
+      },
+      {
+        "at": "S",
+        "id": 7,
+        "name": "Latrine",
+        "required": false,
+        "monsters": [
+      "zombie",
+      "zombie"
+    ]
+      },
+      {
+        "at": "V",
+        "id": 8,
+        "name": "Library",
+        "required": false,
+        "monsters": [
+      "skeleton",
+      "goblin"
+    ]
+      },
+      {
+        "at": "U",
+        "id": 9,
+        "name": "Manager's Office",
+        "required": true,
+        "monsters": [
+      "boss",
+      "orc",
+      "orc"
+    ]
+      }
+    ],
+    "doors": [
+      { "x": 0, "y": 6, "dir": "E", "kind": "normal" },
+      { "x": 6, "y": 8, "dir": "S", "kind": "normal" },
+      { "x": 9, "y": 9, "dir": "E", "kind": "normal" },
+      { "x": 6, "y": 0, "dir": "S", "kind": "normal" },
+      { "x": 0, "y": 11, "dir": "E", "kind": "normal" },
+      { "x": 24, "y": 6, "dir": "E", "kind": "normal" },
+      { "x": 2, "y": 17, "dir": "S", "kind": "normal", "trap": "block" },
+      { "x": 18, "y": 9, "dir": "S", "kind": "normal" },
+      { "x": 22, "y": 17, "dir": "S", "kind": "locked" },
+      { "x": 24, "y": 15, "dir": "E", "kind": "secret" }
+    ],
+    "features": [
+      { "x": 0, "y": 9, "kind": "entrance" },
+      { "x": 22, "y": 16, "kind": "stairs" },
+      { "x": 23, "y": 15, "kind": "blocker" },
+      { "x": 6, "y": 6, "kind": "table" },
+      { "x": 2, "y": 11, "kind": "chest" },
+      { "x": 12, "y": 9, "kind": "rack" },
+      { "x": 22, "y": 6, "kind": "cage" },
+      { "x": 2, "y": 15, "kind": "toilet" },
+      { "x": 18, "y": 11, "kind": "shelf" },
+      { "x": 6, "y": 2, "kind": "blocker" }
+    ],
+    "traps": [
+      { "x": 6, "y": 8, "kind": "pit" },
+      { "x": 12, "y": 10, "kind": "spear" },
+      { "x": 0, "y": 13, "kind": "pit" }
+    ],
+    "stone": [
+      "..............x...........",
+      "..........................",
+      "..........................",
+      "..........................",
+      "..........................",
+      "..........................",
+      "..........................",
+      "..........................",
+      "................x.........",
+      ".x...................x....",
+      "x.........................",
+      "..........................",
+      "..........................",
+      "..........................",
+      "..........................",
+      "..........................",
+      "..........................",
+      "..........................",
+      ".........................."
+    ]
+  }
 }
