@@ -10,8 +10,12 @@ const CONTENT = `${ROOT}src/content`;
 const PAGE = `${ROOT}src/tools/mapedit.html`;
 const PORT = Number(process.env.PORT ?? 5173);
 
+// Never let the browser cache the editor or the map: a stale copy looks exactly
+// like "my edit didn't save".
+const NOCACHE = { "cache-control": "no-store, must-revalidate", "pragma": "no-cache" };
+
 const json = (data: unknown, status = 200) =>
-  new Response(JSON.stringify(data), { status, headers: { "content-type": "application/json" } });
+  new Response(JSON.stringify(data), { status, headers: { "content-type": "application/json", ...NOCACHE } });
 
 const safe = (name: string) => /^[a-z0-9-]+$/i.test(name);
 
@@ -22,7 +26,8 @@ const server = Bun.serve({
     const url = new URL(req.url);
     const p = url.pathname;
 
-    if (p === "/" || p === "/index.html") return new Response(Bun.file(PAGE));
+    if (p === "/" || p === "/index.html")
+      return new Response(Bun.file(PAGE), { headers: { "content-type": "text/html; charset=utf-8", ...NOCACHE } });
 
     if (p === "/api/maps") {
       const files = (await readdir(CONTENT)).filter(f => f.endsWith(".map.json"));
@@ -38,7 +43,7 @@ const server = Bun.serve({
       if (req.method === "GET") {
         const f = Bun.file(file);
         if (!(await f.exists())) return json({ error: "no such map" }, 404);
-        return new Response(f, { headers: { "content-type": "application/json" } });
+        return new Response(f, { headers: { "content-type": "application/json", ...NOCACHE } });
       }
       if (req.method === "PUT") {
         let body: MapFile;

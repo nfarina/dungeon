@@ -314,3 +314,21 @@ if (cmd === "escalation") {
   console.log(`\ngentle = 1,1,2,2,3 damage per round of collapse`);
   console.log(`steep  = 1,2,3,4,5 damage per round of collapse`);
 }
+
+if (cmd === "competence") {
+  console.log(`\n=== HOW MUCH DOES SKILL MOVE IT? (${N} runs each, recommended ruleset) ===\n`);
+  console.log(HEAD2);
+  console.log("  (no timer, so the clock can't swamp the difference)");
+  for (const c of [0.3, 0.5, 0.7, 0.9, 1.0]) {
+    const b = batch(N, { lootRich: true, richRack: true, guaranteedSpellbook: true, competence: c });
+    console.log(`  competence ${c.toFixed(1)}   clears in ${f1(b.mean)} rounds   ` +
+      `boss ${pct(b.bossKillRate)}   deaths/game ${f1(b.meanDead)}   downs ${f1(b.meanDowns)}   ` +
+      `party HP at the kill ${f1(b.meanHpAtBoss)}`);
+  }
+  console.log();
+  console.log(HEAD2);
+  for (const c of [0.3, 0.7, 1.0])
+    console.log(row2(`competence ${c.toFixed(1)} + clock`, batch(N, { ...RECOMMENDED, competence: c })));
+  console.log(`\n0.3 = chaotic table   0.7 = the default   1.0 = always makes the smart play`);
+  console.log(`Gates: kill Greg's Orcs first, spend Firebolt/Sleep/Energy Drink well, clutch heal.`);
+}

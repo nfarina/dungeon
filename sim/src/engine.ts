@@ -193,9 +193,30 @@ export class Game {
     return { pockets: mk(POCKETS), gear: mk(GEAR), big: mk(BIG_GEAR) };
   }
 
-  private setupHeroes() {
+  /**
+   * Everyone starts stacked on the entrance square; at the table the stairs up
+   * sit off the board beside it, so there's room for the figures. They spread
+   * out on turn one. If the entrance is somehow unwalkable, fall back to the
+   * nearest square that isn't -- the editor's checks flag that case anyway.
+   */
+  private startSpots(n: number): Pt[] {
     const e = FLOOR1.entrance;
-    const spots = [e, { x: e.x, y: e.y + 1 }, { x: e.x, y: e.y + 2 }];
+    if (this.board.isFloor(e.x, e.y)) return Array.from({ length: n }, () => ({ ...e }));
+    const policy: EdgePolicy = {
+      openDoors: this.openDoors, foundSecrets: this.foundSecrets,
+      canOpenDoors: true, canUnlock: true, occupied: () => false,
+    };
+    const f = field(this.board, e, policy);
+    let best: Pt = { ...e }, bd = Infinity;
+    for (let y = 0; y < this.board.h; y++) for (let x = 0; x < this.board.w; x++) {
+      const d = f.dist[this.board.idx(x, y)];
+      if (d < bd && this.board.isFloor(x, y)) { bd = d; best = { x, y }; }
+    }
+    return Array.from({ length: n }, () => ({ ...best }));
+  }
+
+  private setupHeroes() {
+    const spots = this.startSpots(this.cfg.heroNames.length);
     this.cfg.heroNames.forEach((name, i) => {
       const h: Hero = {
         name, pos: { ...spots[i] }, hp: this.cfg.heroHp, maxHp: this.cfg.heroHp,
