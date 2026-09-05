@@ -182,7 +182,7 @@ Three heroes at 6 Health each is 18 Health against roughly 25 monster attacks on
 
 ### 4.2 The Floor Manager
 
-Use the dragon. His name is Greg.
+Greg is a troll: too big for the room, too small for a dragon, exactly right for Floor 1. Print his standee from the card workshop; the First Light dragon stays in the box until a floor earns it.
 
 - **Performance Review** (Cooldown 2): 2 attack dice at any hero in line of sight. Greg uses it on whichever hero is carrying the most equipment.
 - **Delegation:** while either Orc is alive, Greg defends with 4 dice instead of 3. Kill the staff first.
@@ -388,7 +388,7 @@ Card template types: Player, Monster, Item (slot, effect, flavor, art), Spell (c
 
 ## 11. Decisions for Nick
 
-Settled: the boss is the dragon, classes are picked after Floor 2, the Daycare stays, the goose is Sir Reginald until the boys rename him, and players pick from eight generated crawlers rather than playing themselves. Roleplaying games are for roleplaying.
+Settled: the boss is a troll named Greg (the dragon was too much for Floor 1), classes are picked after Floor 2, the Daycare stays, the goose is Sir Reginald until the boys rename him, and players pick from eight generated crawlers rather than playing themselves. Roleplaying games are for roleplaying.
 
 Still open:
 

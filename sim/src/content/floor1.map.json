@@ -177,12 +177,11 @@
     ],
     "speeches": [
       { "title": "Welcome to the Dungeon", "when": "Before the first door. About two minutes.", "lines": [
-        "Good evening, Crawlers, and welcome! For those of you who did not read the terms and conditions, and I am looking at you, Vicki, a brief summary of recent events.",
-        "Your planet has been acquired. Congratulations. As part of the transition, every building on Earth was removed at three o'clock this morning. Quietly. Out of respect. If you were indoors at the time, you are no longer with us. If you were outdoors, you are here, and you have been offered an exciting opportunity.",
+        "Good evening, Crawlers, and welcome! For those of you who did not read the terms and conditions, a brief summary of recent events.",
+        "Per Syndicate rules, subsection 543 of the Precious Elemental Reserves Code, having failed to file a proper appeal for mineral and elemental rights within 50 Solars of first contact, your planet has been sucessfully siezed and is currently being mined of all requested elemental deposits by the assigned planetary regent.",
+        "Every interior of your world has been crushed and all raw materials are in the process of being mined for the requested elements. If you were indoors at the time, you are no longer with us. If you were outdoors, you are here, and you have been offered an exciting opportunity.",
         "Beneath your feet is a dungeon. It has eighteen floors. Every floor has a staircase down. Reach the staircase before the floor closes and you continue. Don't, and you don't. The company recommends continuing.",
-        "Some notes for first-time participants. Monsters carry things; check their pockets once they stop moving. The sealed envelopes on the table are Loot Boxes. Earn the achievement printed on the front and you may open one. Several billion viewers are watching you right now, and they enjoy achievements very much. They also enjoy traps.",
         "Please select a crawler from the eight in front of you. They were all outdoors at three this morning, for reasons printed on the card. Write a name on them. They won't mind, and they did not get much of a say in anything else tonight either.",
-        "This floor is run by a Floor Manager named Greg. Greg has a desk, two employees and a stairwell, and he does not want to share any of them.",
         "Should you die, and statistically one of you will, please do so quietly. The viewers are trying to concentrate.",
         "Floor 1 is a learning floor. Most of you will survive it. Please enjoy responsibly."
       ] },

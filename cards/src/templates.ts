@@ -1,16 +1,16 @@
 // Card layouts. Everything is sized in inches so print is exact; the editor
 // scales cards down with a CSS transform for thumbnails.
-import { DECK_NAMES, type Card, type Deck } from "./catalog";
+import { DECK_NAMES, STANDEE_TAB, type Card, type Deck } from "./catalog";
 
 const esc = (s: string) => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
 
 /** Accent colour per deck. Backs use it as a thin stroke only, to save toner. */
 export const DECK_COLOR: Record<Deck, string> = {
   kit: "#5b7a3a", pockets: "#8a6d2f", gear: "#3d5a80", biggear: "#7a3b5e", fan: "#6b4fa0",
-  monster: "#8b2e2e", player: "#2f6f6b", lootbox: "#b08d2c", envelope: "#555", tile: "#4a4036",
+  monster: "#8b2e2e", player: "#2f6f6b", lootbox: "#b08d2c", envelope: "#555", tile: "#4a4036", standee: "#556b2f",
 };
 const DECK_GLYPH: Record<Deck, string> = {
-  kit: "🎒", pockets: "👖", gear: "🛠", biggear: "⚒", fan: "📣", monster: "💀", player: "🙂", lootbox: "🎁", envelope: "✉", tile: "🧱",
+  kit: "🎒", pockets: "👖", gear: "🛠", biggear: "⚒", fan: "📣", monster: "💀", player: "🙂", lootbox: "🎁", envelope: "✉", tile: "🧱", standee: "🧍",
 };
 
 export const CARD_CSS = `
@@ -82,6 +82,13 @@ export const CARD_CSS = `
 .tile.back .nm { font-weight:700; font-size:8pt; letter-spacing:.06em; line-height:1.15; }
 .tile.back .sz { font-size:6pt; letter-spacing:.15em; color:#888; margin-top:.03in; }
 .tile.back.trap .nm { color:#8b2e2e; }
+.standee { position:relative; box-sizing:border-box; background:#fff; display:flex; flex-direction:column; overflow:hidden; -webkit-print-color-adjust:exact; print-color-adjust:exact; color-scheme:light; }
+.standee .fig { box-sizing:border-box; border:.02in solid #2b2420; border-bottom:none; background:#e6dcc8 center/cover no-repeat; }
+.standee .fig.noart { display:flex; align-items:center; justify-content:center; text-align:center; color:#8a7a68; font:italic 6pt 'Alegreya', Georgia, serif; padding:.04in;
+  background-image:repeating-linear-gradient(45deg, #e6dcc8 0 .1in, #ddd2bc .1in .2in); }
+.standee.back .fig { transform:scaleX(-1); }
+.standee .tab { box-sizing:border-box; border:.02in solid #2b2420; border-top:.015in dashed #999; display:flex; align-items:center; justify-content:center;
+  font:5.5pt 'Alegreya SC', Georgia, serif; color:#777; letter-spacing:.1em; text-transform:uppercase; white-space:nowrap; overflow:hidden; }
 /* ---- envelope labels: 4 x 2 in, low ink ---- */
 .label { position:relative; width:4in; height:2in; box-sizing:border-box; border:.02in solid #333; border-radius:0; background:#fff; padding:.12in .18in .1in .3in; display:flex; flex-direction:column; justify-content:center;
   font-family:'Alegreya', Georgia, serif; color:#111; overflow:hidden; -webkit-print-color-adjust:exact; print-color-adjust:exact; break-inside:avoid; }
@@ -123,6 +130,7 @@ function statsRow(s: NonNullable<Card["stats"]>): string {
 export function renderFront(c: Card, artUrl: string | null): string {
   if (c.type === "envelope") return renderLabel(c);
   if (c.type === "tile") return renderTile(c, artUrl);
+  if (c.type === "standee") return renderStandee(c, artUrl, false);
   const deck = DECK_COLOR[c.deck];
   const foot = `<div class="foot"><span>${esc(DECK_NAMES[c.deck])}</span><span>Floor 1</span></div>`;
   const cls = `card ${c.type} ${c.deck === "fan" ? "fan" : ""}`;
@@ -158,9 +166,11 @@ export function renderFront(c: Card, artUrl: string | null): string {
     ${c.flavor ? `<div class="flavor">${esc(c.flavor)}</div>` : ""}${foot}</div>`;
 }
 
-export function renderBack(c: Card): string {
+/** Backs need the art only for standees, which show the figure mirrored on the reverse. */
+export function renderBack(c: Card, artUrl: string | null = null): string {
   if (c.type === "envelope") return "";
   if (c.type === "tile") return renderTileBack(c);
+  if (c.type === "standee") return renderStandee(c, artUrl, true);
   if (c.type === "player") return renderReference(c);
   const deck = DECK_COLOR[c.deck];
   const word = DECK_NAMES[c.deck].toUpperCase();
@@ -180,6 +190,16 @@ export function renderTile(c: Card, artUrl: string | null): string {
 export function renderTileBack(c: Card): string {
   const t = c.tile!;
   return `<div class="tile back ${t.kind}" style="width:${t.w}in;height:${t.h}in"><div class="nm">${esc(c.name)}</div><div class="sz">${t.w}×${t.h}${t.kind === "trap" ? " · trap" : ""}</div></div>`;
+}
+
+/** A stand-up figure: the art with a thin frame, plus a plain tab at the bottom that disappears into the stand.
+ *  The back shows the same figure mirrored, so the standee reads the same from either side of the table. */
+export function renderStandee(c: Card, artUrl: string | null, back: boolean): string {
+  const t = c.tile!;
+  const fig = artUrl
+    ? `<div class="fig" style="height:${t.h - STANDEE_TAB}in;background-image:url('${artUrl}')"></div>`
+    : `<div class="fig noart" style="height:${t.h - STANDEE_TAB}in">no art yet<br>${esc(c.name)}</div>`;
+  return `<div class="standee ${back ? "back" : ""}" style="width:${t.w}in;height:${t.h}in">${fig}<div class="tab" style="height:${STANDEE_TAB}in">${esc(c.name)}</div></div>`;
 }
 
 /** Tiles on letter pages, arranged for a guillotine cutter: rows of equal height, so every
@@ -220,7 +240,7 @@ export function renderTileSheet(items: { card: Card; art: string | null }[], opt
       for (const it of r.items) {
         const w = it.card.tile!.w;
         const tx = back && opts.flip === "long" ? PW - x - w : x;
-        out.push(`<div class="slot" style="left:${tx}in;top:${ty}in;${back ? shift : ""}">${back ? renderTileBack(it.card) : renderTile(it.card, it.art)}</div>`);
+        out.push(`<div class="slot" style="left:${tx}in;top:${ty}in;${back ? shift : ""}">${back ? renderBack(it.card, it.art) : renderFront(it.card, it.art)}</div>`);
         x += w;
         if (!back && x < M + r.w) out.push(`<i style="left:${x}in;top:${y}in;height:.1in;border-left:1px solid #fff;opacity:.9"></i><i style="left:${x}in;top:${y + r.h - .1}in;height:.1in;border-left:1px solid #fff;opacity:.9"></i>`);
       }
@@ -246,7 +266,7 @@ html, body { margin:0; background:#888; }
 .spacer { height:40px; }
 @media print { .bar, .spacer { display:none; } body { background:#fff; } .page { margin:0; } }
 </style></head><body>
-<div class="bar"><b>${esc(title)}</b><span>${list.length} tiles · ${pages.length} sheet${pages.length === 1 ? "" : "s"} front + back</span><span>Duplex, flip on ${opts.flip} edge. Cut the horizontal lines full width first, then each strip at the white ticks.</span>
+<div class="bar"><b>${esc(title)}</b><span>${list.length} pieces · ${pages.length} sheet${pages.length === 1 ? "" : "s"} front + back</span><span>Duplex, flip on ${opts.flip} edge. Cut the horizontal lines full width first, then each strip at the white ticks.</span>
 <span class="nudge">Back offset <a href="${esc(opts.nudge(-0.5, 0))}">&larr;</a> <b>${opts.backDx.toFixed(1)}</b> <a href="${esc(opts.nudge(0.5, 0))}">&rarr;</a> &nbsp; <a href="${esc(opts.nudge(0, -0.5))}">&uarr;</a> <b>${opts.backDy.toFixed(1)}</b> <a href="${esc(opts.nudge(0, 0.5))}">&darr;</a> mm</span>
 <a href="${esc(opts.flipUrl)}">flip on ${opts.flip === "long" ? "short" : "long"} edge instead</a><span style="margin-left:auto">⌘P</span></div>
 <div class="spacer"></div>

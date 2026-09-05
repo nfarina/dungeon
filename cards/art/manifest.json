@@ -173,5 +173,54 @@
     "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a small leather spellbook, open, with a crackling blue-white spark of lightning leaping off the page. Landscape composition.",
     "model": "gemini-3.1-flash-image",
     "at": "2026-09-05T06:23:47.742Z"
+  },
+  "standee-greg": {
+    "file": "standee-greg.9669582b51.png",
+    "hash": "9669582b51",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a stand-up game figure: one character shown full length, standing upright and facing the viewer, head near the top of the frame and feet near the bottom, nothing cropped. Plain flat pale parchment background with a simple ground shadow, no scenery. Portrait (tall) composition.\n\nSubject: a huge lumpy grey-green cave troll in a too-tight short-sleeved dress shirt with a clip-on tie and a lanyard, a name badge reading GREG, reading glasses, standing upright facing the viewer, holding a coffee mug in one hand and a rolled-up stack of paperwork in the other, whole body visible. The second reference image shows this exact character: match their face, hair, skin, build and clothing.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-05T13:52:13.292Z"
+  },
+  "standee-human-5": {
+    "file": "standee-human-5.da6f2f199f.png",
+    "hash": "da6f2f199f",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a stand-up game figure: one character shown full length, standing upright and facing the viewer, head near the top of the frame and feet near the bottom, nothing cropped. Plain flat pale parchment background with a simple ground shadow, no scenery. Portrait (tall) composition.\n\nSubject: full-body figure of a young girl with black braids in a green dinosaur pajama onesie, brandishing a stuffed rabbit like a weapon, ordinary modern everyday clothes, standing facing the viewer, whole body visible from head to shoes, no weapons. The second reference image shows this exact character: match their face, hair, skin, build and clothing.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-05T13:52:04.509Z"
+  },
+  "human-5": {
+    "file": "human-5.e9e932d5a9.png",
+    "hash": "e9e932d5a9",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: waist-up portrait of a young girl with black braids in a green dinosaur pajama onesie, brandishing a stuffed rabbit like a weapon, ordinary modern everyday clothes, standing in a dark stone dungeon looking slightly alarmed but game for it, no weapons. This is a character portrait for a game card, landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-05T13:49:52.939Z"
+  },
+  "floor-manager": {
+    "file": "floor-manager.7fa1373e62.png",
+    "hash": "7fa1373e62",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a huge lumpy grey-green cave troll in a too-tight short-sleeved dress shirt with a clip-on tie and a lanyard, a name badge reading GREG, reading glasses, seated behind a desk with a nameplate and a coffee mug, smug. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-05T13:52:02.924Z"
+  },
+  "human-6": {
+    "file": "human-6.789e30d554.png",
+    "hash": "789e30d554",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: waist-up portrait of a small elderly grandmother with white curly hair, a lavender cardigan and a big handbag, deeply unimpressed, ordinary modern everyday clothes, standing in a dark stone dungeon looking slightly alarmed but game for it, no weapons. This is a character portrait for a game card, landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-05T13:53:40.717Z"
+  },
+  "human-7": {
+    "file": "human-7.39167023ea.png",
+    "hash": "39167023ea",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: waist-up portrait of a muscular young man with brown skin in a tank top and gym shorts, a towel around his neck, confused, ordinary modern everyday clothes, standing in a dark stone dungeon looking slightly alarmed but game for it, no weapons. This is a character portrait for a game card, landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-05T13:54:01.550Z"
+  },
+  "human-8": {
+    "file": "human-8.a4ecd139e8.png",
+    "hash": "a4ecd139e8",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: waist-up portrait of a pale goth teenage girl with short black hair, all black clothes, big headphones around her neck, bored, ordinary modern everyday clothes, standing in a dark stone dungeon looking slightly alarmed but game for it, no weapons. This is a character portrait for a game card, landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-05T13:54:11.602Z"
   }
 }

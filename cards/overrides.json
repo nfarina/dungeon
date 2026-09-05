@@ -55,5 +55,20 @@
   },
   "spark": {
     "art": "a small leather spellbook, open, with a crackling blue-white spark of lightning leaping off the page"
+  },
+  "human-5": {
+    "art": "waist-up portrait of a young girl with black braids in a green dinosaur pajama onesie, brandishing a stuffed rabbit like a weapon, ordinary modern everyday clothes, standing in a dark stone dungeon looking slightly alarmed but game for it, no weapons"
+  },
+  "floor-manager": {
+    "art": "a huge lumpy grey-green cave troll in a too-tight short-sleeved dress shirt with a clip-on tie and a lanyard, a name badge reading GREG, reading glasses, seated behind a desk with a nameplate and a coffee mug, smug"
+  },
+  "human-6": {
+    "art": "waist-up portrait of a small elderly grandmother with white curly hair, a lavender cardigan and a big handbag, deeply unimpressed, ordinary modern everyday clothes, standing in a dark stone dungeon looking slightly alarmed but game for it, no weapons"
+  },
+  "human-7": {
+    "art": "waist-up portrait of a muscular young man with brown skin in a tank top and gym shorts, a towel around his neck, confused, ordinary modern everyday clothes, standing in a dark stone dungeon looking slightly alarmed but game for it, no weapons"
+  },
+  "human-8": {
+    "art": "waist-up portrait of a pale goth teenage girl with short black hair, all black clothes, big headphones around her neck, bored, ordinary modern everyday clothes, standing in a dark stone dungeon looking slightly alarmed but game for it, no weapons"
   }
 }

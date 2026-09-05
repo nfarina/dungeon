@@ -40,7 +40,7 @@ function cardJson(c: Card, model: string, all?: Card[]) {
     ...c, deckName: DECK_NAMES[c.deck],
     art: c.art, prompt: c.art ? fullPrompt(c) : "",
     artUrl: a ? `/art/${a.file}` : null, stale: a?.stale ?? false,
-    front: renderFront(c, a ? `/art/${a.file}` : null), back: renderBack(c),
+    front: renderFront(c, a ? `/art/${a.file}` : null), back: renderBack(c, a ? `/art/${a.file}` : null),
     queued: queue.some(j => j.id === c.id) || running?.id === c.id, error: errors[c.id] ?? null,
   };
 }
@@ -87,14 +87,14 @@ Bun.serve({
       const alt = new URL(url); alt.searchParams.set("flip", flip === "long" ? "short" : "long");
       const backDx = Number(url.searchParams.get("bx") ?? 0) || 0, backDy = Number(url.searchParams.get("by") ?? 0) || 0;
       const nudge = (dx: number, dy: number) => { const u = new URL(url); u.searchParams.set("bx", String(+(backDx + dx).toFixed(1))); u.searchParams.set("by", String(+(backDy + dy).toFixed(1))); return u.pathname + u.search; };
-      if (list.length && list.every(c => c.type === "tile")) return html(renderTileSheet(list.map(c => ({ card: c, art: artUrl(c, model, list) })), { title: deck ? "Floor tiles" : title, flip, flipUrl: alt.pathname + alt.search, backDx, backDy, nudge }));
-      list = list.filter(c => c.type !== "tile");
+      if (list.length && list.every(c => c.type === "tile" || c.type === "standee")) return html(renderTileSheet(list.map(c => ({ card: c, art: artUrl(c, model, list) })), { title: deck === "tile" ? "Floor tiles" : deck === "standee" ? "Standees" : title, flip, flipUrl: alt.pathname + alt.search, backDx, backDy, nudge }));
+      list = list.filter(c => c.type !== "tile" && c.type !== "standee");
       return html(renderPrint(list.map(c => ({ card: c, art: artUrl(c, model) })), { flip, perPage, title, flipUrl: alt.pathname + alt.search, backDx, backDy, nudge }));
     }
     if (p.startsWith("/preview/")) {
       const c = cards().find(x => x.id === p.slice(9));
       if (!c) return new Response("no such card", { status: 404 });
-      return html(`<!doctype html><meta charset="utf-8"><style>${CARD_CSS} body{margin:0;background:#666;display:flex;gap:.3in;padding:.3in;flex-wrap:wrap}</style>${renderFront(c, artUrl(c, model))}${renderBack(c)}`);
+      return html(`<!doctype html><meta charset="utf-8"><style>${CARD_CSS} body{margin:0;background:#666;display:flex;gap:.3in;padding:.3in;flex-wrap:wrap}</style>${renderFront(c, artUrl(c, model))}${renderBack(c, artUrl(c, model))}`);
     }
     return new Response("not found", { status: 404 });
   },

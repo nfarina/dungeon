@@ -32,6 +32,10 @@ the margins. Print at **100% scale, duplex, flip on long edge**; `?flip=short` i
 If the backs land a millimetre or two off the fronts, use the **Back offset** arrows in the print bar (`?bx=1&by=0`, in mm). The print page remembers the last value and the workshop's print buttons reuse it. Cards have a thick square outer frame so the cut line can wander a bit into the frame without showing parchment.
 Envelope labels print single-sided, 10 per sheet, on plain paper or Avery 5163.
 
+**Floor tiles** (`?deck=tile`) and **standees** (`?deck=standee`) share a guillotine layout: rows of equal height, so every horizontal cut runs the full page width and each strip is then cut at the white ticks. Both print duplex. Tiles carry their name on the back; standees show the figure mirrored on the back with a 0.3 in tab at the bottom for the plastic clip stands. Print standees on cardstock.
+
+Cards that share an art prompt (the four Juice Boxes, the pit tiles) share one image: generating any of them fills in all of them. A card with `ref: "<id>"` sends that card's current art along as a second reference image ("this exact character"), which is how the standees match the crawler portraits and the boss card. Generate the referenced card first; regenerating it marks the dependent art stale.
+
 ## Adding a floor
 
 Add cards to the catalog (or a `floor-2.ts` that exports more), give each an `art` prompt, run `gen --all`, print the new decks.

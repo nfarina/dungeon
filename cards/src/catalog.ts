@@ -12,11 +12,12 @@ export type Deck =
   | "player"     // Crawler cards: pick a human, name yourself
   | "lootbox"    // Cards that live only inside an envelope
   | "envelope"   // The envelope labels themselves (label size, not card size)
-  | "tile";      // Floor tiles: furniture and traps, integer inches, top-down art
+  | "tile"       // Floor tiles: furniture and traps, integer inches, top-down art
+  | "standee";   // Stand-up figures for the plastic stands: the eight crawlers and the boss
 
 export type CardType =
   | "item" | "consumable" | "scroll" | "spell" | "companion" | "text"
-  | "monster" | "player" | "fan" | "envelope" | "tile";
+  | "monster" | "player" | "fan" | "envelope" | "tile" | "standee";
 
 export type Stats = { att: number; def: number; hp: number; mind: number; move: string };
 
@@ -43,17 +44,19 @@ export type Card = {
   tier?: "Bronze" | "Silver" | "Gold" | "Platinum" | "Companion";
   trigger?: string;
   contents?: string;
-  /** Tiles: footprint in board squares (1 square = 1 inch). */
-  tile?: { w: number; h: number; kind: "furniture" | "trap" };
+  /** Tiles: footprint in board squares (1 square = 1 inch). Standees: printed size in inches, tab included. */
+  tile?: { w: number; h: number; kind: "furniture" | "trap" | "standee" };
   /** Subject description for the art generator. The style prefix lives in style.md. */
   art: string;
+  /** Id of a card whose current art is sent along as a second reference image: "this exact character". */
+  ref?: string;
   /** Name of the matching entry in the sim, when it differs. */
   simName?: string;
 };
 
 export const DECK_NAMES: Record<Deck, string> = {
   kit: "Starting Kit", pockets: "Pockets", gear: "Gear", biggear: "Big Gear", fan: "Fan Deck",
-  monster: "Monster", player: "Crawler", lootbox: "Loot Box", envelope: "Loot Box Label", tile: "Floor Tile",
+  monster: "Monster", player: "Crawler", lootbox: "Loot Box", envelope: "Loot Box Label", tile: "Floor Tile", standee: "Standee",
 };
 
 const HUMAN: Stats = { att: 2, def: 2, hp: 6, mind: 3, move: "2d6" };
@@ -285,37 +288,43 @@ const monsters: Card[] = [
       "Performance Review (Cooldown 2): 2 attack dice at any hero in line of sight. Targets whoever carries the most equipment.",
       "Delegation: while either Orc is alive, defends with 4 dice instead of 3.",
     ],
-    rules: "", flavor: "A dragon named Greg.",
-    art: "a smug red dragon wearing reading glasses and a lanyard, seated behind a desk with a nameplate and a coffee mug" },
+    rules: "", flavor: "A troll named Greg.",
+    art: "a huge lumpy grey-green cave troll in a too-tight short-sleeved dress shirt with a clip-on tie and a lanyard, a name badge reading GREG, reading glasses, seated behind a desk with a nameplate and a coffee mug, smug" },
 ];
 
 // Eight humans. Nobody is anybody; players pick one and write their own name on it.
+// Each gets a portrait card and a stand-up figure, from the same description.
+const HUMANS: { desc: string; flavor: string }[] = [
+  { desc: "a skinny teenage boy with messy brown hair in an oversized grey hoodie and basketball shorts, holding a flashlight",
+    flavor: "Was outside at 3 a.m. looking for the cat. The cat was inside. The cat is fine." },
+  { desc: "a teenage boy with dark skin, round glasses and a dinosaur graphic tee, backpack straps on both shoulders, determined",
+    flavor: "Camped on the sidewalk for a video game launch. The store is gone. The game, tragically, is not out." },
+  { desc: "a tall woman with a blonde ponytail in a running jacket and leggings, clutching a coffee mug",
+    flavor: "Runs at 2:45 every morning. Has never been late for anything. Was not late for this." },
+  { desc: "a bearded dad with a belly in a flannel shirt, cargo shorts, socks and sandals, holding a TV remote",
+    flavor: "Stepped out to see what the noise was. Brought the remote in case it was the TV." },
+  { desc: "a young girl with black braids in a green dinosaur pajama onesie, brandishing a stuffed rabbit like a weapon",
+    flavor: "Sleepwalks. Woke up in a dungeon holding Mr. Buttons. Mr. Buttons has seen things." },
+  { desc: "a small elderly grandmother with white curly hair, a lavender cardigan and a big handbag, deeply unimpressed",
+    flavor: "Was walking to the 24-hour pharmacy. Has been through worse. Will tell you about it." },
+  { desc: "a muscular young man with brown skin in a tank top and gym shorts, a towel around his neck, confused",
+    flavor: "Leaving the 24-hour gym. Has never skipped leg day. Is about to find out what legs are for." },
+  { desc: "a pale goth teenage girl with short black hair, all black clothes, big headphones around her neck, bored",
+    flavor: "Sat on the roof listening to music. Watched the whole thing happen. Rated it a six." },
+];
 const humanArt = (desc: string) => `waist-up portrait of ${desc}, ordinary modern everyday clothes, standing in a dark stone dungeon looking slightly alarmed but game for it, no weapons`;
-const players: Card[] = [
-  { id: "human-1", name: "", deck: "player", type: "player", stats: HUMAN, rules: "",
-    flavor: "Was outside at 3 a.m. looking for the cat. The cat was inside. The cat is fine.",
-    art: humanArt("a skinny teenage boy with messy brown hair in an oversized grey hoodie and basketball shorts, holding a flashlight") },
-  { id: "human-2", name: "", deck: "player", type: "player", stats: HUMAN, rules: "",
-    flavor: "Camped on the sidewalk for a video game launch. The store is gone. The game, tragically, is not out.",
-    art: humanArt("a teenage boy with dark skin, round glasses and a dinosaur graphic tee, backpack straps on both shoulders, determined") },
-  { id: "human-3", name: "", deck: "player", type: "player", stats: HUMAN, rules: "",
-    flavor: "Runs at 2:45 every morning. Has never been late for anything. Was not late for this.",
-    art: humanArt("a tall woman with a blonde ponytail in a running jacket and leggings, clutching a coffee mug") },
-  { id: "human-4", name: "", deck: "player", type: "player", stats: HUMAN, rules: "",
-    flavor: "Stepped out to see what the noise was. Brought the remote in case it was the TV.",
-    art: humanArt("a bearded dad with a belly in a flannel shirt, cargo shorts, socks and sandals, holding a TV remote") },
-  { id: "human-5", name: "", deck: "player", type: "player", stats: HUMAN, rules: "",
-    flavor: "Sleepwalks. Woke up in a dungeon holding Mr. Buttons. Mr. Buttons has seen things.",
-    art: humanArt("a young girl with black braids in a green dinosaur pajama onesie, brandishing a stuffed rabbit like a weapon") },
-  { id: "human-6", name: "", deck: "player", type: "player", stats: HUMAN, rules: "",
-    flavor: "Was walking to the 24-hour pharmacy. Has been through worse. Will tell you about it.",
-    art: humanArt("a small elderly grandmother with white curly hair, a lavender cardigan and a big handbag, deeply unimpressed") },
-  { id: "human-7", name: "", deck: "player", type: "player", stats: HUMAN, rules: "",
-    flavor: "Leaving the 24-hour gym. Has never skipped leg day. Is about to find out what legs are for.",
-    art: humanArt("a muscular young man with brown skin in a tank top and gym shorts, a towel around his neck, confused") },
-  { id: "human-8", name: "", deck: "player", type: "player", stats: HUMAN, rules: "",
-    flavor: "Sat on the roof listening to music. Watched the whole thing happen. Rated it a six.",
-    art: humanArt("a pale goth teenage girl with short black hair, all black clothes, big headphones around her neck, bored") },
+const players: Card[] = HUMANS.map((h, i) => ({
+  id: `human-${i + 1}`, name: "", deck: "player", type: "player", stats: HUMAN, rules: "", flavor: h.flavor, art: humanArt(h.desc),
+}));
+
+/** Stand-up figures for the plastic card stands. Sizes in inches; the height includes STANDEE_TAB at the bottom that the stand grips. */
+export const STANDEE_TAB = 0.3;
+const standee = (id: string, name: string, w: number, h: number, art: string, ref?: string): Card =>
+  ({ id: `standee-${id}`, name, deck: "standee", type: "standee", tile: { w, h: h + STANDEE_TAB, kind: "standee" }, rules: "", art, ref });
+const standeeArt = (desc: string) => `full-body figure of ${desc}, ordinary modern everyday clothes, standing facing the viewer, whole body visible from head to shoes, no weapons`;
+const standees: Card[] = [
+  ...HUMANS.map((h, i) => standee(`human-${i + 1}`, `Crawler ${i + 1}`, 0.75, 1.5, standeeArt(h.desc), `human-${i + 1}`)),
+  standee("greg", "Greg", 1.5, 2.25, "a huge lumpy grey-green cave troll in a too-tight short-sleeved dress shirt with a clip-on tie and a lanyard, a name badge reading GREG, reading glasses, standing upright facing the viewer, holding a coffee mug in one hand and a rolled-up stack of paperwork in the other, whole body visible", "floor-manager"),
 ];
 
 const env = (id: string, name: string, tier: Card["tier"], trigger: string, contents: string): Card =>
@@ -354,9 +363,9 @@ const tiles: Card[] = [
   tile("secret", "Secret Door", 1, 1, "trap", "a stone floor square with a thin hidden crack outlining a doorway and a small iron ring pull"),
 ];
 
-export const CARDS: Card[] = [...kits, ...pockets, ...gear, ...biggear, ...lootbox, ...fan, ...monsters, ...players, ...envelopes, ...tiles];
+export const CARDS: Card[] = [...kits, ...pockets, ...gear, ...biggear, ...lootbox, ...fan, ...monsters, ...players, ...envelopes, ...tiles, ...standees];
 
-export const DECK_ORDER: Deck[] = ["player", "kit", "pockets", "gear", "biggear", "lootbox", "fan", "monster", "envelope", "tile"];
+export const DECK_ORDER: Deck[] = ["player", "kit", "pockets", "gear", "biggear", "lootbox", "fan", "monster", "envelope", "tile", "standee"];
 
 const byId = new Map(CARDS.map(c => [c.id, c]));
 export const card = (id: string) => byId.get(id);
