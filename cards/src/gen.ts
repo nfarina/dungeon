@@ -37,10 +37,21 @@ const sha = (b: string | Buffer) => createHash("sha1").update(b).digest("hex");
 
 export function fullPrompt(c: Card): string {
   const style = readStyle();
+  if (c.type === "tile") {
+    return `${style}\n\nThis is a board game floor tile seen DIRECTLY FROM ABOVE, like a map: flat top-down orthographic view, no horizon, no walls, nothing hanging or standing upright, no perspective. Objects lie flat on dark grey stone dungeon flagstones as seen from the ceiling, and fill the frame edge to edge.\n\nSubject: ${c.art}.`;
+  }
   const subject = c.type === "player"
-    ? `Subject: ${c.art}. This is a character portrait for a game card.`
-    : `Subject: ${c.art}.`;
+    ? `Subject: ${c.art}. This is a character portrait for a game card, landscape composition.`
+    : `Subject: ${c.art}. Landscape composition.`;
   return `${style}\n\n${subject}`;
+}
+
+/** Gemini only accepts a fixed set of aspect ratios; pick the nearest to the asset's shape. */
+export function aspectRatio(c: Card): string {
+  const want = c.tile ? c.tile.w / c.tile.h : 4 / 3;
+  const options = ["1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9"];
+  return options.map(r => { const [a, b] = r.split(":").map(Number); return { r, d: Math.abs(Math.log(a / b) - Math.log(want)) }; })
+    .sort((x, y) => x.d - y.d)[0].r;
 }
 
 /** What the art for this card would be named under the current prompt, style and model. */
@@ -77,7 +88,7 @@ export async function generate(c: Card, opts: { force?: boolean; model?: string;
   if (ref) parts.push({ inline_data: { mime_type: "image/png", data: ref.toString("base64") } });
   const body = {
     contents: [{ parts }],
-    generationConfig: { responseModalities: ["IMAGE"], imageConfig: { aspectRatio: "4:3" } },
+    generationConfig: { responseModalities: ["IMAGE"], imageConfig: { aspectRatio: aspectRatio(c) } },
   };
   log(`> ${c.id} via ${model}`);
   const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {

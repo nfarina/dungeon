@@ -2,4 +2,4 @@ Cartoony, stylized fantasy illustration in the exact style of the reference imag
 
 Match the reference image's rendering style, line weight and palette exactly.
 
-Do NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame, in a landscape composition.
+Do NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.

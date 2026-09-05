@@ -103,7 +103,7 @@ That's the target shape: nearly every game is decided in the last two rounds, a 
 
 ## 2. Players
 
-Eight crawler cards, all with the same base stats, each a stranger who happened to be outdoors at three in the morning. Pick one, write a name on the line, and roleplay it as hard as you like. Then pick **one** Starting Kit card. The kit is "what they happened to have on them."
+Eight crawler cards, all with the same base stats, each a stranger who happened to be outdoors at three in the morning. Every card carries one or two sentences, in the announcer's voice, about why. Pick one, write a name on the line, and roleplay it as hard as you like. Then pick **one** Starting Kit card. The kit is "what they happened to have on them."
 
 | Starting Kit | Slot | Effect |
 |---|---|---|
@@ -367,7 +367,7 @@ Counts for the card pipeline. Poker size, nine per letter sheet.
 
 | Asset | Count |
 |---|---|
-| Crawler cards (eight strangers, generated portraits, stat boxes, slot outline, a line for the name) | 8 |
+| Crawler cards (eight strangers, generated portraits, stat boxes, slot outline, a line for the name, a backstory line) | 8 |
 | Starting Kit cards | 5 |
 | Monster cards (stats, loot table, one line of flavor) | 6 |
 | Pockets deck | 16 |

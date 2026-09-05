@@ -73,6 +73,7 @@ export const BIG_GEAR: Item[] = [
 
 export const EXTRA: Record<string, Item> = {
   "Spellbook: Nope": { name: "Spellbook: Nope", slot: "learned", spell: { id: "nope", cooldown: 3 } },
+  "Bookmark": { name: "Bookmark", slot: "trinket", resetCd: true },
 };
 
 export const KITS: Record<string, Item[]> = {

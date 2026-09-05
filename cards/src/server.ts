@@ -4,7 +4,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { DECK_NAMES, DECK_ORDER, ROOT, cards, saveOverride, type Card, type Deck } from "./catalog";
 import { ART_DIR, DEFAULT_MODEL, MODELS, artFor, fullPrompt, generate, readStyle, styleRef, writeStyle } from "./gen";
-import { CARD_CSS, renderBack, renderFront, renderPrint } from "./templates";
+import { CARD_CSS, renderBack, renderFront, renderPrint, renderTileSheet } from "./templates";
 
 const PORT = Number(process.env.PORT ?? 5174);
 const EDITOR = join(import.meta.dir, "editor.html");
@@ -84,6 +84,8 @@ Bun.serve({
       if (ids?.length) list = ids.map(id => list.find(c => c.id === id)!).filter(Boolean);
       else if (deck) list = list.filter(c => c.deck === deck);
       const title = ids?.length ? `${list.length} selected cards` : deck ? `${DECK_NAMES[deck]} deck` : "Every card";
+      if (list.length && list.every(c => c.type === "tile")) return html(renderTileSheet(list.map(c => ({ card: c, art: artUrl(c, model) })), deck ? "Floor tiles" : title));
+      list = list.filter(c => c.type !== "tile");
       const alt = new URL(url); alt.searchParams.set("flip", flip === "long" ? "short" : "long");
       const backDx = Number(url.searchParams.get("bx") ?? 0) || 0, backDy = Number(url.searchParams.get("by") ?? 0) || 0;
       const nudge = (dx: number, dy: number) => { const u = new URL(url); u.searchParams.set("bx", String(+(backDx + dx).toFixed(1))); u.searchParams.set("by", String(+(backDy + dy).toFixed(1))); return u.pathname + u.search; };

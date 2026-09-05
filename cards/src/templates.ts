@@ -7,10 +7,10 @@ const esc = (s: string) => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;
 /** Accent colour per deck. Backs use it as a thin stroke only, to save toner. */
 export const DECK_COLOR: Record<Deck, string> = {
   kit: "#5b7a3a", pockets: "#8a6d2f", gear: "#3d5a80", biggear: "#7a3b5e", fan: "#6b4fa0",
-  monster: "#8b2e2e", player: "#2f6f6b", lootbox: "#b08d2c", envelope: "#555",
+  monster: "#8b2e2e", player: "#2f6f6b", lootbox: "#b08d2c", envelope: "#555", tile: "#4a4036",
 };
 const DECK_GLYPH: Record<Deck, string> = {
-  kit: "🎒", pockets: "👖", gear: "🛠", biggear: "⚒", fan: "📣", monster: "💀", player: "🙂", lootbox: "🎁", envelope: "✉",
+  kit: "🎒", pockets: "👖", gear: "🛠", biggear: "⚒", fan: "📣", monster: "💀", player: "🙂", lootbox: "🎁", envelope: "✉", tile: "🧱",
 };
 
 export const CARD_CSS = `
@@ -74,6 +74,12 @@ export const CARD_CSS = `
 .card.back.ref b { font-weight:700; }
 .card.back.ref .dice { display:flex; justify-content:space-between; gap:.04in; margin-top:.015in; }
 .card.back.ref .dice span { flex:1; text-align:center; border:.008in solid #999; border-radius:.03in; padding:.008in 0; font-size:6.2pt; }
+/* ---- floor tiles: integer inches, thin dark frame as bleed ---- */
+.tile { position:relative; box-sizing:border-box; border:.04in solid #2b2420; background:#3b4756 center/cover no-repeat; overflow:hidden; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+.tile.noart { display:flex; align-items:center; justify-content:center; color:#c9d3df; font:italic 7pt 'Alegreya', Georgia, serif; text-align:center; padding:.05in;
+  background-image:repeating-linear-gradient(45deg, #3b4756 0 .12in, #43505f .12in .24in); }
+.tile .tag { position:absolute; left:0; right:0; bottom:0; text-align:center; font:700 5.5pt 'Alegreya SC', Georgia, serif; letter-spacing:.1em; color:#eee; background:rgba(0,0,0,.55); padding:.01in 0; }
+.tile.trap .tag { background:rgba(120,30,30,.75); }
 /* ---- envelope labels: 4 x 2 in, low ink ---- */
 .label { position:relative; width:4in; height:2in; box-sizing:border-box; border:.02in solid #333; border-radius:0; background:#fff; padding:.12in .18in .1in .3in; display:flex; flex-direction:column; justify-content:center;
   font-family:'Alegreya', Georgia, serif; color:#111; overflow:hidden; -webkit-print-color-adjust:exact; print-color-adjust:exact; break-inside:avoid; }
@@ -114,6 +120,7 @@ function statsRow(s: NonNullable<Card["stats"]>): string {
 
 export function renderFront(c: Card, artUrl: string | null): string {
   if (c.type === "envelope") return renderLabel(c);
+  if (c.type === "tile") return renderTile(c, artUrl);
   const deck = DECK_COLOR[c.deck];
   const foot = `<div class="foot"><span>${esc(DECK_NAMES[c.deck])}</span><span>Floor 1</span></div>`;
   const cls = `card ${c.type} ${c.deck === "fan" ? "fan" : ""}`;
@@ -135,7 +142,7 @@ export function renderFront(c: Card, artUrl: string | null): string {
       ${statsRow(c.stats!)}
       <div class="slots">${slots}</div>
       <div class="gap"></div>
-      <div class="flavor">You are a regular person. Loot will fix that.</div>${foot}</div>`;
+      ${c.flavor ? `<div class="flavor">${esc(c.flavor)}</div>` : ""}${foot}</div>`;
   }
   const cooldown = c.type === "spell"
     ? `<div class="cd"><div class="die">${c.cooldown}</div><div class="cdlabel">Cooldown<br>set a die here</div></div>
@@ -150,12 +157,82 @@ export function renderFront(c: Card, artUrl: string | null): string {
 }
 
 export function renderBack(c: Card): string {
-  if (c.type === "envelope") return "";
+  if (c.type === "envelope" || c.type === "tile") return "";
   if (c.type === "player") return renderReference(c);
   const deck = DECK_COLOR[c.deck];
   const word = DECK_NAMES[c.deck].toUpperCase();
   const sub = c.deck === "player" ? "pick one · name yourself" : c.deck === "monster" ? "for the announcer" : c.deck === "fan" ? "viewers only" : c.deck === "lootbox" ? "do not peek" : "floor 1";
   return `<div class="card back" style="--deck:${deck}"><div class="glyph">${DECK_GLYPH[c.deck]}</div><div class="word ${word.length > 8 ? "small" : ""}">${esc(word)}</div><div class="sub">${esc(sub)}</div></div>`;
+}
+
+export function renderTile(c: Card, artUrl: string | null): string {
+  const t = c.tile!;
+  const size = `width:${t.w}in;height:${t.h}in`;
+  const tag = `<div class="tag">${esc(c.name)}</div>`;
+  return artUrl
+    ? `<div class="tile ${t.kind}" style="${size};background-image:url('${artUrl}')">${tag}</div>`
+    : `<div class="tile ${t.kind} noart" style="${size}">no art yet${tag}</div>`;
+}
+
+/** Tiles on letter pages, arranged for a guillotine cutter: rows of equal height, so every
+ *  horizontal cut runs the full page width and vertical cuts are made per strip. */
+export function renderTileSheet(items: { card: Card; art: string | null }[], title: string): string {
+  const PW = 8.5, PH = 11, M = 0.25, maxW = PW - 2 * M, maxH = PH - 2 * M;
+  // expand copies, tallest first, widest first within a height
+  const list: { card: Card; art: string | null }[] = [];
+  for (const it of items) for (let i = 0; i < (it.card.qty ?? 1); i++) list.push(it);
+  list.sort((a, b) => (b.card.tile!.h - a.card.tile!.h) || (b.card.tile!.w - a.card.tile!.w));
+  // rows: same height, fill to maxW
+  type Row = { h: number; items: typeof list; w: number };
+  const rows: Row[] = [];
+  for (const it of list) {
+    const { w, h } = it.card.tile!;
+    let row = rows.find(r => r.h === h && r.w + w <= maxW);
+    if (!row) { row = { h, items: [], w: 0 }; rows.push(row); }
+    row.items.push(it); row.w += w;
+  }
+  // pages: stack rows to maxH
+  const pages: Row[][] = [[]];
+  let used = 0;
+  for (const r of rows) {
+    if (used + r.h > maxH) { pages.push([]); used = 0; }
+    pages[pages.length - 1].push(r); used += r.h;
+  }
+  const pageHtml = pages.map(prow => {
+    let y = M; const out: string[] = [];
+    const hCuts = new Set<number>([M]);
+    for (const r of prow) {
+      let x = M;
+      for (const it of r.items) {
+        out.push(`<div class="slot" style="left:${x}in;top:${y}in">${renderTile(it.card, it.art)}</div>`);
+        x += it.card.tile!.w;
+        // vertical cut tick at the top and bottom of this strip
+        if (x < M + r.w) out.push(`<i style="left:${x}in;top:${y}in;height:.1in;border-left:1px solid #fff;opacity:.9"></i><i style="left:${x}in;top:${y + r.h - .1}in;height:.1in;border-left:1px solid #fff;opacity:.9"></i>`);
+      }
+      y += r.h; hCuts.add(y);
+    }
+    for (const cy of hCuts) out.push(`<i style="top:${cy}in;left:0;width:${M - .06}in;border-top:1px solid #999"></i><i style="top:${cy}in;right:0;width:${M - .06}in;border-top:1px solid #999"></i>`);
+    out.push(`<i style="left:${M}in;top:0;height:${M - .06}in;border-left:1px solid #999"></i><i style="left:${M}in;bottom:0;height:${M - .06}in;border-left:1px solid #999"></i>`);
+    return `<section class="page">${out.join("")}</section>`;
+  });
+  return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(title)}</title>
+<meta name="color-scheme" content="light only">
+<style>${CARD_CSS}
+@page { size: letter; margin: 0; }
+html { color-scheme: light only; }
+html, body { margin:0; background:#888; }
+.page { position:relative; width:8.5in; height:11in; background:#fff; margin:0 auto .2in; overflow:hidden; page-break-after:always; break-after:page; }
+.page i { position:absolute; display:block; }
+.slot { position:absolute; }
+.bar { position:fixed; top:0; left:0; right:0; background:#222; color:#eee; font:13px system-ui; padding:8px 14px; display:flex; gap:16px; align-items:center; z-index:9; }
+.bar b { color:#fff; }
+.spacer { height:40px; }
+@media print { .bar, .spacer { display:none; } body { background:#fff; } .page { margin:0; } }
+</style></head><body>
+<div class="bar"><b>${esc(title)}</b><span>${list.length} tiles · ${pages.length} sheet${pages.length === 1 ? "" : "s"} · single-sided</span><span>Cut the horizontal lines full width first, then cut each strip at the white ticks.</span><span style="margin-left:auto">⌘P</span></div>
+<div class="spacer"></div>
+${pageHtml.join("\n")}
+</body></html>`;
 }
 
 /** The back of every Crawler card: the rules you actually need mid-turn. */

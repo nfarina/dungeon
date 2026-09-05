@@ -11,11 +11,12 @@ export type Deck =
   | "monster"    // Monster cards, for the announcer
   | "player"     // Crawler cards: pick a human, name yourself
   | "lootbox"    // Cards that live only inside an envelope
-  | "envelope";  // The envelope labels themselves (label size, not card size)
+  | "envelope"   // The envelope labels themselves (label size, not card size)
+  | "tile";      // Floor tiles: furniture and traps, integer inches, top-down art
 
 export type CardType =
   | "item" | "consumable" | "scroll" | "spell" | "companion" | "text"
-  | "monster" | "player" | "fan" | "envelope";
+  | "monster" | "player" | "fan" | "envelope" | "tile";
 
 export type Stats = { att: number; def: number; hp: number; mind: number; move: string };
 
@@ -42,6 +43,8 @@ export type Card = {
   tier?: "Bronze" | "Silver" | "Gold" | "Platinum" | "Companion";
   trigger?: string;
   contents?: string;
+  /** Tiles: footprint in board squares (1 square = 1 inch). */
+  tile?: { w: number; h: number; kind: "furniture" | "trap" };
   /** Subject description for the art generator. The style prefix lives in style.md. */
   art: string;
   /** Name of the matching entry in the sim, when it differs. */
@@ -50,7 +53,7 @@ export type Card = {
 
 export const DECK_NAMES: Record<Deck, string> = {
   kit: "Starting Kit", pockets: "Pockets", gear: "Gear", biggear: "Big Gear", fan: "Fan Deck",
-  monster: "Monster", player: "Crawler", lootbox: "Loot Box", envelope: "Loot Box Label",
+  monster: "Monster", player: "Crawler", lootbox: "Loot Box", envelope: "Loot Box Label", tile: "Floor Tile",
 };
 
 const HUMAN: Stats = { att: 2, def: 2, hp: 6, mind: 3, move: "2d6" };
@@ -126,7 +129,7 @@ const gear: Card[] = [
     rules: "Defend +1.", flavor: "The goblin is fine.",
     art: "a brown leather biker jacket with chewed cuffs and little bite marks along the collar" },
   { id: "orc-monocle", name: "Orc Monocle", deck: "gear", type: "item", slot: "Head",
-    rules: "Mind +1. Stacks with the glasses.", flavor: "The orc did not need it.",
+    rules: "Mind +1. Same slot as the Glasses: the second road to Mind 4, not a stack.", flavor: "The orc did not need it.",
     art: "a large brass monocle on a chain, comically oversized, one lens cracked" },
   { id: "sneakers", name: "Stolen Sneakers", deck: "gear", type: "item", slot: "Feet",
     rules: "Move +2.", flavor: "Stolen from whom is not your problem.",
@@ -185,6 +188,10 @@ const biggear: Card[] = [
 ];
 
 const lootbox: Card[] = [
+  { id: "bookmark", name: "Bookmark", deck: "lootbox", type: "item", slot: "Trinket",
+    rules: "Once per floor, set one of your cooldown dice to 0. Tick the box. ☐",
+    flavor: "For the caster who just proved they're the caster.",
+    art: "a worn leather bookmark with a frayed gold tassel, glowing faintly, lying across an open spellbook" },
   { id: "nope", name: "Spellbook: Nope", deck: "lootbox", type: "spell", mind: 4, cooldown: 3,
     rules: "After a monster rolls an attack against anyone in your room, cancel it.", flavor: "The announcer sighs.",
     art: "a small black leather spellbook, open, with a single glowing red stop-sign hand hovering above the page" },
@@ -286,20 +293,28 @@ const monsters: Card[] = [
 const humanArt = (desc: string) => `waist-up portrait of ${desc}, ordinary modern everyday clothes, standing in a dark stone dungeon looking slightly alarmed but game for it, no weapons`;
 const players: Card[] = [
   { id: "human-1", name: "", deck: "player", type: "player", stats: HUMAN, rules: "",
+    flavor: "Was outside at 3 a.m. looking for the cat. The cat was inside. The cat is fine.",
     art: humanArt("a skinny teenage boy with messy brown hair in an oversized grey hoodie and basketball shorts, holding a flashlight") },
   { id: "human-2", name: "", deck: "player", type: "player", stats: HUMAN, rules: "",
+    flavor: "Camped on the sidewalk for a video game launch. The store is gone. The game, tragically, is not out.",
     art: humanArt("a teenage boy with dark skin, round glasses and a dinosaur graphic tee, backpack straps on both shoulders, determined") },
   { id: "human-3", name: "", deck: "player", type: "player", stats: HUMAN, rules: "",
+    flavor: "Runs at 2:45 every morning. Has never been late for anything. Was not late for this.",
     art: humanArt("a tall woman with a blonde ponytail in a running jacket and leggings, clutching a coffee mug") },
   { id: "human-4", name: "", deck: "player", type: "player", stats: HUMAN, rules: "",
+    flavor: "Stepped out to see what the noise was. Brought the remote in case it was the TV.",
     art: humanArt("a bearded dad with a belly in a flannel shirt, cargo shorts, socks and sandals, holding a TV remote") },
   { id: "human-5", name: "", deck: "player", type: "player", stats: HUMAN, rules: "",
+    flavor: "Sleepwalks. Woke up in a dungeon holding Mr. Buttons. Mr. Buttons has seen things.",
     art: humanArt("a young girl with black braids in a green dinosaur pajama onesie, brandishing a stuffed rabbit like a weapon") },
   { id: "human-6", name: "", deck: "player", type: "player", stats: HUMAN, rules: "",
+    flavor: "Was walking to the 24-hour pharmacy. Has been through worse. Will tell you about it.",
     art: humanArt("a small elderly grandmother with white curly hair, a lavender cardigan and a big handbag, deeply unimpressed") },
   { id: "human-7", name: "", deck: "player", type: "player", stats: HUMAN, rules: "",
+    flavor: "Leaving the 24-hour gym. Has never skipped leg day. Is about to find out what legs are for.",
     art: humanArt("a muscular young man with brown skin in a tank top and gym shorts, a towel around his neck, confused") },
   { id: "human-8", name: "", deck: "player", type: "player", stats: HUMAN, rules: "",
+    flavor: "Sat on the roof listening to music. Watched the whole thing happen. Rated it a six.",
     art: humanArt("a pale goth teenage girl with short black hair, all black clothes, big headphones around her neck, bored") },
 ];
 
@@ -310,7 +325,7 @@ const envelopes: Card[] = [
   env("face", "Found It With Your Face", "Silver", "First player to trigger a trap", "Football Helmet"),
   env("you-monster", "You Monster", "Bronze", "Kill all three goblins in the Daycare", "2 gold, You did that."),
   env("toilet", "Why Would You Do That", "Bronze", "Reach into the toilet", "1 Energy Drink, Gold (2)"),
-  env("nerd", "Nerd", "Gold", "First player to learn a Spellbook", "Scroll: Firebolt, Orc Monocle"),
+  env("nerd", "Nerd", "Gold", "First player to learn a Spellbook", "Scroll: Firebolt, Bookmark"),
   env("sharing", "Sharing Is Caring", "Bronze", "Give an item to another player", "2 gold"),
   env("trap-chef", "Trap Chef", "Gold", "A monster dies from a trap", "Fire Axe"),
   env("cartographer", "Cartographer", "Silver", "Open the doors to seven of the nine rooms", "5 gold"),
@@ -319,9 +334,29 @@ const envelopes: Card[] = [
   env("boss", "Boss Box", "Platinum", "Kill the Floor Manager", "Spellbook: Nope, 5 gold, Save the Date"),
 ];
 
-export const CARDS: Card[] = [...kits, ...pockets, ...gear, ...biggear, ...lootbox, ...fan, ...monsters, ...players, ...envelopes];
+// Floor tiles. Sizes are a proposal; the map file is the source of truth once they agree.
+const tile = (id: string, name: string, w: number, h: number, kind: "furniture" | "trap", art: string, qty = 1): Card =>
+  ({ id: `tile-${id}`, name, deck: "tile", type: "tile", tile: { w, h, kind }, qty, rules: "", art });
+const tiles: Card[] = [
+  tile("stairs", "Stairs Down", 2, 2, "furniture", "a wide stone staircase descending into darkness, worn steps, a faint glow from below"),
+  tile("desk", "Manager's Desk", 2, 1, "furniture", "a big dark wooden office desk with a nameplate, coffee mug, stapler and a stack of paperwork"),
+  tile("table", "Break Room Table", 2, 1, "furniture", "a scratched wooden table with a half-eaten sandwich, a juice box and scattered crumbs"),
+  tile("chest", "Locked Chest", 1, 1, "furniture", "an iron-banded wooden treasure chest with a heavy padlock"),
+  tile("rack", "Weapon Rack", 2, 2, "furniture", "a low wooden weapon stand lying on the floor, seen from directly above, with mismatched weapons laid flat across it: a fire axe, a shortbow, a frying pan, a table leg and an open spellbook"),
+  tile("toilet", "Latrine", 1, 1, "furniture", "a grimy dungeon toilet with a cracked wooden seat and a suspicious green glow inside"),
+  tile("shelf", "Bookshelf", 2, 1, "furniture", "a tall wooden bookshelf crammed with old leather spellbooks and scrolls, one book glowing faintly blue"),
+  tile("cage", "The Cage", 2, 2, "furniture", "a large rusted iron cage with an angry white goose inside, feathers on the floor around it"),
+  tile("chairs", "Tiny Chairs", 2, 1, "furniture", "a cluster of tiny wooden chairs and a small round table with crayons and a half-finished drawing of a goblin"),
+  tile("sign", "Welcome Sign", 1, 1, "furniture", "a cheerful corporate welcome sign on a metal stand, blank face, with a small bronze bell beside it"),
+  tile("pit", "Pit Trap", 1, 1, "trap", "a square hole in a stone dungeon floor, a dark pit with a few broken planks around the edge", 3),
+  tile("spear", "Spear Trap", 1, 1, "trap", "a stone floor square with several sharp iron spikes thrust up through cracked flagstones"),
+  tile("block", "Falling Block", 1, 1, "trap", "a heap of massive broken stone rubble and dust filling a square of dungeon floor"),
+  tile("secret", "Secret Door", 1, 1, "trap", "a stone floor square with a thin hidden crack outlining a doorway and a small iron ring pull"),
+];
 
-export const DECK_ORDER: Deck[] = ["player", "kit", "pockets", "gear", "biggear", "lootbox", "fan", "monster", "envelope"];
+export const CARDS: Card[] = [...kits, ...pockets, ...gear, ...biggear, ...lootbox, ...fan, ...monsters, ...players, ...envelopes, ...tiles];
+
+export const DECK_ORDER: Deck[] = ["player", "kit", "pockets", "gear", "biggear", "lootbox", "fan", "monster", "envelope", "tile"];
 
 const byId = new Map(CARDS.map(c => [c.id, c]));
 export const card = (id: string) => byId.get(id);
