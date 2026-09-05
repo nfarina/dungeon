@@ -54,6 +54,23 @@ header .sp{flex:1}
 .seg button:last-child{border-right:0}
 
 .body{display:grid; grid-template-columns:186px 1fr 268px; min-height:0}
+.body[hidden]{display:none}
+.doc{overflow-y:auto; -webkit-overflow-scrolling:touch; padding:20px 28px 80px; min-height:0}
+.doc .inner{max-width:860px; margin:0 auto; font-family:Georgia,"Times New Roman",serif; font-size:17px; line-height:1.55}
+.doc h1{font-size:34px; margin:8px 0 14px}
+.doc h2{font-size:24px; margin:30px 0 10px; padding-bottom:4px; border-bottom:1px solid var(--line-2)}
+.doc h3{font-size:19px; margin:22px 0 8px}
+.doc p{margin:0 0 12px}
+.doc table{border-collapse:collapse; width:100%; margin:8px 0 18px; font:12.5px/1.4 "IBM Plex Mono",ui-monospace,Menlo,monospace}
+.doc th,.doc td{border:1px solid var(--line-2); padding:5px 7px; vertical-align:top; text-align:left}
+.doc th{background:var(--sunk)}
+.doc blockquote{border-left:3px solid var(--amber); margin:0 0 12px; padding:2px 12px; color:var(--muted)}
+.doc code{font-family:ui-monospace,Menlo,monospace; font-size:.85em; background:var(--sunk); padding:1px 4px; border-radius:3px}
+.doc hr{border:0; border-top:1px solid var(--line-2); margin:24px 0}
+.doc ul,.doc ol{margin:0 0 12px 24px} .doc li{margin-bottom:4px}
+.doc .row{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+.doc .intro p{font-size:22px; line-height:1.5; margin-bottom:18px}
+.doc .when{font:12px "IBM Plex Mono",ui-monospace,Menlo,monospace; color:var(--muted); margin-bottom:22px}
 aside{background:var(--surface); overflow-y:auto; -webkit-overflow-scrolling:touch}
 aside.left{border-right:1px solid var(--line-2)}
 aside.right{border-left:1px solid var(--line-2)}
@@ -84,6 +101,10 @@ aside.right{border-left:1px solid var(--line-2)}
 .tools button{padding:5px 9px; font-size:12px}
 .swatch{width:11px; height:11px; border-radius:2px; border:1px solid var(--wall); display:inline-block; margin-right:6px; vertical-align:-1px}
 .hint{font-size:11.5px; color:var(--muted); line-height:1.45; margin-top:8px}
+#speechDlg{width:min(92vw,700px)}
+.speech p{font-family:Georgia,"Times New Roman",serif; font-size:21px; line-height:1.5; margin:0 0 16px}
+.speech p:last-child{margin-bottom:0}
+.speechlist button{display:block; width:100%; text-align:left; margin-bottom:6px}
 
 /* map */
 main{position:relative; min-width:0; min-height:0; overflow:auto; padding:14px; display:grid; place-items:start center}
@@ -172,6 +193,8 @@ dialog textarea{width:100%; min-height:260px; font-size:11.5px; background:var(-
     <div class="seg">
       <button id="mEdit" class="on">Edit</button>
       <button id="mDM">DM</button>
+      <button id="mIntro">Intro</button>
+      <button id="mGuide">Guide</button>
     </div>
     <span class="sp"></span>
     <span id="status">&nbsp;</span>
@@ -214,11 +237,18 @@ dialog textarea{width:100%; min-height:260px; font-size:11.5px; background:var(-
       <div class="pane" id="toolPane"></div>
       <div class="pane" id="selPane"></div>
       <div class="pane" id="clockPane" hidden></div>
+      <div class="pane" id="speechPane"></div>
       <div class="pane" id="rosterPane"></div>
       <div class="pane" id="issuePane"></div>
     </aside>
   </div>
+  <section id="docView" class="doc" hidden></section>
 </div>
+
+<dialog id="speechDlg">
+  <div class="pane"><h2 id="speechTitle"></h2><p class="hint" id="speechWhen"></p><div class="speech" id="speechBody"></div></div>
+  <div class="pane row"><span class="sp" style="flex:1"></span><button id="speechClose">Close</button></div>
+</dialog>
 
 <dialog id="jsonDlg">
   <div class="pane"><h2>Map JSON</h2>
@@ -477,9 +507,14 @@ function render() {
   if (!map) return;
   const avail = Math.min($("main").clientWidth - 34, 1100);
   CS = Math.max(15, Math.min(38, Math.floor(avail / (B().w || 26))));
-  drawMap(); drawLayers(); drawTools(); drawSel(); drawClock(); drawRoster(); drawIssues();
+  drawMap(); drawLayers(); drawTools(); drawSel(); drawClock(); drawSpeeches(); drawRoster(); drawIssues();
   $("#mEdit").classList.toggle("on", mode === "edit");
   $("#mDM").classList.toggle("on", mode === "dm");
+  $("#mIntro").classList.toggle("on", mode === "intro");
+  $("#mGuide").classList.toggle("on", mode === "guide");
+  const docMode = mode === "intro" || mode === "guide";
+  $(".body").hidden = docMode; $("#docView").hidden = !docMode;
+  if (docMode) drawDoc();
 }
 
 const AREA_LAYERS = ["board", "stone"];
@@ -853,6 +888,123 @@ function drawClock() {
     el("button", { class:"on", onclick: () => { play.count = Math.min(play.count, 5); savePlay(); render(); } }, "Reset! (→5)"),
     el("button", { onclick: () => { play.round = 1; play.count = 26; play.cleared = {}; play.opened = {}; savePlay(); render(); } }, "New floor"),
   ]));
+  pane.append(el("p", { class:"hint" }, "Each round: heroes (cooldowns down, move + action) → monsters (4.3) → loot rolls as they die → End round: die down, collapse damage at zero, Viewers draw."));
+}
+
+/* ---------- Intro and Guide views ---------- */
+let guideMd = null, guideFor = null, introIdx = 0;
+window.reloadGuide = () => { guideFor = null; render(); };
+async function drawDoc() {
+  const v = $("#docView");
+  if (mode === "intro") {
+    const list = F().speeches || [];
+    const sp = list[Math.min(introIdx, list.length - 1)];
+    v.innerHTML = "";
+    const inner = el("div", { class:"inner intro" });
+    if (!sp) inner.append(el("p", { class:"hint" }, "No speeches on this floor yet. Add them in Edit mode, under Announcer."));
+    else {
+      inner.append(el("h1", {}, sp.title || "Announcer"));
+      if (sp.when) inner.append(el("p", { class:"when" }, sp.when));
+      for (const l of sp.lines || []) inner.append(el("p", {}, l));
+      const row = el("div", { class:"row", style:"margin-top:28px" });
+      list.forEach((s, i) => row.append(el("button", { class: i === introIdx ? "on" : "", onclick: () => { introIdx = i; render(); } }, s.title)));
+      inner.append(row);
+    }
+    v.append(inner); return;
+  }
+  const name = F().guide || "floor-1";
+  if (guideFor !== name) {
+    guideFor = name; guideMd = null;
+    v.innerHTML = `<div class="inner"><p class="hint">Loading ${esc(name)}.md…</p></div>`;
+    try {
+      const r = await fetch(`/api/doc/${encodeURIComponent(name)}`);
+      guideMd = r.ok ? await r.text() : `# Not found\n\nThere is no ${name}.md next to the sim folder. Set \`floor.guide\` in the map file.`;
+    } catch {
+      guideMd = "# Guide unavailable\n\nOpen this page from `bun run map` so it can read the markdown file.";
+    }
+    if (mode !== "guide") return;
+  }
+  v.innerHTML = `<div class="inner"><div class="row" style="justify-content:flex-end"><button onclick="reloadGuide()">Reload</button></div>${mdToHtml(guideMd)}</div>`;
+}
+
+/** Just enough Markdown for the guidebook: headings, rules, quotes, GFM tables, lists, bold/italic/code/links. */
+function mdInline(s) {
+  s = esc(s);
+  s = s.replace(/`([^`]+)`/g, "<code>$1</code>");
+  s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  s = s.replace(/(^|[^*\w])\*([^*\n]+)\*/g, "$1<em>$2</em>");
+  s = s.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, '<a href="$2">$1</a>');
+  return s;
+}
+function mdToHtml(md) {
+  const out = [], lines = String(md).replace(/\r/g, "").split("\n");
+  let i = 0, para = [];
+  const flush = () => { if (para.length) { out.push(`<p>${mdInline(para.join(" "))}</p>`); para = []; } };
+  const cells = r => r.replace(/^\s*\||\|\s*$/g, "").split("|").map(c => c.trim());
+  while (i < lines.length) {
+    const ln = lines[i]; let m;
+    if (/^\s*$/.test(ln)) { flush(); i++; continue; }
+    if ((m = ln.match(/^(#{1,4})\s+(.*)$/))) { flush(); const h = m[1].length; out.push(`<h${h}>${mdInline(m[2])}</h${h}>`); i++; continue; }
+    if (/^\s*-{3,}\s*$/.test(ln)) { flush(); out.push("<hr>"); i++; continue; }
+    if (/^\s*>/.test(ln)) {
+      flush(); const q = [];
+      while (i < lines.length && /^\s*>/.test(lines[i])) q.push(lines[i++].replace(/^\s*>\s?/, ""));
+      out.push(`<blockquote>${mdToHtml(q.join("\n"))}</blockquote>`); continue;
+    }
+    if (/^\s*\|/.test(ln)) {
+      flush(); const rows = [];
+      while (i < lines.length && /^\s*\|/.test(lines[i])) rows.push(lines[i++]);
+      const body = rows.filter(r => !/^\s*\|\s*:?-{2,}/.test(r));
+      const [head, ...rest] = body;
+      out.push("<table><thead><tr>" + cells(head).map(c => `<th>${mdInline(c)}</th>`).join("") + "</tr></thead><tbody>"
+        + rest.map(r => "<tr>" + cells(r).map(c => `<td>${mdInline(c)}</td>`).join("") + "</tr>").join("") + "</tbody></table>");
+      continue;
+    }
+    if ((m = ln.match(/^\s*([-*]|\d+\.)\s+/))) {
+      flush(); const ol = /\d/.test(m[1]); const items = [];
+      while (i < lines.length && (m = lines[i].match(/^\s*([-*]|\d+\.)\s+(.*)$/))) { items.push(m[2]); i++; }
+      const tag = ol ? "ol" : "ul";
+      out.push(`<${tag}>` + items.map(t => `<li>${mdInline(t)}</li>`).join("") + `</${tag}>`); continue;
+    }
+    para.push(ln.trim()); i++;
+  }
+  flush(); return out.join("\n");
+}
+
+/* ---------- announcer speeches ---------- */
+function openSpeech(sp) {
+  $("#speechTitle").textContent = sp.title || "Announcer";
+  $("#speechWhen").textContent = sp.when || "";
+  $("#speechBody").innerHTML = (sp.lines || []).map(l => `<p>${esc(l)}</p>`).join("");
+  $("#speechDlg").showModal();
+}
+function drawSpeeches() {
+  const pane = $("#speechPane"); pane.innerHTML = "";
+  const list = F().speeches ??= [];
+  pane.append(el("h2", {}, "Announcer"));
+  if (mode === "dm") {
+    if (!list.length) { pane.append(el("p", { class:"hint" }, "No speeches on this floor. Add them in Edit mode.")); return; }
+    const box = el("div", { class:"speechlist" });
+    for (const sp of list) box.append(el("button", { onclick: () => openSpeech(sp) }, sp.title));
+    pane.append(box);
+    return;
+  }
+  list.forEach((sp, i) => {
+    const title = el("input", { type:"text", value:sp.title || "", placeholder:"Title" });
+    title.addEventListener("change", () => { sp.title = title.value; dirty = true; });
+    const when = el("input", { type:"text", value:sp.when || "", placeholder:"When to read it" });
+    when.addEventListener("change", () => { sp.when = when.value; dirty = true; });
+    const body = el("textarea", { rows:"6", spellcheck:"true", style:"width:100%; font-size:12px" });
+    body.value = (sp.lines || []).join("\n\n");
+    body.addEventListener("change", () => { sp.lines = body.value.split(/\n\s*\n/).map(x => x.trim()).filter(Boolean); dirty = true; });
+    pane.append(el("div", { class:"field" }, [title, when, body,
+      el("div", { class:"row" }, [
+        el("button", { onclick: () => openSpeech(sp) }, "Preview"),
+        el("button", { onclick: () => { list.splice(i, 1); dirty = true; render(); } }, "Delete"),
+      ])]));
+  });
+  pane.append(el("button", { onclick: () => { list.push({ title:"New speech", when:"", lines:[] }); dirty = true; render(); } }, "+ Speech"));
+  pane.append(el("p", { class:"hint" }, "Paragraphs are separated by a blank line. Saved with the map, read from the DM view."));
 }
 
 function drawRoster() {
@@ -1032,6 +1184,8 @@ function apply(c, dragging = false) {
 /* ---------- chrome ---------- */
 $("#mEdit").onclick = () => { mode = "edit"; sel = null; render(); };
 $("#mDM").onclick = () => { mode = "dm"; sel = null; render(); };
+$("#mIntro").onclick = () => { mode = "intro"; sel = null; render(); };
+$("#mGuide").onclick = () => { mode = "guide"; sel = null; render(); };
 $("#save").onclick = save;
 $("#undo").onclick = undo;
 $("#mapSel").onchange = e => loadMap(e.target.value);
@@ -1045,6 +1199,7 @@ for (const b of document.querySelectorAll("[data-preset]")) b.onclick = () => {
 };
 $("#jsonBtn").onclick = () => { $("#jsonTxt").value = JSON.stringify(map, null, 2); $("#jsonDlg").showModal(); };
 $("#jsonClose").onclick = () => $("#jsonDlg").close();
+$("#speechClose").onclick = () => $("#speechDlg").close();
 $("#jsonCopy").onclick = async () => {
   try { await navigator.clipboard.writeText($("#jsonTxt").value); status("copied", "good"); }
   catch { $("#jsonTxt").select(); status("select and copy", ""); }

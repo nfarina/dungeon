@@ -149,3 +149,14 @@ spellbook learning, and card-to-nerd trading.
   floor into Downed at 1 Health.
 - `bun run src/run.ts report N` uses the recommended ruleset; `src/tools/content.ts N rec`
   needs the `rec` argument to match it, otherwise it reports the as-written rules.
+
+## The iPad page: Edit | DM | Intro | Guide
+
+`bun run map` serves one page with four views. **Edit** is the map editor.
+**DM** is the table view: the clock, a round checklist, the room roster, and an
+Announcer pane with the floor's speeches. **Intro** shows one speech at a time
+in large type for reading aloud (the first is the welcome speech for players who
+haven't read the books). **Guide** renders the floor's guidebook markdown
+(`floor.guide` in the map file, e.g. `../floor-1.md`) live from disk, so the
+markdown stays canonical and the page never goes stale. Speeches live in
+`floor.speeches` and are edited in the Announcer pane in Edit mode.

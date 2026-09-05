@@ -58,6 +58,15 @@ const server = Bun.serve({
         return json({ ok: true, saved: `src/content/${name}.map.json`, at: new Date().toISOString() });
       }
     }
+    // The floor guidebook: markdown kept next to the sim folder, rendered by the page's Guide view.
+    const d = p.match(/^\/api\/doc\/([^/]+)$/);
+    if (d) {
+      const name = decodeURIComponent(d[1]);
+      if (!safe(name)) return json({ error: "bad doc name" }, 400);
+      const f = Bun.file(`${ROOT}../${name}.md`);
+      if (!(await f.exists())) return new Response("not found", { status: 404, headers: NOCACHE });
+      return new Response(f, { headers: { "content-type": "text/markdown; charset=utf-8", ...NOCACHE } });
+    }
     return new Response("not found", { status: 404 });
   },
 });
@@ -67,4 +76,5 @@ const nets = Object.values(await import("node:os").then(os => os.networkInterfac
 const lan = nets.find(n => n && n.family === "IPv4" && !n.internal)?.address;
 console.log(`\n  map editor   http://localhost:${server.port}`);
 if (lan) console.log(`  on the iPad  http://${lan}:${server.port}`);
-console.log(`  editing      sim/src/content/*.map.json  (Save writes the file)\n`);
+console.log(`  editing      sim/src/content/*.map.json  (Save writes the file)`);
+console.log(`  guide        ../<floor.guide>.md, served live to the Guide view\n`);

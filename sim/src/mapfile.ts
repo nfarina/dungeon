@@ -60,6 +60,8 @@ export type FloorRoom = {
 export type FloorSpec = {
   name: string;
   note?: string;
+  /** Basename of the floor's guidebook markdown, next to the sim folder (e.g. "floor-1" -> ../floor-1.md). */
+  guide?: string;
   rooms: FloorRoom[];
   /** Extra solid stone laid over corridor squares (or part of a room). One
    *  string per row, 'x' = stone. Possible rooms this floor doesn't name are
@@ -69,6 +71,8 @@ export type FloorSpec = {
   features: MapFeature[];
   traps: MapTrap[];
   monsters?: MapMonster[];
+  /** Announcer scripts, read from the DM view. Per floor, so the content machine writes them. */
+  speeches?: { title: string; when?: string; lines: string[] }[];
 };
 
 export type MapFile = { board: BoardDef; floor: FloorSpec };

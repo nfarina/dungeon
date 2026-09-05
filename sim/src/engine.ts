@@ -445,7 +445,8 @@ export class Game {
   private checkAchievements() {
     if (!this.monsters.some(m => m.alive && m.room === 4) && this.board.rooms.get(4)!.monsters.length)
       this.award("You Monster", [{ name: "Gold (2)", slot: "pack", gold: 2 }]);
-    if (this.board.doors.every((d, i) => d.kind === "secret" || this.openDoors[i] === 1))
+    // Cartographer: doors to seven of the nine rooms opened (section 7). Secret doors don't count.
+    if (this.board.doors.filter((d, i) => d.kind !== "secret" && this.openDoors[i] === 1).length >= 7)
       this.award("Cartographer", [{ name: "Gold (5)", slot: "pack", gold: 5 }]);
     if (this.heroes.some(h => h.goose > 0)) this.achievements.add("Sir Reginald");
   }
@@ -980,7 +981,7 @@ export class Game {
     if (w.kind === "rack" && this.rackBook) { this.give(h, this.rackBook); this.rackBook = null; }
     const it = this.draw(deck as any); if (it) this.give(h, it);
     if (w.kind === "rack" && this.cfg.richRack) { const it2 = this.draw("gear"); if (it2) this.give(h, it2); }
-    if (w.kind === "toilet") this.award("Why Would You Do That", [{ name: "Energy Drink", slot: "pack", use: "energy" }]);
+    if (w.kind === "toilet") this.award("Why Would You Do That", [{ name: "Energy Drink", slot: "pack", use: "energy" }, { name: "Gold (2)", slot: "pack", gold: 2 }]);
     return true;
   }
 

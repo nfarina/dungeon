@@ -78,12 +78,12 @@ On your turn, hand any card to an adjacent player. Free. Trading is how the righ
 
 ### 1.7 The clock
 
-Two timers, one die. Put a d12 where everyone can see it.
+Two timers, one clock. The countdown lives on the iPad DM view (the map editor in DM mode, which also holds the announcer speeches and the round checklist). Bring a d12 out onto the table once the count is 12 or under, so the slam to 5 happens in front of everyone.
 
 - **Floor cap: 26 rounds.** Announced at the start and counted down out loud every round. It exists so the party can't clear every room at leisure. In most games it never actually binds. A threat, not a guillotine.
 - **Emergency Floor Reset: 5 rounds.** The moment the Manager's Office door opens, the countdown drops to 5, or stays put if it's already lower. The die visibly slamming from 12 to 5 is the drama beat. Announcer: "Attention, Crawlers. The Floor Manager has initiated an Emergency Floor Reset. This is a standard retention measure and is not a reflection on your performance. You have five rounds. Cheers!"
 - **The collapse is a ramp.** When the count hits zero the floor starts coming down. At the end of each round, every hero still on the floor takes 1, 1, 2, 2, then 3 damage. After the fifth round, nobody left up there is walking down the stairs.
-- **You can leave without killing Greg.** Any hero on the stairwell square at the end of a round has escaped. Escaping with the boss alive forfeits the Boss Box. Say this out loud before the fight, so the last three rounds are a decision and not arithmetic.
+- **You can leave without killing Greg.** Any hero on one of the four stairs squares at the end of a round has escaped. Escaping with the boss alive forfeits the Boss Box. Say this out loud before the fight, so the last three rounds are a decision and not arithmetic.
 - **What the collapse means.** Heroes who reached the stairs continue to Floor 2 as they are. Heroes who died, in the collapse or before it, are revived on Floor 2 at a cost decided when that floor is generated. Greg, if alive, remembers all of this.
 
 On the real Side A map with the death rule, placed monsters, the Office pit and the Slingshot, the simulator reports (3,000 runs):
@@ -186,7 +186,7 @@ Use the dragon. His name is Greg.
 
 - **Performance Review** (Cooldown 2): 2 attack dice at any hero in line of sight. Greg uses it on whichever hero is carrying the most equipment.
 - **Delegation:** while either Orc is alive, Greg defends with 4 dice instead of 3. Kill the staff first.
-- On death: the killer opens the **Boss Box**. Everyone gets the Big Gear draw split by the announcer.
+- On death: the killer opens the **Boss Box**. Greg also drops one Big Gear card, which the announcer hands to whoever is carrying the least.
 
 ### 4.3 Monster behavior (for the announcer and, later, the simulator)
 
@@ -376,6 +376,8 @@ Counts for the card pipeline. Poker size, nine per letter sheet.
 | Fan deck | 14 |
 | Trap tokens (pit, spear, block, revealed-secret-door) | 9 |
 | Room signs (optional, but the Daycare deserves one) | 9 |
+| Player reference on the back of each player card: turn order, the dice, Downed, cooldowns, trading | 3 |
+| Announcer speeches: in the map file, read from the iPad DM view | 5 |
 | Countdown die: a d12. Cooldown dice: any d6s. Gold: coins from the HeroQuest box or printed tokens. | |
 
 Card template types: Player, Monster, Item (slot, effect, flavor, art), Spell (cooldown box, tick boxes, Mind requirement), Consumable, Companion, Fan (the Item layout with its own color and back), Envelope label. Eight HTML templates, one data file.
@@ -388,7 +390,6 @@ Settled: the boss is the dragon, classes are picked after Floor 2, the Daycare s
 
 Still open:
 
-- **The real map.** Type Side A's Quest 1 into the simulator's map file and re-run. Every timer number above depends on corridor length.
 - **The death window.** One full round Downed before death is the main difficulty dial. If the re-run shows too many deaths, try two rounds before softening any monster.
 - **Fan deck power.** Aimed at "annoying and occasionally decisive." Poke and Heckle are the cards to cut if it overshoots.
 - **Floor 2 revival cost.** Decided at generation time. Candidates: lose your gold, lose one equipped item of Greg's choosing, start Floor 2 at half Health, or a sponsorship you didn't ask for.
