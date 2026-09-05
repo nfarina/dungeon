@@ -14,9 +14,9 @@ const STYLE_MD = join(ROOT, "style.md");
 const STYLE_REF = join(ROOT, "..", "art-style.png");
 const KEY_FILE = join(ROOT, "..", ".gemini.key");
 
-/** Nano Banana 2 by default. gemini-3-pro-image is the slower, prettier, pricier one. */
-export const DEFAULT_MODEL = process.env.GEMINI_IMAGE_MODEL ?? "gemini-3.1-flash-image";
-export const MODELS = ["gemini-3.1-flash-image", "gemini-3-pro-image", "gemini-2.5-flash-image"];
+/** Nano Banana 2 Lite by default. gemini-3-pro-image is the slower, prettier, pricier one. */
+export const DEFAULT_MODEL = process.env.GEMINI_IMAGE_MODEL ?? "gemini-3.1-flash-lite-image";
+export const MODELS = ["gemini-3.1-flash-lite-image", "gemini-3.1-flash-image", "gemini-3-pro-image", "gemini-2.5-flash-image"];
 
 export type ManifestEntry = { file: string; hash: string; prompt: string; model: string; at: string };
 export type Manifest = Record<string, ManifestEntry>;
