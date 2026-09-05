@@ -12,7 +12,7 @@ Keep everything from HeroQuest that isn't listed here (movement 2d6, combat dice
 
 | HeroQuest | Floor 1 |
 |---|---|
-| Four hero classes | Eight pre-made crawlers with identical stats. Pick one, write a name on it. Loot makes you different. |
+| Four hero classes | Nine pre-made crawlers with identical stats. Pick one, write a name on it. Loot makes you different. |
 | One-shot spells, wizard only | **Scrolls** (one use, anyone) and **Spellbooks** (permanent, cooldown, need Mind 4+). |
 | Search for treasure, once per room | Gone. Monsters drop loot when killed. Chests and racks are visible furniture with a fixed draw. |
 | Search for traps | Kept, but a found trap gets a **trap token** placed on the board. A Torch does this passively. |
@@ -103,7 +103,7 @@ That's the target shape: nearly every game is decided in the last two rounds, a 
 
 ## 2. Players
 
-Eight crawler cards, all with the same base stats, each a stranger who happened to be outdoors at three in the morning. Every card carries one or two sentences, in the announcer's voice, about why. Pick one, write a name on the line, and roleplay it as hard as you like. Then pick **one** Starting Kit card. The kit is "what they happened to have on them."
+Nine crawler cards, all with the same base stats, each a stranger who happened to be outdoors at three in the morning. Every card carries one or two sentences, in the announcer's voice, about why. Pick one, write a name on the line, and roleplay it as hard as you like. Then pick **one** Starting Kit card. The kit is "what they happened to have on them."
 
 | Starting Kit | Slot | Effect |
 |---|---|---|
@@ -367,7 +367,7 @@ Counts for the card pipeline. Poker size, nine per letter sheet.
 
 | Asset | Count |
 |---|---|
-| Crawler cards (eight strangers, generated portraits, stat boxes, slot outline, a line for the name, a backstory line) | 8 |
+| Crawler cards (nine strangers, generated portraits, stat boxes, slot outline, a line for the name, a backstory line) | 9 |
 | Starting Kit cards | 5 |
 | Monster cards (stats, loot table, one line of flavor) | 6 |
 | Pockets deck | 16 |
@@ -388,7 +388,7 @@ Card template types: Player, Monster, Item (slot, effect, flavor, art), Spell (c
 
 ## 11. Decisions for Nick
 
-Settled: the boss is a troll named Greg (the dragon was too much for Floor 1), classes are picked after Floor 2, the Daycare stays, the goose is Sir Reginald until the boys rename him, and players pick from eight generated crawlers rather than playing themselves. Roleplaying games are for roleplaying.
+Settled: the boss is a troll named Greg (the dragon was too much for Floor 1), classes are picked after Floor 2, the Daycare stays, the goose is Sir Reginald until the boys rename him, and players pick from nine generated crawlers rather than playing themselves. Roleplaying games are for roleplaying.
 
 Still open:
 

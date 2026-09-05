@@ -222,5 +222,19 @@
     "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: waist-up portrait of a pale goth teenage girl with short black hair, all black clothes, big headphones around her neck, bored, ordinary modern everyday clothes, standing in a dark stone dungeon looking slightly alarmed but game for it, no weapons. This is a character portrait for a game card, landscape composition.",
     "model": "gemini-3.1-flash-image",
     "at": "2026-09-05T13:54:11.602Z"
+  },
+  "human-9": {
+    "file": "human-9.e7a899a148.png",
+    "hash": "e7a899a148",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: waist-up portrait of a lanky middle-aged man with a mustache in a red pizza delivery polo shirt and visor cap, holding an insulated pizza delivery bag, ordinary modern everyday clothes, standing in a dark stone dungeon looking slightly alarmed but game for it, no weapons. This is a character portrait for a game card, landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-05T13:56:02.110Z"
+  },
+  "standee-human-9": {
+    "file": "standee-human-9.561bdaf1f0.png",
+    "hash": "561bdaf1f0",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a stand-up game figure: one character shown full length, standing upright and facing the viewer, head near the top of the frame and feet near the bottom, nothing cropped. Plain flat pale parchment background with a simple ground shadow, no scenery. Portrait (tall) composition.\n\nSubject: full-body figure of a lanky middle-aged man with a mustache in a red pizza delivery polo shirt and visor cap, holding an insulated pizza delivery bag, ordinary modern everyday clothes, standing facing the viewer, whole body visible from head to shoes, no weapons. The second reference image shows this exact character: match their face, hair, skin, build and clothing.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-05T13:56:12.112Z"
   }
 }

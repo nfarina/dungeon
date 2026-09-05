@@ -13,7 +13,7 @@ export type Deck =
   | "lootbox"    // Cards that live only inside an envelope
   | "envelope"   // The envelope labels themselves (label size, not card size)
   | "tile"       // Floor tiles: furniture and traps, integer inches, top-down art
-  | "standee";   // Stand-up figures for the plastic stands: the eight crawlers and the boss
+  | "standee";   // Stand-up figures for the plastic stands: the nine crawlers and the boss
 
 export type CardType =
   | "item" | "consumable" | "scroll" | "spell" | "companion" | "text"
@@ -292,7 +292,7 @@ const monsters: Card[] = [
     art: "a huge lumpy grey-green cave troll in a too-tight short-sleeved dress shirt with a clip-on tie and a lanyard, a name badge reading GREG, reading glasses, seated behind a desk with a nameplate and a coffee mug, smug" },
 ];
 
-// Eight humans. Nobody is anybody; players pick one and write their own name on it.
+// Nine humans. Nobody is anybody; players pick one and write their own name on it.
 // Each gets a portrait card and a stand-up figure, from the same description.
 const HUMANS: { desc: string; flavor: string }[] = [
   { desc: "a skinny teenage boy with messy brown hair in an oversized grey hoodie and basketball shorts, holding a flashlight",
@@ -311,6 +311,8 @@ const HUMANS: { desc: string; flavor: string }[] = [
     flavor: "Leaving the 24-hour gym. Has never skipped leg day. Is about to find out what legs are for." },
   { desc: "a pale goth teenage girl with short black hair, all black clothes, big headphones around her neck, bored",
     flavor: "Sat on the roof listening to music. Watched the whole thing happen. Rated it a six." },
+  { desc: "a lanky middle-aged man with a mustache in a red pizza delivery polo shirt and visor cap, holding an insulated pizza delivery bag",
+    flavor: "Was delivering a large pepperoni to 14 Elm Street. Elm Street is gone. The pizza is still warm, and he still expects a tip." },
 ];
 const humanArt = (desc: string) => `waist-up portrait of ${desc}, ordinary modern everyday clothes, standing in a dark stone dungeon looking slightly alarmed but game for it, no weapons`;
 const players: Card[] = HUMANS.map((h, i) => ({
