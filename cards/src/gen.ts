@@ -40,7 +40,7 @@ export function fullPrompt(c: Card): string {
   if (c.type === "tile") {
     return `${style}\n\nThis is a board game floor tile seen DIRECTLY FROM ABOVE, like a map: flat top-down orthographic view, no horizon, no walls, nothing hanging or standing upright, no perspective. Objects lie flat on dark grey stone dungeon flagstones as seen from the ceiling, and fill the frame edge to edge.\n\nSubject: ${c.art}.`;
   }
-  const same = c.ref ? " The second reference image shows this exact character: match their face, hair, skin, build and clothing." : "";
+  const same = c.ref ? " The second reference image shows this exact character: match their face, hair, skin, build and clothing, but take ONLY the character from it, not its background or framing." : "";
   if (c.type === "standee") {
     return `${style}\n\nThis is a stand-up game figure: one character shown full length, standing upright and facing the viewer, head near the top of the frame and feet near the bottom, nothing cropped. Plain flat pale parchment background with a simple ground shadow, no scenery. Portrait (tall) composition.\n\nSubject: ${c.art}.${same}`;
   }
