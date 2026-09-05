@@ -14,9 +14,9 @@ const STYLE_MD = join(ROOT, "style.md");
 const STYLE_REF = join(ROOT, "..", "art-style.png");
 const KEY_FILE = join(ROOT, "..", ".gemini.key");
 
-/** Nano Banana 2 Lite by default. gemini-3-pro-image is the slower, prettier, pricier one. */
-export const DEFAULT_MODEL = process.env.GEMINI_IMAGE_MODEL ?? "gemini-3.1-flash-lite-image";
-export const MODELS = ["gemini-3.1-flash-lite-image", "gemini-3.1-flash-image", "gemini-3-pro-image", "gemini-2.5-flash-image"];
+/** Nano Banana 2 by default. flash-lite is cheaper but not good enough for finals. gemini-3-pro-image is the slower, prettier, pricier one. */
+export const DEFAULT_MODEL = process.env.GEMINI_IMAGE_MODEL ?? "gemini-3.1-flash-image";
+export const MODELS = ["gemini-3.1-flash-image", "gemini-3.1-flash-lite-image", "gemini-3-pro-image", "gemini-2.5-flash-image"];
 
 export type ManifestEntry = { file: string; hash: string; prompt: string; model: string; at: string };
 export type Manifest = Record<string, ManifestEntry>;
@@ -60,11 +60,21 @@ export function expectedHash(c: Card, model = DEFAULT_MODEL): string {
   return sha([model, readStyle(), ref ? sha(ref) : "noref", c.art].join(" ")).slice(0, 10);
 }
 
-/** Current art for a card, if the manifest has one. Stale = prompt, style or model changed since it was made. */
-export function artFor(c: Card, model = DEFAULT_MODEL): { file: string; stale: boolean } | null {
-  const e = loadManifest()[c.id];
-  if (!e || !existsSync(join(ART_DIR, e.file))) return null;
-  return { file: e.file, stale: e.hash !== expectedHash(c, model) };
+/** Cards that would get the exact same request as `c` (same prompt text and shape), e.g. the four Juice Boxes.
+ *  They share one image: generating any of them fills in all of them. */
+export function linked(c: Card, all: Card[] = cards()): Card[] {
+  const kind = (x: Card) => x.type === "tile" ? "tile" : x.type === "player" ? "player" : "card";
+  return all.filter(o => o.id !== c.id && o.art && o.art === c.art && kind(o) === kind(c) && aspectRatio(o) === aspectRatio(c));
+}
+
+/** Current art for a card, if the manifest has one for it or for a linked card.
+ *  Stale = prompt, style or model changed since it was made. Fresh art on a twin beats stale art of our own. */
+export function artFor(c: Card, model = DEFAULT_MODEL, all?: Card[]): { file: string; stale: boolean } | null {
+  const m = loadManifest();
+  const hash = expectedHash(c, model);
+  const entries = [c, ...linked(c, all)].map(x => m[x.id]).filter(e => e && existsSync(join(ART_DIR, e.file)));
+  const e = entries.find(e => e.hash === hash) ?? entries[0];
+  return e ? { file: e.file, stale: e.hash !== hash } : null;
 }
 
 function apiKey(): string {
@@ -78,9 +88,15 @@ export async function generate(c: Card, opts: { force?: boolean; model?: string;
   const log = opts.log ?? console.log;
   if (!c.art) throw new Error(`${c.id} has no art prompt`);
   const hash = expectedHash(c, model);
-  const manifest = loadManifest();
-  const have = manifest[c.id];
-  if (!opts.force && have && have.hash === hash && existsSync(join(ART_DIR, have.file))) { log(`= ${c.id} (cached)`); return have; }
+  const twins = linked(c);
+  const ids = [c.id, ...twins.map(t => t.id)];
+  /** Record `entry` for this card and every card sharing its prompt. */
+  const record = (entry: ManifestEntry) => { const m = loadManifest(); for (const id of ids) m[id] = entry; saveManifest(m); };
+  if (!opts.force) {
+    const manifest = loadManifest();
+    const have = ids.map(id => manifest[id]).find(e => e && e.hash === hash && existsSync(join(ART_DIR, e.file)));
+    if (have) { record(have); log(`= ${c.id} (cached${twins.length ? `, shared with ${twins.length} linked` : ""})`); return have; }
+  }
 
   const prompt = fullPrompt(c);
   const ref = styleRef();
@@ -106,8 +122,8 @@ export async function generate(c: Card, opts: { force?: boolean; model?: string;
   mkdirSync(ART_DIR, { recursive: true });
   writeFileSync(join(ART_DIR, file), Buffer.from(data, "base64"));
   const entry: ManifestEntry = { file, hash, prompt, model, at: new Date().toISOString() };
-  const fresh = loadManifest(); fresh[c.id] = entry; saveManifest(fresh);
-  log(`ok ${c.id} -> art/${file}`);
+  record(entry);
+  log(`ok ${c.id} -> art/${file}${twins.length ? ` (also ${twins.map(t => t.id).join(", ")})` : ""}`);
   return entry;
 }
 

@@ -32,10 +32,10 @@ function enqueue(ids: string[], force: boolean, model: string) {
   pump();
 }
 
-function artUrl(c: Card, model: string): string | null { const a = artFor(c, model); return a ? `/art/${a.file}` : null; }
+function artUrl(c: Card, model: string, all?: Card[]): string | null { const a = artFor(c, model, all); return a ? `/art/${a.file}` : null; }
 
-function cardJson(c: Card, model: string) {
-  const a = artFor(c, model);
+function cardJson(c: Card, model: string, all?: Card[]) {
+  const a = artFor(c, model, all);
   return {
     ...c, deckName: DECK_NAMES[c.deck],
     art: c.art, prompt: c.art ? fullPrompt(c) : "",
@@ -63,7 +63,7 @@ Bun.serve({
       return existsSync(f) ? new Response(Bun.file(f)) : new Response("not found", { status: 404 });
     }
 
-    if (p === "/api/cards") return json({ decks: DECK_ORDER.map(d => ({ id: d, name: DECK_NAMES[d] })), model, models: MODELS, cards: cards().map(c => cardJson(c, model)) });
+    if (p === "/api/cards") return json({ decks: DECK_ORDER.map(d => ({ id: d, name: DECK_NAMES[d] })), model, models: MODELS, cards: (all => all.map(c => cardJson(c, model, all)))(cards()) });
     if (p === "/api/status") return json({ running: running?.id ?? null, queue: queue.map(j => j.id), done, errors, log: log.slice(-30) });
     if (p === "/api/style" && req.method === "GET") return json({ style: readStyle(), hasRef: !!styleRef() });
     if (p === "/api/style" && req.method === "PUT") { const b = await req.json(); writeStyle(String(b.style ?? "")); return json({ ok: true }); }
@@ -87,7 +87,7 @@ Bun.serve({
       const alt = new URL(url); alt.searchParams.set("flip", flip === "long" ? "short" : "long");
       const backDx = Number(url.searchParams.get("bx") ?? 0) || 0, backDy = Number(url.searchParams.get("by") ?? 0) || 0;
       const nudge = (dx: number, dy: number) => { const u = new URL(url); u.searchParams.set("bx", String(+(backDx + dx).toFixed(1))); u.searchParams.set("by", String(+(backDy + dy).toFixed(1))); return u.pathname + u.search; };
-      if (list.length && list.every(c => c.type === "tile")) return html(renderTileSheet(list.map(c => ({ card: c, art: artUrl(c, model) })), { title: deck ? "Floor tiles" : title, flip, flipUrl: alt.pathname + alt.search, backDx, backDy, nudge }));
+      if (list.length && list.every(c => c.type === "tile")) return html(renderTileSheet(list.map(c => ({ card: c, art: artUrl(c, model, list) })), { title: deck ? "Floor tiles" : title, flip, flipUrl: alt.pathname + alt.search, backDx, backDy, nudge }));
       list = list.filter(c => c.type !== "tile");
       return html(renderPrint(list.map(c => ({ card: c, art: artUrl(c, model) })), { flip, perPage, title, flipUrl: alt.pathname + alt.search, backDx, backDy, nudge }));
     }

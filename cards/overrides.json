@@ -43,5 +43,17 @@
   },
   "bandage": {
     "art": "a roll of white gauze bandage with a cartoon band-aid stuck to it"
+  },
+  "energy-drink-1": {
+    "art": "a tall neon green energy drink can crackling with little lightning bolts"
+  },
+  "orc-monocle": {
+    "art": "a large brass monocle on a chain, comically oversized, one lens cracked"
+  },
+  "trap-kit": {
+    "art": "a small open tin of trap-disarming tools: wire cutters, a screwdriver, duct tape and a lockpick"
+  },
+  "spark": {
+    "art": "a small leather spellbook, open, with a crackling blue-white spark of lightning leaping off the page"
   }
 }
