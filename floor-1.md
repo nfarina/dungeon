@@ -83,21 +83,21 @@ Two timers, one clock. The countdown lives on the iPad DM view (the map editor i
 - **Floor cap: 26 rounds.** Announced at the start and counted down out loud every round. It exists so the party can't clear every room at leisure. In most games it never actually binds. A threat, not a guillotine.
 - **Emergency Floor Reset: 5 rounds.** The moment the Manager's Office door opens, the countdown drops to 5, or stays put if it's already lower. The die visibly slamming from 12 to 5 is the drama beat. Announcer: "Attention, Crawlers. The Floor Manager has initiated an Emergency Floor Reset. This is a standard retention measure and is not a reflection on your performance. You have five rounds. Cheers!"
 - **The collapse is a ramp.** When the count hits zero the floor starts coming down. At the end of each round, every hero still on the floor takes 1, 1, 2, 2, then 3 damage. After the fifth round, nobody left up there is walking down the stairs.
-- **You can leave without killing Greg.** Any hero on one of the four stairs squares at the end of a round has escaped. Escaping with the boss alive forfeits the Boss Box. Say this out loud before the fight, so the last three rounds are a decision and not arithmetic.
+- **You can leave without killing Greg.** Any hero on a stairs square at the end of a round has escaped. Escaping with the boss alive forfeits the Boss Box. Say this out loud before the fight, so the last three rounds are a decision and not arithmetic.
 - **What the collapse means.** Heroes who reached the stairs continue to Floor 2 as they are. Heroes who died, in the collapse or before it, are revived on Floor 2 at a cost decided when that floor is generated. Greg, if alive, remembers all of this.
 
-On the real Side A map with the death rule, placed monsters, the Office pit and the Slingshot, the simulator reports (3,000 runs):
+On the real Side A map with the final furniture, placed monsters, monsters that never step on traps, Mind 4 to cast, and in-combat swap costs, the simulator reports (3,000 runs):
 
 | Measure | Result |
 |---|---|
-| Party wins (Greg dead, everyone alive down the stairs) | 86.7% |
-| Wins that got out under the collapse | 75.2% |
-| Games where the clock never mattered | 0.0% |
-| Games where someone dies | 28.3% |
-| Full wipe | 1.4% |
-| Round the Office door opens, on average | 18.2 |
+| Party wins (Greg dead, everyone alive down the stairs) | 80% |
+| Escaped down the stairs with Greg alive | 14% |
+| Games where the clock never mattered | 0% |
+| Games where someone dies | 36% |
+| Full wipe | under 1% |
+| Round the Office door opens, on average | 18 |
 
-That's the target shape: nearly every game is decided in the last two rounds, a death is common enough to fear and rare enough to hurt, and a wipe is a story. Re-run whenever the route changes; route length moves these numbers more than anything else.
+Eighty percent is the chosen target: nearly every game is decided in the last two rounds, a death is common enough to fear, and a wipe is a story. The two dials that move this most are the fuse length (6 rounds instead of 5 is worth about eight points) and how many squares Greg can be attacked from (he stands against the back wall with two, and one row forward would be worth about five). Re-run whenever the route or the furniture changes; geometry moves these numbers more than anything else.
 
 ---
 
@@ -131,7 +131,7 @@ The board is Side A, traced into the simulator's map file (`sim/src/content/floo
 | 6 | **The Cage** | 1 Abomination | Cage with a goose in it | none | no |
 | 7 | **Latrine** | 2 Zombies | The toilet | Falling block at the door | no |
 | 8 | **Library** | 1 Skeleton, 1 Goblin | Bookshelf: 1 Big Gear draw if reader has Mind 4+, else 1 Gear draw | none | no |
-| 9 | **Manager's Office** | The Floor Manager, 2 Orcs | Desk; stairwell down (2x2, behind Greg) | Pit trap beside the desk | yes (boss) |
+| 9 | **Manager's Office** | The Floor Manager, 2 Orcs | Long desk in front of Greg; stairwell down behind him | Pit trap beside the desk | yes (boss) |
 
 **Corridors:** one pit trap somewhere on the required path (so five traps on the floor, counting the Office), and one secret door that shortcuts to Room 9. The secret door is found by searching or by walking past it with a Torch.
 
