@@ -12,5 +12,33 @@
     "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame, in a landscape composition.\n\nSubject: a splintered wooden table leg with a few bent nails sticking out, held like a club.",
     "model": "gemini-3.1-flash-image",
     "at": "2026-09-04T22:56:33.696Z"
+  },
+  "human-2": {
+    "file": "human-2.4b8bf8426e.png",
+    "hash": "4b8bf8426e",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame, in a landscape composition.\n\nSubject: waist-up portrait of a teenage boy with dark skin, round glasses and a dinosaur graphic tee, backpack straps on both shoulders, determined, ordinary modern everyday clothes, standing in a dark stone dungeon looking slightly alarmed but game for it, no weapons. This is a character portrait for a game card.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-05T01:50:02.755Z"
+  },
+  "hockey-stick": {
+    "file": "hockey-stick.cd48a33ab2.png",
+    "hash": "cd48a33ab2",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame, in a landscape composition.\n\nSubject: a battered street hockey stick with tape wrapped around the blade, held like a weapon.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-05T01:51:08.248Z"
+  },
+  "multitool": {
+    "file": "multitool.3a72d9dd02.png",
+    "hash": "3a72d9dd02",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame, in a landscape composition.\n\nSubject: a red folding multitool with pliers, tiny screwdriver and knife all fanned open.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-05T01:51:43.571Z"
+  },
+  "fire-axe": {
+    "file": "fire-axe.8dff514974.png",
+    "hash": "8dff514974",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame, in a landscape composition.\n\nSubject: a big red fire axe with a gleaming steel blade and a black rubber grip.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-05T01:52:24.562Z"
   }
 }

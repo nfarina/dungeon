@@ -20,7 +20,9 @@ export const CARD_CSS = `
   background:var(--parch); border:.1in solid var(--line); padding:.08in .09in .07in; display:flex; flex-direction:column;
   font-family:'Alegreya', Georgia, serif; color:var(--ink); -webkit-print-color-adjust:exact; print-color-adjust:exact; break-inside:avoid; }
 .card::before { content:""; position:absolute; inset:.025in; border:.012in solid var(--gold2); border-radius:.07in; pointer-events:none; opacity:.7; }
-.card .art { position:relative; height:1.35in; border:.02in solid var(--line); border-radius:.06in; background:var(--stone) center/cover no-repeat; flex:none; }
+.card .art { position:relative; flex:0 1 1.6in; min-height:.75in; border:.02in solid var(--line); border-radius:.06in; background:var(--stone) center/cover no-repeat; }
+.card .gap { flex:1 1 0; min-height:0; }
+.card > *:not(.art):not(.gap) { flex-shrink:0; }
 .card .art.noart { display:flex; align-items:center; justify-content:center; color:#c9d3df; font-size:7pt; font-style:italic; text-align:center; padding:.1in;
   background-image:repeating-linear-gradient(45deg, #3b4756 0 .12in, #43505f .12in .24in); }
 .card .banner { position:absolute; left:50%; transform:translateX(-50%); bottom:-.13in; background:var(--gold); border:.018in solid var(--line); border-radius:.04in;
@@ -30,7 +32,7 @@ export const CARD_CSS = `
 .card .meta { display:flex; gap:.05in; justify-content:center; margin-top:.19in; flex-wrap:wrap; }
 .card .chip { font-family:'Alegreya SC', Georgia, serif; font-weight:700; font-size:7.2pt; letter-spacing:.06em; border:.012in solid var(--line); border-radius:.03in; padding:0 .05in; background:var(--parch2); }
 .card .chip.deck { color:#fff; background:var(--deck); border-color:var(--deck); }
-.card .rules { font-size:9pt; line-height:1.3; margin-top:.07in; flex:1; text-align:center; }
+.card .rules { font-size:9pt; line-height:1.3; margin-top:.07in; text-align:center; }
 .card .rules b { font-weight:700; }
 .card .flavor { font-size:7.6pt; line-height:1.25; font-style:italic; color:var(--muted); text-align:center; margin-top:.04in; }
 .card .foot { display:flex; justify-content:space-between; align-items:flex-end; font-family:'Alegreya SC', Georgia, serif; font-size:6.6pt; color:var(--muted); margin-top:.04in; letter-spacing:.04em; }
@@ -54,12 +56,8 @@ export const CARD_CSS = `
 .card .slots { display:grid; grid-template-columns:1fr 1fr; gap:.02in .08in; margin-top:.05in; font-family:'Alegreya SC'; font-size:6.6pt; letter-spacing:.04em; color:var(--muted); }
 .card .slots div::before { content:"☐ "; }
 .card.fan { --parch:#e9e2f2; --parch2:#ddd3ec; --gold:#c8b3ee; --gold2:#8f76c4; --stone:#2d2540; }
-.card.player .art { height:1.55in; }
-.card.monster .art { height:1.25in; }
-.card.monster.boss .art { height:1.05in; }
-.card.companion .art { height:1.0in; }
-.card.text .art { height:1.0in; }
-.card.spell .art { height:1.1in; }
+.card.player .art { flex-basis:1.85in; }
+.card.text .art { flex-basis:1.2in; }
 .card.text .rules { font-size:9.5pt; font-style:italic; }
 /* ---- backs: white, one thin stroke, outlined type. Minimal toner. ---- */
 .card.back { background:#fff; border:none; padding:.1in; align-items:center; justify-content:center; gap:.1in; }
@@ -119,8 +117,8 @@ export function renderFront(c: Card, artUrl: string | null): string {
       const [a, ...rest] = l.split(/\s{2,}/); return rest.length ? `<div class="row"><span>${esc(a)}</span><span>${esc(rest.join(" "))}</span></div>` : `<div class="row"><span style="flex:1;text-align:center">${esc(l)}</span></div>`;
     }).join("")}</div>`;
     const special = c.special?.length ? `<div class="special">${c.special.map(p => `<p><b>${esc(p.split(":")[0])}:</b>${esc(p.slice(p.indexOf(":") + 1))}</p>`).join("")}</div>` : "";
-    const rules = c.rules ? `<div class="rules" style="flex:none;margin-top:.03in">${esc(c.rules)}</div>` : "";
-    return `<div class="${cls}${c.special?.length ? " boss" : ""}" style="${style}">${artBlock(c, artUrl)}${statsRow(s)}${loot}${special}${rules}<div style="flex:1"></div>${c.flavor ? `<div class="flavor">${esc(c.flavor)}</div>` : ""}${foot}</div>`;
+    const rules = c.rules ? `<div class="rules" style="margin-top:.03in">${esc(c.rules)}</div>` : "";
+    return `<div class="${cls}${c.special?.length ? " boss" : ""}" style="${style}">${artBlock(c, artUrl)}${statsRow(s)}${loot}${special}${rules}<div class="gap"></div>${c.flavor ? `<div class="flavor">${esc(c.flavor)}</div>` : ""}${foot}</div>`;
   }
   if (c.type === "player") {
     const slots = ["Main hand", "Off hand", "Body", "Head", "Feet", "Trinket ×2"].map(s => `<div>${s}</div>`).join("");
@@ -128,7 +126,7 @@ export function renderFront(c: Card, artUrl: string | null): string {
       <div class="nameline"><span class="k">Name</span><span class="line"></span></div>
       ${statsRow(c.stats!)}
       <div class="slots">${slots}</div>
-      <div style="flex:1"></div>
+      <div class="gap"></div>
       <div class="flavor">You are a regular person. Loot will fix that.</div>${foot}</div>`;
   }
   const cooldown = c.type === "spell"
@@ -139,6 +137,7 @@ export function renderFront(c: Card, artUrl: string | null): string {
     <div class="meta">${chips(c)}</div>
     <div class="rules">${esc(c.rules)}</div>
     ${cooldown}
+    <div class="gap"></div>
     ${c.flavor ? `<div class="flavor">${esc(c.flavor)}</div>` : ""}${foot}</div>`;
 }
 
