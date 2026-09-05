@@ -54,5 +54,54 @@
     "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game floor tile seen DIRECTLY FROM ABOVE: flat top-down orthographic view, no horizon, no walls, no perspective. The object sits on dark grey stone dungeon flagstones and fills the frame edge to edge.\n\nSubject: a square hole in a stone dungeon floor, a dark pit with a few broken planks around the edge.",
     "model": "gemini-3.1-flash-image",
     "at": "2026-09-05T05:22:48.479Z"
+  },
+  "dramatic-music": {
+    "file": "dramatic-music.c803a6506a.png",
+    "hash": "c803a6506a",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a skeleton orchestra conductor mid-swing with glowing musical notes swirling around. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-05T05:40:36.903Z"
+  },
+  "poke": {
+    "file": "poke.62fc667ba3.png",
+    "hash": "62fc667ba3",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a giant finger descending from dark clouds toward a tiny startled goblin. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-05T05:41:26.748Z"
+  },
+  "sir-reginald": {
+    "file": "sir-reginald.c233dbcc39.png",
+    "hash": "c233dbcc39",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a furious white goose with an orange beak, wings half spread, wearing a tiny crooked knight's helmet. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-05T05:46:37.493Z"
+  },
+  "juice-box-1": {
+    "file": "juice-box-1.de2992be3f.png",
+    "hash": "de2992be3f",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a dented cardboard juice box with a bendy straw, cartoon fruit on the label. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-05T05:47:05.769Z"
+  },
+  "human-1": {
+    "file": "human-1.df7c9c0e03.png",
+    "hash": "df7c9c0e03",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: waist-up portrait of a skinny teenage boy with messy brown hair in an oversized grey hoodie and basketball shorts, holding a flashlight, ordinary modern everyday clothes, standing in a dark stone dungeon looking slightly alarmed but game for it, no weapons. This is a character portrait for a game card, landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-05T05:47:44.776Z"
+  },
+  "human-3": {
+    "file": "human-3.a5fbcca9a7.png",
+    "hash": "a5fbcca9a7",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: waist-up portrait of a tall woman with a blonde ponytail in a running jacket and leggings, clutching a coffee mug, ordinary modern everyday clothes, standing in a dark stone dungeon looking slightly alarmed but game for it, no weapons. This is a character portrait for a game card, landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-05T05:48:24.206Z"
+  },
+  "human-4": {
+    "file": "human-4.2a7a11dd2a.png",
+    "hash": "2a7a11dd2a",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: waist-up portrait of a bearded dad with a belly in a flannel shirt, cargo shorts, socks and sandals, holding a TV remote, ordinary modern everyday clothes, standing in a dark stone dungeon looking slightly alarmed but game for it, no weapons. This is a character portrait for a game card, landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-05T05:49:03.674Z"
   }
 }

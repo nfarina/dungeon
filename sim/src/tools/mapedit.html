@@ -286,7 +286,7 @@ const LAYERS = [
   {id:"inplay",    name:"Rooms this floor", hint:"Tap a possible room to put it in play and name it. Anything you don't use is stone."},
   {id:"stone",     name:"Solid stone",  hint:"Extra blocking tiles over corridor squares. Unused rooms are already stone."},
   {id:"doors",     name:"Doors",     hint:"Tap near the edge between two squares."},
-  {id:"furniture", name:"Furniture", hint:"Entrance, stairs and anything that blocks a square."},
+  {id:"furniture", name:"Furniture", hint:"Entrance, stairs and anything that blocks squares. Drag to size a piece."},
   {id:"traps",     name:"Traps",     hint:""},
   {id:"monsters",  name:"Monsters",  hint:"Tap a square inside a room to place one. A room with placed monsters spawns exactly those; a room with none scatters its list at random."},
 ];
@@ -430,7 +430,7 @@ function afterLoad() {
   for (const l of LAYERS) { if (!(l.id in vis)) vis[l.id] = true; if (!(l.id in lock)) lock[l.id] = false; }
   lock.board = true;                    // the printed board is the thing you don't want to nudge
   tool.board ??= "."; tool.stone ??= "x"; tool.doors ??= "normal";
-  tool.furniture ??= "blocker"; tool.traps ??= "pit"; tool.monsters ??= "goblin"; tool.fw ??= 1; tool.fh ??= 1;
+  tool.furniture ??= "blocker"; tool.traps ??= "pit"; tool.monsters ??= "goblin";
   F().monsters ??= [];
   render(); status("loaded " + name, "good");
 }
@@ -527,6 +527,7 @@ const boardTint = c => `hsl(${(ROOM_CHARS.indexOf(c) * 53) % 360} 18% ${dark() ?
 
 function toolFill() {
   if (active === "stone") return tool.stone === "x" ? "var(--danger)" : "var(--corridor)";
+  if (active === "furniture") return "var(--sunk)";
   const t = tool.board;
   return t === "." ? "var(--corridor)" : isRoomChar(t) ? boardTint(t) : "var(--stone)";
 }
@@ -609,7 +610,7 @@ function drawMap() {
     const fw = f.w || 1, fh = f.h || 1, W = fw*CS, H = fh*CS;
     if (FF.blocks || fw > 1 || fh > 1)
       p.push(`<rect x="${f.x*CS+2}" y="${f.y*CS+2}" width="${W-4}" height="${H-4}" fill="${FF.blocks ? "var(--sunk)" : "none"}" stroke="var(--line-2)" rx="2"/>`);
-    p.push(`<text class="glyph" x="${f.x*CS+W/2}" y="${f.y*CS+H/2+1}" style="font-size:${CS*.62*Math.min(fw,fh)}px">${FF.g}</text>`);
+    p.push(`<text class="glyph" x="${f.x*CS+W/2}" y="${f.y*CS+H/2+1}" style="font-size:${CS*.62}px">${FF.g}</text>`);
     if (f.label && CS >= 20)
       p.push(`<text class="rid" x="${f.x*CS+W/2}" y="${f.y*CS+H-3}" text-anchor="middle" style="font-size:${Math.min(CS*.4,9)}px">${esc(f.label)}</text>`);
   }
@@ -728,15 +729,11 @@ function drawTools() {
     for (const id of MONSTERS) t.append(tbtn("monsters", id, " " + id, MONSTER_GLYPH[id]));
     t.append(tbtn("monsters", "erase", "Remove"));
   }
-  if (active === "furniture") {
-    const num = (k, lbl) => {
-      const i = el("input", { type:"number", min:"1", max:"8", value:tool[k], style:"width:52px" });
-      i.addEventListener("change", () => { tool[k] = Math.max(1, Math.min(8, +i.value || 1)); });
-      return el("label", { class:"mono-sm", style:"display:inline-flex;gap:4px;align-items:center" }, [lbl, i]);
-    };
-    t.append(el("span", { class:"hint" }, "Size: "), num("fw", "W"), num("fh", "H"));
-  }
   pane.append(t);
+  if (active === "furniture")
+    pane.append(el("p", { class:"hint" }, tool.furniture === "erase"
+      ? "Tap any square of a piece to remove the whole piece."
+      : "Tap for a 1×1, or drag out a rectangle for bigger furniture. Hold Shift to square it off. Esc cancels."));
   if (isArea(active)) {
     const setMode = m => { paintMode = m; localStorage.setItem("dungeon.paintMode", m); render(); };
     pane.append(el("div", { class:"tools", style:"margin-top:9px" }, [
@@ -833,7 +830,7 @@ function drawSel() {
     (isRoomChar(c) ? (r ? `room ${r.id} — ${r.name}` : `possible room ${c} — not in play, stone`) : "corridor")
     + (stoneAt(x, y) ? " · stone laid over it" : "")));
   const fi = featAt(x, y), ti = trapAt(x, y);
-  if (fi >= 0) pane.append(el("p", { class:"mono-sm" }, FEATURES[F().features[fi].kind].g + " " + FEATURES[F().features[fi].kind].n));
+  if (fi >= 0) { const f = F().features[fi]; pane.append(el("p", { class:"mono-sm" }, `${FEATURES[f.kind].g} ${FEATURES[f.kind].n} · ${f.w || 1}×${f.h || 1} at ${f.x},${f.y}${f.label ? " · " + f.label : ""}`)); }
   if (ti >= 0) pane.append(el("p", { class:"mono-sm" }, TRAPS[F().traps[ti].kind].g + " " + TRAPS[F().traps[ti].kind].n + " trap"));
 }
 function field(label, val, on, kind = "input", focus = false) {
@@ -1058,7 +1055,8 @@ function bindMap() {
     const c = cellAt(ev);
     if (!inB(c.x, c.y)) return;
     ev.preventDefault(); svg.setPointerCapture(ev.pointerId);
-    if (mode === "edit" && !lock[active] && isArea(active) && paintMode === "rect") {
+    const rectTool = (isArea(active) && paintMode === "rect") || (active === "furniture" && tool.furniture !== "erase");
+    if (mode === "edit" && !lock[active] && rectTool) {
       drag = { x0:c.x, y0:c.y, x1:c.x, y1:c.y }; drawMap(); return;
     }
     if (mode === "edit" && !lock[active]) { snapshot(); painting = isArea(active); last = ""; }
@@ -1091,6 +1089,14 @@ function bindMap() {
 function fillBox(b) {
   if (!b) return;
   snapshot();
+  if (active === "furniture") {
+    const w = b.x1 - b.x0 + 1, h = b.y1 - b.y0 + 1;
+    // anything already under the new footprint goes; entrance and stairs are unique
+    F().features = F().features.filter(f => !featCells(f).some(c => c.x >= b.x0 && c.x <= b.x1 && c.y >= b.y0 && c.y <= b.y1));
+    if (tool.furniture === "entrance" || tool.furniture === "stairs") F().features = F().features.filter(f => f.kind !== tool.furniture);
+    F().features.push({ x:b.x0, y:b.y0, kind: tool.furniture, ...(w > 1 || h > 1 ? { w, h } : {}) });
+    sel = { type:"cell", x:b.x0, y:b.y0 }; dirty = true; render(); return;
+  }
   for (let y = b.y0; y <= b.y1; y++) for (let x = b.x0; x <= b.x1; x++) {
     if (active === "board") setCell(x, y, tool.board);
     else if (active === "stone") setStone(x, y, tool.stone === "x");
@@ -1156,8 +1162,7 @@ function apply(c, dragging = false) {
       if (tool.furniture !== "erase") {
         if (tool.furniture === "entrance" || tool.furniture === "stairs")
           F().features = F().features.filter(f => f.kind !== tool.furniture);
-        const fw = tool.fw || 1, fh = tool.fh || 1;
-        F().features.push({ x, y, kind: tool.furniture, ...(fw > 1 || fh > 1 ? { w:fw, h:fh } : {}) });
+        F().features.push({ x, y, kind: tool.furniture });
       }
       break;
     }

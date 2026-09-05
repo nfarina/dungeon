@@ -34,7 +34,7 @@ export const CARD_CSS = `
 .card .chip.deck { color:#fff; background:var(--deck); border-color:var(--deck); }
 .card .rules { font-size:9pt; line-height:1.3; margin-top:.07in; text-align:center; }
 .card .rules b { font-weight:700; }
-.card .flavor { font-size:7.6pt; line-height:1.25; font-style:italic; color:var(--muted); text-align:center; margin-top:.04in; }
+.card .flavor { font-size:7.6pt; line-height:1.25; font-style:italic; color:var(--muted); text-align:center; margin-top:.08in; }
 .card .foot { display:flex; justify-content:space-between; align-items:flex-end; font-family:'Alegreya SC', Georgia, serif; font-size:6.6pt; color:var(--muted); margin-top:.04in; letter-spacing:.04em; }
 .card .cd { display:flex; align-items:center; justify-content:center; gap:.08in; margin-top:.05in; }
 .card .die { width:.34in; height:.34in; border:.02in solid var(--line); border-radius:.06in; background:#fff; display:flex; align-items:center; justify-content:center; font-family:'Cinzel'; font-weight:800; font-size:13pt; }
@@ -53,7 +53,7 @@ export const CARD_CSS = `
 .card .nameline { margin-top:.2in; display:flex; align-items:flex-end; gap:.06in; }
 .card .nameline .k { font-family:'Alegreya SC'; font-size:7pt; letter-spacing:.08em; color:var(--muted); }
 .card .nameline .line { flex:1; border-bottom:.014in solid var(--line); height:.22in; }
-.card .slots { display:grid; grid-template-columns:1fr 1fr; gap:.02in .08in; margin-top:.05in; font-family:'Alegreya SC'; font-size:6.6pt; letter-spacing:.04em; color:var(--muted); }
+.card .slots { display:grid; display: none; grid-template-columns:1fr 1fr; gap:.02in .08in; margin-top:.05in; font-family:'Alegreya SC'; font-size:6.6pt; letter-spacing:.04em; color:var(--muted); }
 .card .slots div::before { content:"☐ "; }
 .card.fan { --parch:#e9e2f2; --parch2:#ddd3ec; --gold:#c8b3ee; --gold2:#8f76c4; --stone:#2d2540; }
 .card.player .art { flex-basis:1.85in; }
@@ -78,15 +78,17 @@ export const CARD_CSS = `
 .tile { position:relative; box-sizing:border-box; border:.04in solid #2b2420; background:#3b4756 center/cover no-repeat; overflow:hidden; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
 .tile.noart { display:flex; align-items:center; justify-content:center; color:#c9d3df; font:italic 7pt 'Alegreya', Georgia, serif; text-align:center; padding:.05in;
   background-image:repeating-linear-gradient(45deg, #3b4756 0 .12in, #43505f .12in .24in); }
-.tile .tag { position:absolute; left:0; right:0; bottom:0; text-align:center; font:700 5.5pt 'Alegreya SC', Georgia, serif; letter-spacing:.1em; color:#eee; background:rgba(0,0,0,.55); padding:.01in 0; }
-.tile.trap .tag { background:rgba(120,30,30,.75); }
+.tile.back { background:#fff; border-color:#ddd; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:.08in; font-family:'Alegreya SC', Georgia, serif; color:#444; }
+.tile.back .nm { font-weight:700; font-size:8pt; letter-spacing:.06em; line-height:1.15; }
+.tile.back .sz { font-size:6pt; letter-spacing:.15em; color:#888; margin-top:.03in; }
+.tile.back.trap .nm { color:#8b2e2e; }
 /* ---- envelope labels: 4 x 2 in, low ink ---- */
 .label { position:relative; width:4in; height:2in; box-sizing:border-box; border:.02in solid #333; border-radius:0; background:#fff; padding:.12in .18in .1in .3in; display:flex; flex-direction:column; justify-content:center;
   font-family:'Alegreya', Georgia, serif; color:#111; overflow:hidden; -webkit-print-color-adjust:exact; print-color-adjust:exact; break-inside:avoid; }
 .label .stripe { position:absolute; left:0; top:0; bottom:0; width:.14in; background:var(--tier); }
 .label .tier { font-family:'Alegreya SC'; font-weight:700; font-size:8.5pt; letter-spacing:.2em; color:var(--tier); }
-.label .name { font-family:'Cinzel'; font-weight:800; font-size:17pt; line-height:1.1; margin:.02in 0 .05in; }
-.label .name.long { font-size:13.5pt; }
+.label .name { font-family:'Cinzel'; font-weight:800; font-size:20pt; line-height:1.1; margin:.03in 0 .05in; }
+.label .name.long { font-size:15pt; }
 .label .trig { font-size:11pt; line-height:1.3; }
 .label .warn { position:absolute; right:.15in; bottom:.08in; font-family:'Alegreya SC'; font-size:6.5pt; letter-spacing:.15em; color:#777; }
 `;
@@ -157,7 +159,8 @@ export function renderFront(c: Card, artUrl: string | null): string {
 }
 
 export function renderBack(c: Card): string {
-  if (c.type === "envelope" || c.type === "tile") return "";
+  if (c.type === "envelope") return "";
+  if (c.type === "tile") return renderTileBack(c);
   if (c.type === "player") return renderReference(c);
   const deck = DECK_COLOR[c.deck];
   const word = DECK_NAMES[c.deck].toUpperCase();
@@ -168,15 +171,21 @@ export function renderBack(c: Card): string {
 export function renderTile(c: Card, artUrl: string | null): string {
   const t = c.tile!;
   const size = `width:${t.w}in;height:${t.h}in`;
-  const tag = `<div class="tag">${esc(c.name)}</div>`;
   return artUrl
-    ? `<div class="tile ${t.kind}" style="${size};background-image:url('${artUrl}')">${tag}</div>`
-    : `<div class="tile ${t.kind} noart" style="${size}">no art yet${tag}</div>`;
+    ? `<div class="tile ${t.kind}" style="${size};background-image:url('${artUrl}')"></div>`
+    : `<div class="tile ${t.kind} noart" style="${size}">no art yet<br>${esc(c.name)}</div>`;
+}
+
+/** Tile backs: the name, for the announcer, in as little toner as possible. */
+export function renderTileBack(c: Card): string {
+  const t = c.tile!;
+  return `<div class="tile back ${t.kind}" style="width:${t.w}in;height:${t.h}in"><div class="nm">${esc(c.name)}</div><div class="sz">${t.w}×${t.h}${t.kind === "trap" ? " · trap" : ""}</div></div>`;
 }
 
 /** Tiles on letter pages, arranged for a guillotine cutter: rows of equal height, so every
  *  horizontal cut runs the full page width and vertical cuts are made per strip. */
-export function renderTileSheet(items: { card: Card; art: string | null }[], title: string): string {
+export function renderTileSheet(items: { card: Card; art: string | null }[], opts: { title: string; flip: "long" | "short"; flipUrl: string; backDx: number; backDy: number; nudge: (dx: number, dy: number) => string }): string {
+  const title = opts.title;
   const PW = 8.5, PH = 11, M = 0.25, maxW = PW - 2 * M, maxH = PH - 2 * M;
   // expand copies, tallest first, widest first within a height
   const list: { card: Card; art: string | null }[] = [];
@@ -198,23 +207,31 @@ export function renderTileSheet(items: { card: Card; art: string | null }[], tit
     if (used + r.h > maxH) { pages.push([]); used = 0; }
     pages[pages.length - 1].push(r); used += r.h;
   }
-  const pageHtml = pages.map(prow => {
+  const shift = `transform:translate(${opts.backDx}mm,${opts.backDy}mm)`;
+  // Each sheet renders twice: fronts, then backs mirrored for the duplex flip.
+  const pageHtml = pages.flatMap(prow => [false, true].map(back => {
+    const totalH = prow.reduce((a, r) => a + r.h, 0);
     let y = M; const out: string[] = [];
     const hCuts = new Set<number>([M]);
     for (const r of prow) {
       let x = M;
+      // on the back, a strip's tiles run right-to-left (long-edge flip) or the strips stack bottom-up (short-edge)
+      const ty = back && opts.flip === "short" ? M + totalH - (y - M) - r.h : y;
       for (const it of r.items) {
-        out.push(`<div class="slot" style="left:${x}in;top:${y}in">${renderTile(it.card, it.art)}</div>`);
-        x += it.card.tile!.w;
-        // vertical cut tick at the top and bottom of this strip
-        if (x < M + r.w) out.push(`<i style="left:${x}in;top:${y}in;height:.1in;border-left:1px solid #fff;opacity:.9"></i><i style="left:${x}in;top:${y + r.h - .1}in;height:.1in;border-left:1px solid #fff;opacity:.9"></i>`);
+        const w = it.card.tile!.w;
+        const tx = back && opts.flip === "long" ? PW - x - w : x;
+        out.push(`<div class="slot" style="left:${tx}in;top:${ty}in;${back ? shift : ""}">${back ? renderTileBack(it.card) : renderTile(it.card, it.art)}</div>`);
+        x += w;
+        if (!back && x < M + r.w) out.push(`<i style="left:${x}in;top:${y}in;height:.1in;border-left:1px solid #fff;opacity:.9"></i><i style="left:${x}in;top:${y + r.h - .1}in;height:.1in;border-left:1px solid #fff;opacity:.9"></i>`);
       }
       y += r.h; hCuts.add(y);
     }
-    for (const cy of hCuts) out.push(`<i style="top:${cy}in;left:0;width:${M - .06}in;border-top:1px solid #999"></i><i style="top:${cy}in;right:0;width:${M - .06}in;border-top:1px solid #999"></i>`);
-    out.push(`<i style="left:${M}in;top:0;height:${M - .06}in;border-left:1px solid #999"></i><i style="left:${M}in;bottom:0;height:${M - .06}in;border-left:1px solid #999"></i>`);
+    if (!back) {
+      for (const cy of hCuts) out.push(`<i style="top:${cy}in;left:0;width:${M - .06}in;border-top:1px solid #999"></i><i style="top:${cy}in;right:0;width:${M - .06}in;border-top:1px solid #999"></i>`);
+      out.push(`<i style="left:${M}in;top:0;height:${M - .06}in;border-left:1px solid #999"></i><i style="left:${M}in;bottom:0;height:${M - .06}in;border-left:1px solid #999"></i>`);
+    }
     return `<section class="page">${out.join("")}</section>`;
-  });
+  }));
   return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(title)}</title>
 <meta name="color-scheme" content="light only">
 <style>${CARD_CSS}
@@ -225,11 +242,13 @@ html, body { margin:0; background:#888; }
 .page i { position:absolute; display:block; }
 .slot { position:absolute; }
 .bar { position:fixed; top:0; left:0; right:0; background:#222; color:#eee; font:13px system-ui; padding:8px 14px; display:flex; gap:16px; align-items:center; z-index:9; }
-.bar b { color:#fff; }
+.bar b { color:#fff; } .bar a { color:#9cf; } .bar .nudge a { text-decoration:none; padding:0 4px; border:1px solid #555; border-radius:4px; }
 .spacer { height:40px; }
 @media print { .bar, .spacer { display:none; } body { background:#fff; } .page { margin:0; } }
 </style></head><body>
-<div class="bar"><b>${esc(title)}</b><span>${list.length} tiles · ${pages.length} sheet${pages.length === 1 ? "" : "s"} · single-sided</span><span>Cut the horizontal lines full width first, then cut each strip at the white ticks.</span><span style="margin-left:auto">⌘P</span></div>
+<div class="bar"><b>${esc(title)}</b><span>${list.length} tiles · ${pages.length} sheet${pages.length === 1 ? "" : "s"} front + back</span><span>Duplex, flip on ${opts.flip} edge. Cut the horizontal lines full width first, then each strip at the white ticks.</span>
+<span class="nudge">Back offset <a href="${esc(opts.nudge(-0.5, 0))}">&larr;</a> <b>${opts.backDx.toFixed(1)}</b> <a href="${esc(opts.nudge(0.5, 0))}">&rarr;</a> &nbsp; <a href="${esc(opts.nudge(0, -0.5))}">&uarr;</a> <b>${opts.backDy.toFixed(1)}</b> <a href="${esc(opts.nudge(0, 0.5))}">&darr;</a> mm</span>
+<a href="${esc(opts.flipUrl)}">flip on ${opts.flip === "long" ? "short" : "long"} edge instead</a><span style="margin-left:auto">⌘P</span></div>
 <div class="spacer"></div>
 ${pageHtml.join("\n")}
 </body></html>`;
@@ -258,7 +277,6 @@ export function renderLabel(c: Card): string {
   return `<div class="label" style="--tier:${tier}"><div class="stripe"></div>
     <div class="tier">${esc(c.tier ?? "")} loot box</div>
     <div class="name ${c.name.length > 18 ? "long" : ""}">${esc(c.name)}</div>
-    <div class="trig">${esc(c.trigger ?? "")}</div>
     <div class="warn">do not open until earned</div></div>`;
 }
 
