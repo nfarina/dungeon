@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Floor Map">
 <title>Floor Map Editor</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,7 +47,9 @@ button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--amber); ou
 header{
   display:flex; align-items:center; gap:10px; flex-wrap:wrap;
   padding:8px 12px; border-bottom:1px solid var(--line-2); background:var(--surface);
+  padding-top:calc(8px + env(safe-area-inset-top));
 }
+#leftBtn.off, #rightBtn.off, #fsBtn.off{opacity:.55}
 header h1{font-size:19px; font-weight:700; letter-spacing:.02em; text-transform:uppercase; white-space:nowrap}
 header .sp{flex:1}
 #status{font-size:11.5px; color:var(--muted); white-space:nowrap}
@@ -55,6 +60,10 @@ header .sp{flex:1}
 
 .body{display:grid; grid-template-columns:186px 1fr 268px; min-height:0}
 .body[hidden]{display:none}
+.body.noleft{grid-template-columns:1fr 268px}
+.body.noright{grid-template-columns:186px 1fr}
+.body.noleft.noright{grid-template-columns:1fr}
+.body.noleft aside.left, .body.noright aside.right{display:none}
 .doc{overflow-y:auto; -webkit-overflow-scrolling:touch; padding:20px 28px 80px; min-height:0}
 .doc .inner{max-width:860px; margin:0 auto; font-family:Georgia,"Times New Roman",serif; font-size:17px; line-height:1.55}
 .doc h1{font-size:34px; margin:8px 0 14px}
@@ -175,6 +184,8 @@ dialog textarea{width:100%; min-height:260px; font-size:11.5px; background:var(-
 
 @media (max-width:900px){
   .body{grid-template-columns:1fr; grid-template-rows:auto auto 1fr}
+  .body.noleft, .body.noright{grid-template-columns:1fr; grid-template-rows:auto 1fr}
+  .body.noleft.noright{grid-template-rows:1fr}
   aside{max-height:38vh}
   aside.left{border-right:0; border-bottom:1px solid var(--line-2)}
   aside.right{border-left:0; border-top:1px solid var(--line-2); order:3}
@@ -198,6 +209,8 @@ dialog textarea{width:100%; min-height:260px; font-size:11.5px; background:var(-
     </div>
     <span class="sp"></span>
     <span id="status">&nbsp;</span>
+    <div class="seg"><button id="leftBtn" title="Show or hide the left panel">◧</button><button id="rightBtn" title="Show or hide the right panel">◨</button></div>
+    <button id="fsBtn" title="Fullscreen">⛶</button>
     <button id="undo" title="Undo (⌘Z)">Undo</button>
     <button id="jsonBtn">JSON</button>
     <button id="save">Save</button>
@@ -1192,6 +1205,30 @@ $("#mDM").onclick = () => { mode = "dm"; sel = null; render(); };
 $("#mIntro").onclick = () => { mode = "intro"; sel = null; render(); };
 $("#mGuide").onclick = () => { mode = "guide"; sel = null; render(); };
 $("#save").onclick = save;
+
+// Side panels: each side toggles on its own, remembered per device.
+function setSide(side, on) {
+  document.querySelector(".body").classList.toggle("no" + side, !on);
+  $("#" + side + "Btn").classList.toggle("off", !on);
+  localStorage.setItem("dungeon.side." + side, on ? "1" : "0");
+  render();
+}
+for (const side of ["left", "right"]) {
+  $("#" + side + "Btn").onclick = () => setSide(side, document.querySelector(".body").classList.contains("no" + side));
+  setSide(side, localStorage.getItem("dungeon.side." + side) !== "0");
+}
+
+// Fullscreen, including iPad Safari's prefixed API. iPhone Safari has neither; there the button hides and
+// "Add to Home Screen" gives the same chrome-free result via the apple-mobile-web-app meta tags.
+const fsEl = document.documentElement;
+const fsRequest = fsEl.requestFullscreen || fsEl.webkitRequestFullscreen;
+const fsActive = () => document.fullscreenElement || document.webkitFullscreenElement;
+if (!fsRequest) $("#fsBtn").hidden = true;
+$("#fsBtn").onclick = () => {
+  if (fsActive()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+  else fsRequest.call(fsEl);
+};
+for (const ev of ["fullscreenchange", "webkitfullscreenchange"]) document.addEventListener(ev, () => { $("#fsBtn").classList.toggle("off", !!fsActive()); render(); });
 $("#undo").onclick = undo;
 $("#mapSel").onchange = e => loadMap(e.target.value);
 for (const b of document.querySelectorAll("[data-preset]")) b.onclick = () => {
