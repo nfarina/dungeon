@@ -12,7 +12,7 @@ Keep everything from HeroQuest that isn't listed here (movement 2d6, combat dice
 
 | HeroQuest | Floor 1 |
 |---|---|
-| Four hero classes | Three humans with identical stats. You are literally you. Loot makes you different. |
+| Four hero classes | Eight pre-made crawlers with identical stats. Pick one, write a name on it. Loot makes you different. |
 | One-shot spells, wizard only | **Scrolls** (one use, anyone) and **Spellbooks** (permanent, cooldown, need Mind 4+). |
 | Search for treasure, once per room | Gone. Monsters drop loot when killed. Chests and racks are visible furniture with a fixed draw. |
 | Search for traps | Kept, but a found trap gets a **trap token** placed on the board. A Torch does this passively. |
@@ -103,7 +103,7 @@ That's the target shape: nearly every game is decided in the last two rounds, a 
 
 ## 2. Players
 
-Three cards, portrait of the real person, identical base stats. Each player picks **one** Starting Kit card before the floor. The kit is "what you happened to have on you."
+Eight crawler cards, all with the same base stats, each a stranger who happened to be outdoors at three in the morning. Pick one, write a name on the line, and roleplay it as hard as you like. Then pick **one** Starting Kit card. The kit is "what they happened to have on them."
 
 | Starting Kit | Slot | Effect |
 |---|---|---|
@@ -246,7 +246,7 @@ Junk and consumables. What a goblin has on him.
 | **Trash Can Lid** | Off hand | Defend +1. |
 | **Frying Pan** | Off hand | Defend +1. Action: throw it at a monster in line of sight for 2 attack dice. Then it's on the floor over there. |
 | **Goblin-Chewed Leather Jacket** | Body | Defend +1. |
-| **Orc Monocle** | Head | Mind +1. The orc did not need it. Stacks with the glasses. |
+| **Orc Monocle** | Head | Mind +1. The orc did not need it. Same slot as the Glasses, so it's the second road to Mind 4, not a stack. Mind 5 does nothing on this floor except add a lockpicking die. |
 | **Stolen Sneakers** | Feet | Move +2. |
 | **Lucky Rabbit's Foot** | Trinket | Once per floor, reroll one die. The rabbit would like it back. |
 | **Trap Kit** | Trinket | Disarm an adjacent revealed trap as your action. Three uses. |
@@ -288,7 +288,7 @@ Envelopes. Each has a printed label with the achievement name and its trigger on
 | **Found It With Your Face** | Silver | First player to trigger a trap | Football Helmet |
 | **You Monster** | Bronze | Kill all three goblins in the Daycare | 2 gold and a card that just says "You did that. We all saw." Trinket, no effect. |
 | **Why Would You Do That** | Bronze | Reach into the toilet | 1 Energy Drink, 1 Gold (2). Sticky. |
-| **Nerd** | Gold | First player to learn a Spellbook | Scroll: Firebolt, Orc Monocle |
+| **Nerd** | Gold | First player to learn a Spellbook | Scroll: Firebolt, Bookmark |
 | **Sharing Is Caring** | Bronze | Give an item to another player | 2 gold. This fires on turn one of every game. It's a handout that teaches trading, so it's priced like one. |
 | **Trap Chef** | Gold | A monster dies from a trap | Fire Axe |
 | **Cartographer** | Silver | Open the doors to seven of the nine rooms | 5 gold |
@@ -299,6 +299,8 @@ Envelopes. Each has a printed label with the achievement name and its trigger on
 Box contents that duplicate a card already in a deck: pull that card out of the deck when you assemble the envelope, so there's exactly one in the world.
 
 **Sir Reginald (Companion card):** an ill-tempered goose. Moves with the player who freed him, occupies no square. Once per turn, 1 attack die at a monster adjacent to his person. When a monster attacks his person, roll 1 die: on a skull, it attacks the goose instead. The goose has 2 Health. If the goose dies, everyone is sad and the announcer takes a moment. He does not come back.
+
+**Bookmark** (Trinket): once per floor, set one of your cooldown dice to 0. For the caster who just proved they're the caster. A Mind item here would be wasted on someone who already has Mind 4.
 
 **Spellbook: Nope** (Mind 4+, Cooldown 3): after a monster rolls an attack against anyone in your room, cancel it. The announcer sighs.
 
@@ -365,18 +367,18 @@ Counts for the card pipeline. Poker size, nine per letter sheet.
 
 | Asset | Count |
 |---|---|
-| Player cards (portrait of the real person, stat boxes, slot outline) | 3 |
+| Crawler cards (eight strangers, generated portraits, stat boxes, slot outline, a line for the name) | 8 |
 | Starting Kit cards | 5 |
 | Monster cards (stats, loot table, one line of flavor) | 6 |
 | Pockets deck | 16 |
 | Gear deck | 14 |
 | Big Gear deck | 9 |
-| Loot Box exclusives (Nope, Companion, Save-the-Date, "You did that") | 4 |
+| Loot Box exclusives (Nope, Bookmark, Companion, Save-the-Date, "You did that") | 5 |
 | Loot Box envelope labels | 11 |
 | Fan deck | 14 |
 | Trap tokens (pit, spear, block, revealed-secret-door) | 9 |
 | Room signs (optional, but the Daycare deserves one) | 9 |
-| Player reference on the back of each player card: turn order, the dice, Downed, cooldowns, trading | 3 |
+| Player reference on the back of each crawler card: turn order, the dice, Downed, cooldowns, trading | 8 |
 | Announcer speeches: in the map file, read from the iPad DM view | 5 |
 | Countdown die: a d12. Cooldown dice: any d6s. Gold: coins from the HeroQuest box or printed tokens. | |
 
@@ -386,7 +388,7 @@ Card template types: Player, Monster, Item (slot, effect, flavor, art), Spell (c
 
 ## 11. Decisions for Nick
 
-Settled: the boss is the dragon, classes are picked after Floor 2, the Daycare stays, the goose is Sir Reginald until the boys rename him, and player portraits are real photos in a fantasy style.
+Settled: the boss is the dragon, classes are picked after Floor 2, the Daycare stays, the goose is Sir Reginald until the boys rename him, and players pick from eight generated crawlers rather than playing themselves. Roleplaying games are for roleplaying.
 
 Still open:
 

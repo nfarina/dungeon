@@ -95,6 +95,7 @@ export type Hero = {
   trapImmuneUsed: boolean;
   rerollUsed: boolean;
   capeUsed: boolean;
+  bookmarkUsed: boolean;
   energy: number;          // pending +1 attack die
   stoneSkin: boolean;
   goose: number;           // goose hp, 0 = none
@@ -193,8 +194,8 @@ export class Game {
 
   private buildDecks() {
     // Loot-box exclusives are pulled out of the decks, per floor-1.md.
-    // Envelopes: Found It With Your Face (Helmet), Nerd (Firebolt + Monocle), Trap Chef (Fire Axe).
-    const pulled = new Set(["Football Helmet", "Scroll: Firebolt", "Orc Monocle", "Fire Axe"]);
+    // Envelopes: Found It With Your Face (Helmet), Nerd (Firebolt + Bookmark), Trap Chef (Fire Axe).
+    const pulled = new Set(["Football Helmet", "Scroll: Firebolt", "Fire Axe"]);
     const mk = (src: Item[]) => this.rng.shuffle(src.filter(i => !pulled.has(i.name)).map(clone));
     const decks = { pockets: mk(POCKETS), gear: mk(GEAR), big: mk(BIG_GEAR) };
     if (this.cfg.guaranteedSpellbook) {
@@ -234,7 +235,7 @@ export class Game {
         equip: { main: null, off: null, body: null, head: null, feet: null },
         trinkets: [null, null], pack: [], learned: [], gold: 0,
         downed: false, downedRound: -99, exited: false, dead: false, inPit: false,
-        trapImmuneUsed: false, rerollUsed: false, capeUsed: false, energy: 0, stoneSkin: false,
+        trapImmuneUsed: false, rerollUsed: false, capeUsed: false, bookmarkUsed: false, energy: 0, stoneSkin: false,
         goose: 0, deaths: 0,
       };
       for (const item of KITS[this.cfg.kits[i]].map(clone)) this.give(h, item);
@@ -298,7 +299,7 @@ export class Game {
   private score(i: Item) {
     return (i.atk ?? 0) * 3 + (i.def ?? 0) * 3 + (i.mind ?? 0) * 2 + (i.move ?? 0) * 0.5
       + (i.torch ? 1 : 0) + (i.ranged ? 2 : 0) + (i.trapImmuneOnce ? 1 : 0)
-      + (i.disarms ? 0.5 : 0) + (i.unlocks ? 1.5 : 0) + (i.reroll ? 1 : 0) + (i.rope ? 0.5 : 0) + (i.capeOnce ? 2.5 : 0);
+      + (i.disarms ? 0.5 : 0) + (i.unlocks ? 1.5 : 0) + (i.reroll ? 1 : 0) + (i.rope ? 0.5 : 0) + (i.capeOnce ? 2.5 : 0) + (i.resetCd ? 1.5 : 0);
   }
 
   private equipOrStash(h: Hero, item: Item) {
@@ -862,6 +863,11 @@ export class Game {
 
   private tryCast(h: Hero, target: Monster): boolean {
     if (!los(this.board, h.pos, target.pos, this.openDoors)) return false;
+    // Bookmark: once per floor, a cooling spell is ready again. Spent the first time it would matter.
+    if (!h.bookmarkUsed && this.items(h).some(i => i.resetCd)) {
+      const cooling = h.learned.find(l => l.cd > 0 && l.item.spell?.id === "spark");
+      if (cooling) { cooling.cd = 0; h.bookmarkUsed = true; }
+    }
     const spark = h.learned.find(l => l.item.spell?.id === "spark" && l.cd === 0);
     if (spark && (!adjacent(h.pos, target.pos) || 2 > this.atk(h))) {
       spark.cd = spark.item.spell!.cooldown;
@@ -992,7 +998,7 @@ export class Game {
     h.pack = h.pack.filter(x => x !== bk);
     h.learned.push({ item: bk, cd: 0 });
     this.award("Nerd", [{ name: "Scroll: Firebolt", slot: "pack", use: "firebolt" },
-      { name: "Orc Monocle", slot: "head", mind: 1 }]);
+      { name: "Bookmark", slot: "trinket", resetCd: true }]);
     return true;
   }
 

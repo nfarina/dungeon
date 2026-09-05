@@ -25,6 +25,7 @@ export type Item = {
   inert?: boolean;
   fragile?: boolean;       // Hockey Stick: snaps on a zero-skull attack
   capeOnce?: boolean;      // Sponsored Cape: once per floor, die -> Downed at 1 Health instead
+  resetCd?: boolean;       // Bookmark: once per floor, set one cooldown die to 0
 };
 
 const g = (n: number): Item => ({ name: `Gold (${n})`, slot: "pack", gold: n, inert: true });

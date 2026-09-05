@@ -22,7 +22,7 @@ const roomCleared = new Map<number, number>();
 const roomLooted = new Map<number, number>();
 
 const start = { pockets: POCKETS.length, gear: GEAR.length, big: BIG_GEAR.length };
-const pulled = 4; // loot-box exclusives removed from the decks at setup (plus Spark, moved to the rack)
+const pulled = 3; // loot-box exclusives removed from the decks at setup (plus Spark, moved to the rack)
 
 for (let i = 0; i < N; i++) {
   const kits = rng.shuffle([...KITS]).slice(0, 3);

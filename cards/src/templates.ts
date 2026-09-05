@@ -15,7 +15,7 @@ const DECK_GLYPH: Record<Deck, string> = {
 
 export const CARD_CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Alegreya:ital,wght@0,400;0,700;1,400&family=Alegreya+SC:wght@700&display=swap');
-:root { --parch:#ecdfc4; --parch2:#e2d2ae; --ink:#2b1e14; --line:#3a2a1c; --gold:#e3b746; --gold2:#b8862b; --stone:#3b4756; --muted:#6a5a48; }
+.card, .label { --parch:#ecdfc4; --parch2:#e2d2ae; --ink:#2b1e14; --line:#3a2a1c; --gold:#e3b746; --gold2:#b8862b; --stone:#3b4756; --muted:#6a5a48; color-scheme:light; }
 .card { position:relative; width:2.5in; height:3.5in; box-sizing:border-box; overflow:hidden; border-radius:0;
   background:var(--parch); border:.1in solid var(--line); padding:.08in .09in .07in; display:flex; flex-direction:column;
   font-family:'Alegreya', Georgia, serif; color:var(--ink); -webkit-print-color-adjust:exact; print-color-adjust:exact; break-inside:avoid; }
@@ -66,6 +66,14 @@ export const CARD_CSS = `
 .card.back .word { font-family:'Cinzel'; font-weight:800; font-size:21pt; letter-spacing:.1em; color:var(--deck); text-align:center; line-height:1.1; }
 .card.back .word.small { font-size:16pt; }
 .card.back .sub { font-family:'Alegreya SC'; font-size:7.5pt; letter-spacing:.2em; color:var(--deck); opacity:.85; }
+/* ---- Crawler back: a rules reference, text only ---- */
+.card.back.ref { display:block; padding:.12in .14in .08in; font-family:'Alegreya', Georgia, serif; color:#222; font-size:7.7pt; line-height:1.22; }
+.card.back.ref .hd { font-family:'Cinzel'; font-weight:800; font-size:9pt; letter-spacing:.12em; color:var(--deck); text-align:center; margin-bottom:.04in; }
+.card.back.ref h4 { font-family:'Alegreya SC'; font-weight:700; font-size:7.8pt; letter-spacing:.1em; color:var(--deck); margin:.04in 0 .004in; border-bottom:.008in solid #bbb; }
+.card.back.ref p { margin:0; }
+.card.back.ref b { font-weight:700; }
+.card.back.ref .dice { display:flex; justify-content:space-between; gap:.04in; margin-top:.015in; }
+.card.back.ref .dice span { flex:1; text-align:center; border:.008in solid #999; border-radius:.03in; padding:.008in 0; font-size:6.2pt; }
 /* ---- envelope labels: 4 x 2 in, low ink ---- */
 .label { position:relative; width:4in; height:2in; box-sizing:border-box; border:.02in solid #333; border-radius:0; background:#fff; padding:.12in .18in .1in .3in; display:flex; flex-direction:column; justify-content:center;
   font-family:'Alegreya', Georgia, serif; color:#111; overflow:hidden; -webkit-print-color-adjust:exact; print-color-adjust:exact; break-inside:avoid; }
@@ -143,10 +151,29 @@ export function renderFront(c: Card, artUrl: string | null): string {
 
 export function renderBack(c: Card): string {
   if (c.type === "envelope") return "";
+  if (c.type === "player") return renderReference(c);
   const deck = DECK_COLOR[c.deck];
   const word = DECK_NAMES[c.deck].toUpperCase();
   const sub = c.deck === "player" ? "pick one · name yourself" : c.deck === "monster" ? "for the announcer" : c.deck === "fan" ? "viewers only" : c.deck === "lootbox" ? "do not peek" : "floor 1";
   return `<div class="card back" style="--deck:${deck}"><div class="glyph">${DECK_GLYPH[c.deck]}</div><div class="word ${word.length > 8 ? "small" : ""}">${esc(word)}</div><div class="sub">${esc(sub)}</div></div>`;
+}
+
+/** The back of every Crawler card: the rules you actually need mid-turn. */
+export function renderReference(c: Card): string {
+  return `<div class="card back ref" style="--deck:${DECK_COLOR[c.deck]}">
+    <div class="hd">CRAWLER</div>
+    <h4>Your turn</h4>
+    <p><b>1.</b> Turn every cooldown die down 1.</p>
+    <p><b>2.</b> Move <b>2d6</b> and take <b>one action</b>, either order.</p>
+    <p><b>Actions:</b> attack · cast · search for traps · open a chest or rack · disarm · pick up a Downed friend · learn a spellbook (Mind 4+).</p>
+    <p><b>Free:</b> open doors · swap one item at turn start · use consumables · hand a card to an adjacent player.</p>
+    <h4>Downed</h4>
+    <p>At 0 Health lie down; skip turns, monsters ignore you. An adjacent friend spends an action to get you up with 1 Health. A Bandage does it free. Still down at the end of the <b>next round</b>: dead for the floor.</p>
+    <h4>Spells and Mind</h4>
+    <p><b>Scrolls:</b> anyone, once. <b>Spellbooks:</b> Mind 4+, yours for good, cooldown: set a d6 on the card. <b>Lockpick:</b> roll your Mind in dice, any skull opens it.</p>
+    <h4>End of round</h4>
+    <p>Monsters act, loot drops as they die, the countdown drops 1. On the stairs at round end: you're out.</p>
+  </div>`;
 }
 
 export function renderLabel(c: Card): string {
