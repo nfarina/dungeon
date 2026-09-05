@@ -18,8 +18,8 @@ sight, doors opening free, monster rules 4.3.1–4.3.5 including Delegation and
 Performance Review, traps (heroes *and* monsters trigger unrevealed ones),
 equipment slots and two-handed conflicts, stat stacking, cooldowns, the d6 loot
 tables, deck composition with loot-box exclusives pulled, Mind-gated spellbook
-learning, Downed → dead after one round, the floor cap and the Office fuse, and
-the collapse ramp.
+learning, Downed → dead after one round, the floor cap and the Office fuse, the collapse
+ramp, monsters spawning on their placed squares, and multi-square furniture.
 
 ---
 
@@ -75,6 +75,7 @@ judgement:
 | Football Helmet | Eats the first trap that would hurt them |
 | Rope | Pits cost nothing |
 | Goblin Shortbow | Replaces melee entirely; drops to 1 die if something closes to adjacent |
+| Slingshot | Melee as normal when adjacent; if the turn ends out of reach with a clear line, 1 die at the target |
 | Kitchen Knife | +1 die against 1-Health monsters |
 
 There's also one clutch save: at 0 Health, `competence × 0.4` of the time
@@ -120,7 +121,7 @@ the sim models exactly.
 
 ## What it does NOT do
 
-Cards with no combat effect are **inert** — the Phone, the Whistle, the thrown
+Cards with no combat effect are **inert** — the Whistle, the thrown
 Frying Pan, Firecracker, Smoke Bomb, Stone Skin, Shove used by a hero, the
 Kitchen Knife's bonus move, and spending gold.
 

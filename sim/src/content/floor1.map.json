@@ -81,7 +81,7 @@
     ]
       },
       {
-        "at": "J",
+        "at": "R",
         "id": 6,
         "name": "The Cage",
         "required": false,
@@ -127,28 +127,51 @@
       { "x": 9, "y": 9, "dir": "E", "kind": "normal" },
       { "x": 6, "y": 0, "dir": "S", "kind": "normal" },
       { "x": 0, "y": 11, "dir": "E", "kind": "normal" },
-      { "x": 24, "y": 6, "dir": "E", "kind": "normal" },
       { "x": 2, "y": 17, "dir": "S", "kind": "normal", "trap": "block" },
       { "x": 18, "y": 9, "dir": "S", "kind": "normal" },
       { "x": 22, "y": 17, "dir": "S", "kind": "locked" },
-      { "x": 24, "y": 15, "dir": "E", "kind": "secret" }
+      { "x": 24, "y": 15, "dir": "E", "kind": "secret" },
+      { "x": 15, "y": 17, "dir": "S", "kind": "normal" },
+      { "x": 2, "y": 13, "dir": "S", "kind": "secret" }
     ],
     "features": [
       { "x": 0, "y": 9, "kind": "entrance" },
-      { "x": 22, "y": 16, "kind": "stairs" },
-      { "x": 23, "y": 15, "kind": "blocker" },
+      { "x": 23, "y": 14, "kind": "stairs", "w": 2, "h": 2 },
+      { "x": 22, "y": 16, "kind": "blocker", "label": "Desk" },
       { "x": 6, "y": 6, "kind": "table" },
       { "x": 2, "y": 11, "kind": "chest" },
       { "x": 12, "y": 9, "kind": "rack" },
-      { "x": 22, "y": 6, "kind": "cage" },
       { "x": 2, "y": 15, "kind": "toilet" },
       { "x": 18, "y": 11, "kind": "shelf" },
-      { "x": 6, "y": 2, "kind": "blocker" }
+      { "x": 6, "y": 2, "kind": "blocker" },
+      { "x": 16, "y": 15, "kind": "cage" }
     ],
     "traps": [
       { "x": 6, "y": 8, "kind": "pit" },
       { "x": 12, "y": 10, "kind": "spear" },
-      { "x": 0, "y": 13, "kind": "pit" }
+      { "x": 0, "y": 13, "kind": "pit" },
+      { "x": 23, "y": 16, "kind": "pit" }
+    ],
+    "monsters": [
+      { "x": 4, "y": 5, "id": "goblin" },
+      { "x": 4, "y": 8, "id": "goblin" },
+      { "x": 8, "y": 5, "id": "orc" },
+      { "x": 5, "y": 4, "id": "goblin" },
+      { "x": 4, "y": 10, "id": "skeleton" },
+      { "x": 4, "y": 13, "id": "skeleton" },
+      { "x": 5, "y": 3, "id": "goblin" },
+      { "x": 8, "y": 1, "id": "goblin" },
+      { "x": 8, "y": 3, "id": "goblin" },
+      { "x": 14, "y": 8, "id": "orc" },
+      { "x": 15, "y": 11, "id": "zombie" },
+      { "x": 4, "y": 14, "id": "zombie" },
+      { "x": 1, "y": 14, "id": "zombie" },
+      { "x": 20, "y": 12, "id": "skeleton" },
+      { "x": 17, "y": 12, "id": "goblin" },
+      { "x": 22, "y": 15, "id": "boss" },
+      { "x": 21, "y": 15, "id": "orc" },
+      { "x": 24, "y": 16, "id": "orc" },
+      { "x": 16, "y": 16, "id": "abomination" }
     ],
     "stone": [
       "..............x...........",
@@ -164,7 +187,7 @@
       "x.........................",
       "..........................",
       "..........................",
-      "..........................",
+      ".........................x",
       "..........................",
       "..........................",
       "..........................",

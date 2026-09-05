@@ -18,12 +18,13 @@ export type Item = {
   trapImmuneOnce?: boolean;
   reroll?: number;         // rerolls per floor
   goblinAversion?: boolean;
-  ranged?: { dice: number };   // replaces melee attack, cannot hit adjacent
+  ranged?: { dice: number; sidearm?: boolean };   // replaces melee attack, cannot hit adjacent; sidearm = shoot when out of reach, melee normally when adjacent
   bonusVs1hp?: number;
   spell?: { id: "spark" | "shove" | "patchup" | "nope"; cooldown: number };
   gold?: number;
   inert?: boolean;
   fragile?: boolean;       // Hockey Stick: snaps on a zero-skull attack
+  capeOnce?: boolean;      // Sponsored Cape: once per floor, die -> Downed at 1 Health instead
 };
 
 const g = (n: number): Item => ({ name: `Gold (${n})`, slot: "pack", gold: n, inert: true });
@@ -66,6 +67,7 @@ export const BIG_GEAR: Item[] = [
   { name: "Spellbook: Spark", slot: "learned", spell: { id: "spark", cooldown: 2 } },
   { name: "Spellbook: Shove", slot: "learned", spell: { id: "shove", cooldown: 2 } },
   { name: "Spellbook: Patch Up", slot: "learned", spell: { id: "patchup", cooldown: 3 } },
+  { name: "Sponsored Cape", slot: "trinket", capeOnce: true },
 ];
 
 export const EXTRA: Record<string, Item> = {
@@ -73,7 +75,7 @@ export const EXTRA: Record<string, Item> = {
 };
 
 export const KITS: Record<string, Item[]> = {
-  Phone: [{ name: "Phone (11% battery)", slot: "trinket", inert: true }],
+  Slingshot: [{ name: "Slingshot", slot: "main", ranged: { dice: 1, sidearm: true } }],
   HockeyStick: [{ name: "Hockey Stick", slot: "main", atk: 1, fragile: true }],
   Multitool: [{ name: "Multitool", slot: "trinket", disarms: 2 }],
   SnackBag: [{ name: "Juice Box", slot: "pack", use: "heal3" }, { name: "Juice Box", slot: "pack", use: "heal3" }],

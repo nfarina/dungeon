@@ -106,7 +106,7 @@ spellbook learning, and card-to-nerd trading.
    health, revive each other, skip side rooms when the clock is short, and mostly
    remember to kill Greg's Orcs first. They do not do anything clever or anything
    stupid. Real 11-year-olds have more variance in both directions.
-3. **Cards with no combat effect are inert:** the Phone, the Whistle, the Frying
+3. **Cards with no combat effect are inert:** the Whistle, the Frying
    Pan throw, Firecracker, Smoke Bomb, Stone Skin, and Shove as a hero action.
    Shove matters: see the Trap Chef circularity note in the analysis.
 4. **Nobody searches.** Heroes never spend an action searching for traps or
@@ -130,3 +130,22 @@ spellbook learning, and card-to-nerd trading.
 - `src/mapfile.ts` the map format and its adapter into the simulator's Board
 - `src/tools/mapedit.html` + `mapserve.ts` the map editor and its local server
 - `src/run.ts` experiments and statistics
+
+## Map file: placed monsters and sized furniture
+
+- `floor.monsters` is a list of `{ x, y, id }`. A room with any placed monsters
+  spawns exactly those squares; a room with none scatters its `monsters` list at
+  random (the old behaviour). The editor's Monsters layer writes this list and
+  keeps the room's roster in sync. `placedMonsters: false` in the config ignores
+  placements, for A/B runs.
+- Features take an optional `w` and `h` (default 1x1), anchored at the top-left
+  square. Blocking furniture blocks every square of its footprint; the stairs are
+  a 2x2 and a hero on any of the four squares counts as on the stairs. The
+  editor's Furniture tools have W/H inputs.
+- Deck exclusives match floor-1.md section 7: Football Helmet, Scroll: Firebolt,
+  Orc Monocle and Fire Axe are pulled into envelopes at setup; with
+  `guaranteedSpellbook` Spark is pulled onto the Armory rack. Sharing Is Caring
+  pays 2 gold. The Sponsored Cape (Big Gear) turns a hero's first death of the
+  floor into Downed at 1 Health.
+- `bun run src/run.ts report N` uses the recommended ruleset; `src/tools/content.ts N rec`
+  needs the `rec` argument to match it, otherwise it reports the as-written rules.

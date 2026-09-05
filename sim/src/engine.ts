@@ -49,6 +49,8 @@ export type Config = {
   richRack: boolean;
   /** Put a guaranteed Spellbook on the required path (in the Armory rack). */
   guaranteedSpellbook: boolean;
+  /** Use the map's placed monster squares (false = scatter every room's list at random). */
+  placedMonsters: boolean;
   maxRounds: number;
 };
 
@@ -75,6 +77,7 @@ export const DEFAULT_CONFIG: Config = {
   lootRich: false,
   richRack: false,
   guaranteedSpellbook: false,
+  placedMonsters: true,
   maxRounds: 80,
 };
 
@@ -91,6 +94,7 @@ export type Hero = {
   inPit: boolean;
   trapImmuneUsed: boolean;
   rerollUsed: boolean;
+  capeUsed: boolean;
   energy: number;          // pending +1 attack die
   stoneSkin: boolean;
   goose: number;           // goose hp, 0 = none
@@ -146,6 +150,8 @@ export class Game {
   cfg: Config;
   heroes: Hero[] = [];
   monsters: Monster[] = [];
+  /** Spellbook: Spark, pulled from the Big Gear deck at setup and left on the Armory rack (section 3). */
+  rackBook: Item | null = null;
   openDoors: Uint8Array;
   foundSecrets: Uint8Array;
   revealedTraps = new Set<string>();
@@ -187,10 +193,15 @@ export class Game {
 
   private buildDecks() {
     // Loot-box exclusives are pulled out of the decks, per floor-1.md.
-    const pulled = new Set(["Football Helmet", "Scroll: Firebolt", "Orc Monocle",
-      "Lucky Rabbit's Foot", "Spellbook: Shove"]);
+    // Envelopes: Found It With Your Face (Helmet), Nerd (Firebolt + Monocle), Trap Chef (Fire Axe).
+    const pulled = new Set(["Football Helmet", "Scroll: Firebolt", "Orc Monocle", "Fire Axe"]);
     const mk = (src: Item[]) => this.rng.shuffle(src.filter(i => !pulled.has(i.name)).map(clone));
-    return { pockets: mk(POCKETS), gear: mk(GEAR), big: mk(BIG_GEAR) };
+    const decks = { pockets: mk(POCKETS), gear: mk(GEAR), big: mk(BIG_GEAR) };
+    if (this.cfg.guaranteedSpellbook) {
+      const spark = decks.big.find(i => i.name === "Spellbook: Spark") ?? null;
+      if (spark) { decks.big = decks.big.filter(i => i !== spark); this.rackBook = spark; }
+    }
+    return decks;
   }
 
   /**
@@ -223,24 +234,26 @@ export class Game {
         equip: { main: null, off: null, body: null, head: null, feet: null },
         trinkets: [null, null], pack: [], learned: [], gold: 0,
         downed: false, downedRound: -99, exited: false, dead: false, inPit: false,
-        trapImmuneUsed: false, rerollUsed: false, energy: 0, stoneSkin: false,
+        trapImmuneUsed: false, rerollUsed: false, capeUsed: false, energy: 0, stoneSkin: false,
         goose: 0, deaths: 0,
       };
       for (const item of KITS[this.cfg.kits[i]].map(clone)) this.give(h, item);
       this.heroes.push(h);
     });
     // "Sharing Is Caring" is free: someone hands someone a card on turn one.
-    this.award("Sharing Is Caring", [{ name: "Lucky Rabbit's Foot", slot: "trinket", reroll: 1 }]);
+    this.award("Sharing Is Caring", [{ name: "Gold (2)", slot: "pack", gold: 2 }]);
   }
 
   private setupMonsters() {
     for (const r of FLOOR1.rooms) {
-      const cells = this.roomCells(r.id).filter(c => this.board.isFloor(c.x, c.y));
+      const fixed = this.cfg.placedMonsters ? (r.spawns ?? []) : [];
+      const cells = this.roomCells(r.id).filter(c => this.board.isFloor(c.x, c.y) && !fixed.some(f => same(f, c)));
       const shuffled = this.rng.shuffle([...cells]);
+      let k = 0;
       r.monsters.forEach((id, i) => {
         const def = MONSTERS[id];
         this.monsters.push({
-          def, pos: { ...shuffled[i % shuffled.length] },
+          def, pos: { ...(fixed[i] ?? shuffled[(k++) % shuffled.length]) },
           hp: def.boss ? this.cfg.bossHp : def.hp,
           room: r.id, active: false, asleep: 0, alive: true, cd: 0,
         });
@@ -285,7 +298,7 @@ export class Game {
   private score(i: Item) {
     return (i.atk ?? 0) * 3 + (i.def ?? 0) * 3 + (i.mind ?? 0) * 2 + (i.move ?? 0) * 0.5
       + (i.torch ? 1 : 0) + (i.ranged ? 2 : 0) + (i.trapImmuneOnce ? 1 : 0)
-      + (i.disarms ? 0.5 : 0) + (i.unlocks ? 1.5 : 0) + (i.reroll ? 1 : 0) + (i.rope ? 0.5 : 0);
+      + (i.disarms ? 0.5 : 0) + (i.unlocks ? 1.5 : 0) + (i.reroll ? 1 : 0) + (i.rope ? 0.5 : 0) + (i.capeOnce ? 2.5 : 0);
   }
 
   private equipOrStash(h: Hero, item: Item) {
@@ -444,6 +457,8 @@ export class Game {
       // for the floor. The figure comes off the board; your cards stay in front
       // of you, unusable, and your body rides the stairs down with the party.
       if (h.downed && !h.dead && this.round - h.downedRound >= 1) {
+        // Sponsored Cape: once per floor, the sponsor would rather you didn't.
+        if (!h.capeUsed && this.items(h).some(i => i.capeOnce)) { h.capeUsed = true; h.downed = false; h.hp = 1; continue; }
         h.downed = false; h.dead = true; h.deaths++; this.stats.deaths++;
       }
     }
@@ -564,6 +579,7 @@ export class Game {
     if (t2 && adjacent(h.pos, t2.pos)) { this.heroAttack(h, t2); return; }
     if (t2 && this.hasRanged(h) && los(this.board, h.pos, t2.pos, this.openDoors)) { this.heroAttack(h, t2); return; }
     if (t2 && this.tryCast(h, t2)) return;
+    if (t2 && this.hasSidearm(h) && los(this.board, h.pos, t2.pos, this.openDoors)) { this.heroAttack(h, t2); return; }
     if (this.tryInteract(h)) return;
     if (this.tryLearn(h)) return;
   }
@@ -604,7 +620,8 @@ export class Game {
   }
 
   stairsCell(): Pt { return this.board.rooms.get(9)!.interact!.at; }
-  onStairs(h: Hero) { return same(h.pos, this.stairsCell()); }
+  stairsCells(): Pt[] { return this.board.rooms.get(9)!.interact!.cells; }
+  onStairs(h: Hero) { return this.stairsCells().some(c => same(h.pos, c)); }
 
   private roomDone(id: number) { return !this.monsters.some(m => m.alive && m.room === id); }
 
@@ -837,7 +854,10 @@ export class Game {
     down.downed = false; down.hp = this.cfg.reviveHp;
   }
 
-  private hasRanged(h: Hero) { return !!h.equip.main?.ranged; }
+  /** A true ranged weapon (the Shortbow): shoot instead of closing to melee. */
+  private hasRanged(h: Hero) { const r = h.equip.main?.ranged; return !!r && !r.sidearm; }
+  /** A sidearm (the Slingshot): melee as normal, but take a shot if the turn ends out of reach. */
+  private hasSidearm(h: Hero) { return !!h.equip.main?.ranged?.sidearm; }
 
   private tryCast(h: Hero, target: Monster): boolean {
     if (!los(this.board, h.pos, target.pos, this.openDoors)) return false;
@@ -868,7 +888,7 @@ export class Game {
     let dice = this.atk(h) + h.energy;
     const ranged = h.equip.main?.ranged;
     if (ranged) {
-      if (adjacent(h.pos, m.pos)) dice = 1;      // can't use the bow point-blank
+      if (adjacent(h.pos, m.pos)) { if (!ranged.sidearm) dice = 1; }   // can't use the bow point-blank; a slingshot hero just punches
       else dice = ranged.dice + h.energy;
     }
     if (h.equip.main?.bonusVs1hp && m.hp === 1) dice += h.equip.main.bonusVs1hp;
@@ -912,12 +932,13 @@ export class Game {
       this.heroHpAtBossKill = this.heroes.reduce((a, h) => a + Math.max(0, h.hp), 0);
     }
     if (!killer) {
-      this.award("Trap Chef", [{ name: "Spellbook: Shove", slot: "learned", spell: { id: "shove", cooldown: 2 } }]);
+      this.award("Trap Chef", [{ name: "Fire Axe", slot: "main", twoHanded: true, atk: 2, unlocks: 99 }]);
       return;
     }
     const roll = this.rng.d6();
     let kind = m.def.loot(roll);
     if (this.cfg.lootRich && roll === 5 && (m.def.id === "orc" || m.def.id === "zombie")) kind = "gear";
+    if (this.cfg.lootRich && roll === 6 && m.def.id === "skeleton") kind = "gear";
     if (this.cfg.lootRich && roll >= 4 && m.def.id === "skeleton") kind = roll === 6 ? "gear" : "pockets";
     if (kind !== "none") {
       const item = this.draw(kind === "big" ? "big" : kind === "gear" ? "gear" : "pockets");
@@ -933,7 +954,7 @@ export class Game {
     if (rid === null) return false;
     const r = this.board.rooms.get(rid)!;
     if (!r.interact || this.usedInteract.has(rid)) return false;
-    if (!adjacent(h.pos, r.interact.at) && !same(h.pos, r.interact.at)) return false;
+    if (!r.interact.cells.some(c => adjacent(h.pos, c) || same(h.pos, c))) return false;
     if (this.monsters.some(m => m.alive && m.active && dist1(m.pos, h.pos) <= 2)) return false;
     const w = r.interact.what;
     if (w.kind === "stairs") return false;
@@ -956,10 +977,7 @@ export class Game {
     this.usedInteract.add(rid);
     const deck = w.kind === "shelf" ? (this.mind(h) >= 4 ? "big" : "gear")
       : w.kind === "rack" ? "gear" : "pockets";
-    if (w.kind === "rack" && this.cfg.guaranteedSpellbook) {
-      const bk = this.decks.big.find(x => x.slot === "learned");
-      if (bk) { this.decks.big = this.decks.big.filter(x => x !== bk); this.give(h, bk); }
-    }
+    if (w.kind === "rack" && this.rackBook) { this.give(h, this.rackBook); this.rackBook = null; }
     const it = this.draw(deck as any); if (it) this.give(h, it);
     if (w.kind === "rack" && this.cfg.richRack) { const it2 = this.draw("gear"); if (it2) this.give(h, it2); }
     if (w.kind === "toilet") this.award("Why Would You Do That", [{ name: "Energy Drink", slot: "pack", use: "energy" }]);

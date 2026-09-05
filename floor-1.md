@@ -86,7 +86,18 @@ Two timers, one die. Put a d12 where everyone can see it.
 - **You can leave without killing Greg.** Any hero on the stairwell square at the end of a round has escaped. Escaping with the boss alive forfeits the Boss Box. Say this out loud before the fight, so the last three rounds are a decision and not arithmetic.
 - **What the collapse means.** Heroes who reached the stairs continue to Floor 2 as they are. Heroes who died, in the collapse or before it, are revived on Floor 2 at a cost decided when that floor is generated. Greg, if alive, remembers all of this.
 
-These numbers came from the simulator using an invented map and free respawns. They need a re-run against the real Side A layout with the one-round death window before they're trusted. Expect the fuse to move by a round or two.
+On the real Side A map with the death rule, placed monsters, the Office pit and the Slingshot, the simulator reports (3,000 runs):
+
+| Measure | Result |
+|---|---|
+| Party wins (Greg dead, everyone alive down the stairs) | 86.7% |
+| Wins that got out under the collapse | 75.2% |
+| Games where the clock never mattered | 0.0% |
+| Games where someone dies | 28.3% |
+| Full wipe | 1.4% |
+| Round the Office door opens, on average | 18.2 |
+
+That's the target shape: nearly every game is decided in the last two rounds, a death is common enough to fear and rare enough to hurt, and a wipe is a story. Re-run whenever the route changes; route length moves these numbers more than anything else.
 
 ---
 
@@ -96,19 +107,19 @@ Three cards, portrait of the real person, identical base stats. Each player pick
 
 | Starting Kit | Slot | Effect |
 |---|---|---|
-| **Phone (11% battery)** | Trinket | Twice per floor, before opening a door, ask the announcer what's in the room. They have to tell you. Tick the boxes. |
+| **Slingshot** | Main hand | Instead of your normal attack, roll 1 attack die at any monster in line of sight that isn't adjacent. You can still punch things next to you with your usual 2. |
 | **Hockey Stick** | Main hand | Attack +1. The first time you roll zero skulls with it, it snaps: discard it. |
 | **Multitool** | Trinket | Disarm an adjacent revealed trap as your action. Two uses. Tick the boxes. |
 | **Snack Bag** | Backpack | Two Juice Boxes (heal 3 each, one use). |
 | **Homework Glasses** | Head | Mind +1. Someone can read Spellbooks from turn one. |
 
-Five kits for three people. Whoever takes the glasses is volunteering to be the nerd. Whoever takes the stick is volunteering to be in front.
+Five kits for three people. Whoever takes the glasses is volunteering to be the nerd. Whoever takes the stick is volunteering to be in front. Whoever takes the slingshot is volunteering to stand behind them.
 
 ---
 
 ## 3. Floor layout
 
-Rooms are numbered so you can map them onto the Quest 1 layout yourself. I don't have First Light's Quest 1 map memorized, so assign numbers to physical rooms with this rule: **rooms 1, 2, 5 and 9 must be on the path from the entrance to the exit**, and the other five branch off it. The floor is clearable in an hour if the party only does the required rooms; the optional rooms are where the good loot is, and the announcer should say so.
+The board is Side A, traced into the simulator's map file (`sim/src/content/floor1.map.json`), which is the source of truth for room placement, doors, furniture, traps and where each monster stands. Rooms 1, 2, 5 and 9 sit on the path from the entrance to the stairs, and the other five branch off it. The floor is clearable in an hour if the party only does the required rooms; the optional rooms are where the good loot is, and the announcer should say so.
 
 | # | Room | Monsters | Furniture | Trap | Required |
 |---|---|---|---|---|---|
@@ -120,7 +131,7 @@ Rooms are numbered so you can map them onto the Quest 1 layout yourself. I don't
 | 6 | **The Cage** | 1 Abomination | Cage with a goose in it | none | no |
 | 7 | **Latrine** | 2 Zombies | The toilet | Falling block at the door | no |
 | 8 | **Library** | 1 Skeleton, 1 Goblin | Bookshelf: 1 Big Gear draw if reader has Mind 4+, else 1 Gear draw | none | no |
-| 9 | **Manager's Office** | The Floor Manager, 2 Orcs | Desk, stairwell down | Pit trap between the door and the desk | yes (boss) |
+| 9 | **Manager's Office** | The Floor Manager, 2 Orcs | Desk; stairwell down (2x2, behind Greg) | Pit trap beside the desk | yes (boss) |
 
 **Corridors:** one pit trap somewhere on the required path (so five traps on the floor, counting the Office), and one secret door that shortcuts to Room 9. The secret door is found by searching or by walking past it with a Torch.
 
@@ -137,6 +148,8 @@ Rooms are numbered so you can map them onto the Quest 1 layout yourself. I don't
 **Room 9 pit:** Greg had a pit installed in front of his desk last week for visitor management and hasn't told the Orcs. They don't know it's there until one of them finds out. Anything Shoved, Whistled, or otherwise persuaded across it goes in, and most things on this floor have 1 Health.
 
 **Monster count:** 7 Goblins, 4 Orcs, 3 Skeletons, 3 Zombies, 1 Abomination, 1 boss. Required path only: 9 monsters plus the boss. Substitute whatever cutouts the box actually has; only the stats matter.
+
+**Monster positions** are fixed on the map, quest-sheet style, and every monster starts at least two squares from its room's door so the party gets the first swing. The simulator says this matters more than it looks: scattering the same monsters at random drops the win rate from about 87% to about 74% and raises deaths by half. Where a monster stands is a balance dial. Move a guard next to a door when a floor needs to be meaner.
 
 ---
 
@@ -165,7 +178,7 @@ Rough expected values, no gear, so you know where the dials are before the simul
 | Orc attacks Hero (2 defend) | about 0.9 damage per attack |
 | Hero (2 dice) attacks the Floor Manager | about 0.67 net damage per attack |
 
-Three heroes at 6 Health each is 18 Health against roughly 25 monster attacks on the full floor, plus Juice Boxes. Heroes will get Downed once or twice, and with a one-round rescue window most of those should become a scramble rather than a death. Greg goes down in about two rounds once the Orcs are dead, even without gear. He is a softer boss than he looks; Delegation and the clock are what make the fight. The first simulator run used free respawns and never lost a game, so none of this is confirmed for the death rule yet.
+Three heroes at 6 Health each is 18 Health against roughly 25 monster attacks on the full floor, plus Juice Boxes. Heroes will get Downed once or twice, and with a one-round rescue window most of those should become a scramble rather than a death. Greg goes down in about two rounds once the Orcs are dead, even without gear. He is a softer boss than he looks; Delegation and the clock are what make the fight. With the death rule in, the simulator sees someone die in about 30% of games and a wipe in under 2%.
 
 ### 4.2 The Floor Manager
 
@@ -311,22 +324,24 @@ The power level is deliberately a fraction of a living hero. A Viewer should be 
 
 | Card | Effect |
 |---|---|
-| **Banana Peel** | Place on any empty square. The first figure to enter it stops there and falls over. A monster loses its attack this round. A hero takes no damage but the announcer describes it in detail. |
 | **Boo!** | One monster must spend its movement moving away from the nearest hero. It can still attack if it ends adjacent to someone. |
 | **Applause** | One hero rerolls one die. Play after the roll. |
+| **Dramatic Music** | One hero rolls +1 die on their attack this round. Play before the roll. |
 | **Wardrobe Malfunction** | One monster's pants fall down. Defend -1 this round. |
 | **Lighting Cue** | Reveal every trap in one room or corridor. Place tokens. |
 | **Fog Machine** | No ranged attacks or spells this round, by anyone. Yes, including Performance Review. Yes, including Spark. |
 | **Hype Train** | Every hero gets Move +2 this round. |
 | **Heckle** | A monster about to attack instead attacks a different hero of your choice that it could reach. Usable for good or evil. |
 | **Slow Clap** | One monster skips its movement this round. It can still attack if already adjacent. |
-| **Loose Floorboard** | Move one trap token one square in any direction. Unrevealed traps count; ask the announcer where. |
+| **Loose Floorboard** | Move one revealed trap token one square in any direction. If it lands under a figure, it triggers. |
 | **Poke** | 1 attack die at any monster on the board, from the sky. It defends normally. Nobody knows where it came from. |
 | **Fan Mail** | Name an achievement nobody has earned. If a living hero earns it this round, you open the envelope and read it aloud. No mechanical effect. Enormous emotional effect. |
 | **Sponsor Message** | The announcer must deliver a fifteen-second advertisement for a product of your choice. A hero of your choice heals 1 while everyone endures it. |
 | **Confetti** | Nothing happens. The announcer must say something sincerely nice about a hero of your choice. Best played at the worst possible moment. |
 
 Poke and Heckle are the two that can swing a fight. If a Viewer is enjoying the floor more than the living are, cut those two first.
+
+Every card resolves immediately and in the open. Nothing in the deck asks a Viewer to place something the announcer can then route around, or to keep a secret the table can't check. A card that needs trust or discretion to work doesn't belong here.
 
 ---
 

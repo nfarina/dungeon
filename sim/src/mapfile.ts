@@ -25,6 +25,16 @@ export type MapFeature = {
   x: number; y: number;
   kind: "entrance" | "stairs" | "chest" | "rack" | "table" | "shelf" | "toilet" | "cage" | "blocker";
   label?: string;
+  /** Footprint in squares, anchored at the top-left (x, y). Default 1x1. */
+  w?: number; h?: number;
+};
+/** A monster placed on a specific square. A room with any placed monsters spawns
+ *  exactly those; a room with none scatters its `monsters` list at random. */
+export type MapMonster = { x: number; y: number; id: string };
+export const featureCells = (f: MapFeature): Pt[] => {
+  const out: Pt[] = [];
+  for (let dy = 0; dy < (f.h ?? 1); dy++) for (let dx = 0; dx < (f.w ?? 1); dx++) out.push({ x: f.x + dx, y: f.y + dy });
+  return out;
 };
 export type MapTrap = { x: number; y: number; kind: "pit" | "spear" };
 
@@ -58,6 +68,7 @@ export type FloorSpec = {
   doors: MapDoor[];
   features: MapFeature[];
   traps: MapTrap[];
+  monsters?: MapMonster[];
 };
 
 export type MapFile = { board: BoardDef; floor: FloorSpec };
@@ -131,17 +142,22 @@ export function toFloorDef(m: MapFile): FloorDef {
     const cells = roomCells(m, r.at).filter(c => open(c.x, c.y));
     const xs = cells.map(c => c.x), ys = cells.map(c => c.y);
     const inRoom = (p: { x: number; y: number }) => m.board.grid[p.y]?.[p.x] === r.at;
-    const feats = m.floor.features.filter(inRoom);
+    const feats = m.floor.features.filter(f => featureCells(f).some(inRoom));
     const interactive = feats.find(f => INTERACT[f.kind]);
     const trap = m.floor.traps.find(inRoom);
+    const placed = (m.floor.monsters ?? []).filter(inRoom);
     return {
-      id: r.id, name: r.name, required: r.required, monsters: r.monsters,
+      id: r.id, name: r.name, required: r.required,
+      monsters: placed.length ? placed.map(p => p.id) : r.monsters,
+      spawns: placed.length ? placed.map(p => ({ x: p.x, y: p.y })) : undefined,
       rect: {
         x0: xs.length ? Math.min(...xs) : 0, y0: ys.length ? Math.min(...ys) : 0,
         x1: xs.length ? Math.max(...xs) : 0, y1: ys.length ? Math.max(...ys) : 0,
       },
-      furniture: feats.filter(f => BLOCKS[f.kind]).map(f => ({ x: f.x, y: f.y })),
-      interact: interactive ? { at: { x: interactive.x, y: interactive.y }, what: INTERACT[interactive.kind]! } : undefined,
+      furniture: feats.filter(f => BLOCKS[f.kind]).flatMap(f => featureCells(f).filter(inRoom)),
+      interact: interactive
+        ? { at: { x: interactive.x, y: interactive.y }, cells: featureCells(interactive), what: INTERACT[interactive.kind]! }
+        : undefined,
       trap: trap ? { at: { x: trap.x, y: trap.y }, kind: trap.kind } : undefined,
     };
   });

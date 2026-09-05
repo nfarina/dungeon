@@ -4,7 +4,7 @@ import { RNG } from "../rng";
 import { POCKETS, GEAR, BIG_GEAR } from "../content/items";
 
 const ALL_OPTIONAL = [3, 4, 6, 7, 8];
-const KITS = ["Phone", "HockeyStick", "Multitool", "SnackBag", "Glasses"];
+const KITS = ["Slingshot", "HockeyStick", "Multitool", "SnackBag", "Glasses"];
 const N = Number(process.argv[2] ?? 2000);
 const base: Partial<Config> = process.argv[3] === "rec"
   ? { lootRich: true, richRack: true, guaranteedSpellbook: true, collapseStart: "both",
@@ -22,7 +22,7 @@ const roomCleared = new Map<number, number>();
 const roomLooted = new Map<number, number>();
 
 const start = { pockets: POCKETS.length, gear: GEAR.length, big: BIG_GEAR.length };
-const pulled = 5; // loot-box exclusives removed from the decks at setup
+const pulled = 4; // loot-box exclusives removed from the decks at setup (plus Spark, moved to the rack)
 
 for (let i = 0; i < N; i++) {
   const kits = rng.shuffle([...KITS]).slice(0, 3);
@@ -59,7 +59,7 @@ for (let i = 0; i < N; i++) {
 const pc = (x: number) => `${((x / N) * 100).toFixed(1)}%`;
 console.log(`\n=== CONTENT UTILISATION — ${N} games ${base.collapseRound ? "(recommended ruleset)" : "(as written)"} ===\n`);
 console.log(`Deck sizes after pulling loot-box exclusives: pockets ${start.pockets}, gear ${start.gear - 3}, big ${start.big - 2}`);
-console.log(`  (${pulled} cards are removed from the decks to fill envelopes, per section 7)\n`);
+console.log(`  (${pulled} cards are removed from the decks to fill envelopes, per section 7; Spark sits on the Armory rack)\n`);
 console.log(`Cards drawn per game    pockets ${(drawn.pockets / N).toFixed(1)} of ${start.pockets}`);
 console.log(`                        gear    ${(drawn.gear / N).toFixed(1)} of ${start.gear - 3}`);
 console.log(`                        BIG     ${(drawn.big / N).toFixed(2)} of ${start.big - 2}   <-- the whole spellbook economy`);

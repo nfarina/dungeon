@@ -31,8 +31,11 @@ export type RoomDef = {
   rect: Rect;
   required: boolean;
   monsters: string[];
+  /** Fixed spawn squares, parallel to `monsters`. Absent = scatter at random. */
+  spawns?: Pt[];
   furniture: Pt[];                       // blocks movement + line of sight
-  interact?: { at: Pt; what: Interactable };
+  /** `at` is the anchor square; `cells` is the whole footprint (stairs are 2x2). */
+  interact?: { at: Pt; cells: Pt[]; what: Interactable };
   trap?: { at: Pt; kind: "pit" | "spear" };
 };
 

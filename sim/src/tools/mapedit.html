@@ -249,6 +249,7 @@ const FEATURES = {
 const TRAPS = { pit:{g:"◍",n:"Pit"}, spear:{g:"✕",n:"Spear"} };
 const DOORS = { normal:"Door", locked:"Locked", secret:"Secret", block:"Falling block" };
 const MONSTERS = ["goblin","orc","skeleton","zombie","abomination","boss"];
+const MONSTER_GLYPH = { goblin:"g", orc:"O", skeleton:"S", zombie:"Z", abomination:"A", boss:"★" };
 
 const LAYERS = [
   {id:"board",     name:"Possible rooms", hint:"What's printed on the cardboard: corridors and every room the board has. Trace it once, then lock it — every floor on this board side reuses it."},
@@ -257,6 +258,7 @@ const LAYERS = [
   {id:"doors",     name:"Doors",     hint:"Tap near the edge between two squares."},
   {id:"furniture", name:"Furniture", hint:"Entrance, stairs and anything that blocks a square."},
   {id:"traps",     name:"Traps",     hint:""},
+  {id:"monsters",  name:"Monsters",  hint:"Tap a square inside a room to place one. A room with placed monsters spawns exactly those; a room with none scatters its list at random."},
 ];
 
 let map = null, name = "floor1", hasServer = false;
@@ -321,7 +323,14 @@ const findDoor = (x, y, dir) => {
   return F().doors.findIndex(d => d.x === n.x && d.y === n.y && d.dir === n.dir);
 };
 const doorCells = d => [{ x:d.x, y:d.y }, { x:d.x + DELTA[d.dir][0], y:d.y + DELTA[d.dir][1] }];
-const featAt = (x, y) => F().features.findIndex(f => f.x === x && f.y === y);
+/** Every square a piece of furniture covers (w x h, anchored top-left). */
+const featCells = f => { const o = []; for (let dy = 0; dy < (f.h || 1); dy++) for (let dx = 0; dx < (f.w || 1); dx++) o.push({ x:f.x + dx, y:f.y + dy }); return o; };
+const featAt = (x, y) => F().features.findIndex(f => featCells(f).some(c => c.x === x && c.y === y));
+const monAt = (x, y) => (F().monsters || []).findIndex(m => m.x === x && m.y === y);
+/** Monsters placed inside one possible room. */
+const placedIn = letter => (F().monsters || []).filter(m => at(m.x, m.y) === letter);
+/** Placed monsters are authoritative for their room's list. */
+function syncRoster(r) { if (!r) return; r.monsters = placedIn(r.at).map(m => m.id); }
 const trapAt = (x, y) => F().traps.findIndex(t => t.x === x && t.y === y);
 const doorKey = d => `${d.x},${d.y},${d.dir}`;
 
@@ -391,7 +400,8 @@ function afterLoad() {
   for (const l of LAYERS) { if (!(l.id in vis)) vis[l.id] = true; if (!(l.id in lock)) lock[l.id] = false; }
   lock.board = true;                    // the printed board is the thing you don't want to nudge
   tool.board ??= "."; tool.stone ??= "x"; tool.doors ??= "normal";
-  tool.furniture ??= "blocker"; tool.traps ??= "pit";
+  tool.furniture ??= "blocker"; tool.traps ??= "pit"; tool.monsters ??= "goblin"; tool.fw ??= 1; tool.fh ??= 1;
+  F().monsters ??= [];
   render(); status("loaded " + name, "good");
 }
 async function save() {
@@ -561,12 +571,20 @@ function drawMap() {
 
   if (vis.furniture) for (const f of F().features) {
     const FF = FEATURES[f.kind]; if (!FF) continue;
-    if (FF.blocks) p.push(`<rect x="${f.x*CS+2}" y="${f.y*CS+2}" width="${CS-4}" height="${CS-4}" fill="var(--sunk)" stroke="var(--line-2)" rx="2"/>`);
-    p.push(`<text class="glyph" x="${f.x*CS+CS/2}" y="${f.y*CS+CS/2+1}" style="font-size:${CS*.62}px">${FF.g}</text>`);
+    const fw = f.w || 1, fh = f.h || 1, W = fw*CS, H = fh*CS;
+    if (FF.blocks || fw > 1 || fh > 1)
+      p.push(`<rect x="${f.x*CS+2}" y="${f.y*CS+2}" width="${W-4}" height="${H-4}" fill="${FF.blocks ? "var(--sunk)" : "none"}" stroke="var(--line-2)" rx="2"/>`);
+    p.push(`<text class="glyph" x="${f.x*CS+W/2}" y="${f.y*CS+H/2+1}" style="font-size:${CS*.62*Math.min(fw,fh)}px">${FF.g}</text>`);
+    if (f.label && CS >= 20)
+      p.push(`<text class="rid" x="${f.x*CS+W/2}" y="${f.y*CS+H-3}" text-anchor="middle" style="font-size:${Math.min(CS*.4,9)}px">${esc(f.label)}</text>`);
   }
   if (vis.traps) for (const t of F().traps) {
     p.push(`<circle cx="${t.x*CS+CS/2}" cy="${t.y*CS+CS/2}" r="${CS*.3}" fill="none" stroke="var(--danger)" stroke-width="2"/>`);
     p.push(`<text class="glyph" x="${t.x*CS+CS/2}" y="${t.y*CS+CS/2+1}" fill="var(--danger)" style="font-size:${CS*.42}px">${TRAPS[t.kind].g}</text>`);
+  }
+  if (vis.monsters) for (const mo of F().monsters || []) {
+    p.push(`<circle cx="${mo.x*CS+CS/2}" cy="${mo.y*CS+CS/2}" r="${CS*.36}" fill="var(--danger)" opacity=".85"/>`);
+    p.push(`<text class="glyph" x="${mo.x*CS+CS/2}" y="${mo.y*CS+CS/2+1}" fill="#fff" style="font-size:${CS*.5}px;font-weight:700">${MONSTER_GLYPH[mo.id] || "?"}</text>`);
   }
 
   // labels: floor rooms get their name, unused possible rooms get their letter
@@ -579,7 +597,7 @@ function drawMap() {
     if (r) {
       if (CS >= 20) {
         p.push(`<text class="rlabel" x="${X}" y="${Y}" text-anchor="middle" dominant-baseline="central" style="font-size:${Math.min(CS*.62,14)}px">${esc(r.name)}</text>`);
-        if (vis.traps && r.monsters.length)
+        if (vis.monsters && r.monsters.length && !placedIn(c).length)
           p.push(`<text class="rid" x="${X}" y="${Y+CS*.62}" text-anchor="middle" style="font-size:${Math.min(CS*.44,10)}px">${esc(r.monsters.join(" "))}</text>`);
       } else p.push(`<text class="rlabel" x="${X}" y="${Y}" text-anchor="middle" dominant-baseline="central" style="font-size:${CS*.6}px">${r.id}</text>`);
     } else if (vis.board && active === "inplay" || vis.board && active === "board") {
@@ -671,6 +689,17 @@ function drawTools() {
   } else if (active === "traps") {
     for (const [k, T] of Object.entries(TRAPS)) t.append(tbtn("traps", k, " " + T.n, T.g));
     t.append(tbtn("traps", "erase", "Remove"));
+  } else if (active === "monsters") {
+    for (const id of MONSTERS) t.append(tbtn("monsters", id, " " + id, MONSTER_GLYPH[id]));
+    t.append(tbtn("monsters", "erase", "Remove"));
+  }
+  if (active === "furniture") {
+    const num = (k, lbl) => {
+      const i = el("input", { type:"number", min:"1", max:"8", value:tool[k], style:"width:52px" });
+      i.addEventListener("change", () => { tool[k] = Math.max(1, Math.min(8, +i.value || 1)); });
+      return el("label", { class:"mono-sm", style:"display:inline-flex;gap:4px;align-items:center" }, [lbl, i]);
+    };
+    t.append(el("span", { class:"hint" }, "Size: "), num("fw", "W"), num("fh", "H"));
   }
   pane.append(t);
   if (isArea(active)) {
@@ -750,7 +779,11 @@ function drawSel() {
     idf.addEventListener("change", () => { r.id = Math.max(1, Math.min(35, +idf.value || r.id)); dirty = true; render(); });
     pane.append(el("div", { class:"field" }, [el("label", {}, "Room number"), idf]));
     pane.append(checkbox("On the required path", r.required, v => { r.required = v; dirty = true; render(); }));
-    pane.append(field("Monsters (comma separated)", r.monsters.join(", "),
+    const placed = placedIn(letter);
+    if (placed.length) {
+      pane.append(el("p", { class:"mono-sm", style:"margin:4px 0 8px" }, "Placed on the map: " + placed.map(m => m.id).join(" · ")));
+      pane.append(el("p", { class:"hint" }, "This room spawns exactly what's placed. Add or remove on the Monsters layer."));
+    } else pane.append(field("Monsters (comma separated, scattered at random)", r.monsters.join(", "),
       v => { r.monsters = v.split(",").map(x => x.trim().toLowerCase()).filter(Boolean); dirty = true; render(); }));
     const bad = r.monsters.filter(x => !MONSTERS.includes(x));
     if (bad.length) pane.append(el("p", { class:"hint", style:"color:var(--danger)" }, "Unknown: " + bad.join(", ") + ". Known: " + MONSTERS.join(", ")));
@@ -793,6 +826,7 @@ function resize(w, h) {
   if (F().stone) F().stone = Array.from({ length:h }, (_, y) => ((F().stone[y] || "") + ".".repeat(w)).slice(0, w));
   F().features = F().features.filter(f => inB(f.x, f.y));
   F().traps = F().traps.filter(t => inB(t.x, t.y));
+  F().monsters = (F().monsters || []).filter(m => inB(m.x, m.y));
   F().doors = F().doors.filter(d => inB(d.x, d.y));
   render();
 }
@@ -970,8 +1004,18 @@ function apply(c, dragging = false) {
       if (tool.furniture !== "erase") {
         if (tool.furniture === "entrance" || tool.furniture === "stairs")
           F().features = F().features.filter(f => f.kind !== tool.furniture);
-        F().features.push({ x, y, kind: tool.furniture });
+        const fw = tool.fw || 1, fh = tool.fh || 1;
+        F().features.push({ x, y, kind: tool.furniture, ...(fw > 1 || fh > 1 ? { w:fw, h:fh } : {}) });
       }
+      break;
+    }
+    case "monsters": {
+      if (dragging) return;
+      const i = monAt(x, y);
+      if (i >= 0) F().monsters.splice(i, 1);
+      const r = roomAt(x, y);
+      if (tool.monsters !== "erase" && r) F().monsters.push({ x, y, id: tool.monsters });
+      syncRoster(r);
       break;
     }
     case "traps": {
@@ -995,8 +1039,8 @@ for (const b of document.querySelectorAll("[data-preset]")) b.onclick = () => {
   const p = b.dataset.preset;
   const set = o => { for (const L of LAYERS) vis[L.id] = o[L.id] ?? true; };
   if (p === "dm") set({});
-  if (p === "players") set({ traps:false, stone:false, board:false });
-  if (p === "board") set({ traps:false, furniture:false, stone:false });
+  if (p === "players") set({ traps:false, monsters:false, stone:false, board:false });
+  if (p === "board") set({ traps:false, monsters:false, furniture:false, stone:false });
   render();
 };
 $("#jsonBtn").onclick = () => { $("#jsonTxt").value = JSON.stringify(map, null, 2); $("#jsonDlg").showModal(); };

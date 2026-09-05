@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Card Workshop</title>
+<link rel="stylesheet" href="/card.css">
+<style>
+:root { color-scheme: light dark; --bg:#f3f1ec; --panel:#fff; --line:#d8d3c8; --ink:#1d1a16; --muted:#6d675c; --amber:#b0770f; --danger:#b4442a; --ok:#0f7f5e; }
+@media (prefers-color-scheme: dark) { :root { --bg:#17150f; --panel:#1f1c16; --line:#3a352b; --ink:#ece7dc; --muted:#a39c8e; --amber:#dda63f; } }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.4 system-ui, -apple-system, sans-serif; display:grid; grid-template-columns:220px 1fr 360px; grid-template-rows:100vh; }
+aside, section, main { overflow:auto; }
+aside { border-right:1px solid var(--line); padding:14px 12px; background:var(--panel); }
+aside h1 { font-size:15px; margin:0 0 10px; letter-spacing:.02em; }
+.deck { display:flex; justify-content:space-between; align-items:center; padding:6px 8px; border-radius:6px; cursor:pointer; }
+.deck:hover { background:rgba(128,128,128,.12); } .deck.on { background:rgba(176,119,15,.15); font-weight:600; }
+.deck .n { color:var(--muted); font-size:12px; }
+.deck .n b { color:var(--danger); font-weight:600; }
+aside .tools { margin-top:14px; display:flex; flex-direction:column; gap:6px; }
+button { font:inherit; padding:6px 10px; border:1px solid var(--line); border-radius:6px; background:var(--panel); color:var(--ink); cursor:pointer; }
+button:hover { border-color:var(--amber); } button.primary { background:var(--amber); color:#fff; border-color:var(--amber); }
+button:disabled { opacity:.5; cursor:default; }
+main { padding:14px; }
+.bar { display:flex; gap:10px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
+.bar .status { color:var(--muted); font-size:13px; margin-left:auto; }
+.grid { display:grid; grid-template-columns:repeat(auto-fill, 190px); gap:14px 12px; }
+.thumb { position:relative; width:180px; cursor:pointer; }
+.thumb .scale { width:180px; height:252px; overflow:hidden; border-radius:10px; box-shadow:0 1px 3px rgba(0,0,0,.25); }
+.thumb .scale > * { transform:scale(.75); transform-origin:top left; }
+.thumb .scale > .label { transform:scale(.45); }
+.thumb.on .scale { outline:3px solid var(--amber); }
+.thumb .tag { position:absolute; top:6px; right:6px; font-size:10px; padding:2px 6px; border-radius:10px; color:#fff; background:var(--danger); }
+.thumb .tag.stale { background:var(--amber); } .thumb .tag.queued { background:#555; } .thumb .tag.err { background:#000; }
+.thumb input { position:absolute; top:6px; left:6px; width:16px; height:16px; }
+section { border-left:1px solid var(--line); background:var(--panel); padding:14px; }
+section h2 { margin:0 0 8px; font-size:15px; }
+section .pair { display:flex; gap:10px; align-items:flex-start; }
+section .pair .scale { width:150px; height:210px; overflow:hidden; border-radius:8px; }
+section .pair .scale > * { transform:scale(.6); transform-origin:top left; }
+textarea { width:100%; min-height:110px; font:13px/1.4 ui-monospace, Menlo, monospace; padding:8px; border:1px solid var(--line); border-radius:6px; background:var(--bg); color:var(--ink); resize:vertical; }
+label.k { display:block; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin:12px 0 4px; }
+.row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.hint { color:var(--muted); font-size:12px; }
+.err { color:var(--danger); font-size:12px; white-space:pre-wrap; }
+pre.log { font:11px/1.35 ui-monospace, Menlo, monospace; background:var(--bg); border:1px solid var(--line); border-radius:6px; padding:8px; max-height:160px; overflow:auto; white-space:pre-wrap; }
+select { font:inherit; padding:5px 8px; border:1px solid var(--line); border-radius:6px; background:var(--panel); color:var(--ink); }
+img.ref { width:100%; border-radius:8px; border:1px solid var(--line); }
+a { color:var(--amber); }
+</style>
+</head>
+<body>
+<aside>
+  <h1>Card Workshop</h1>
+  <div id="decks"></div>
+  <div class="tools">
+    <button id="printDeck">Print this deck</button>
+    <button id="printSel" disabled>Print selected</button>
+    <button id="genMissing">Generate missing in deck</button>
+    <button id="genStale">Regenerate stale in deck</button>
+    <button id="styleBtn">Art style</button>
+  </div>
+  <p class="hint" style="margin-top:14px">Red = no art. Amber = art is stale (prompt, style or model changed). Tick boxes to select.</p>
+</aside>
+<main>
+  <div class="bar">
+    <span id="title" style="font-weight:600"></span>
+    <label class="hint">Model <select id="model"></select></label>
+    <span class="status" id="status"></span>
+  </div>
+  <div class="grid" id="grid"></div>
+</main>
+<section id="detail"><h2>Pick a card</h2><p class="hint">Click a card to see it at size, edit its art prompt, or regenerate it.</p></section>
+
+<script>
+let data = { decks: [], cards: [], models: [], model: "" };
+let deck = localStorage.getItem("cards.deck") || "player";
+let sel = new Set(), current = null, showStyle = false;
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+const model = () => $("#model").value || data.model;
+
+async function load() {
+  const r = await fetch("/api/cards?model=" + encodeURIComponent(model() || ""));
+  data = await r.json();
+  const m = $("#model");
+  if (!m.options.length) { for (const x of data.models) m.append(new Option(x, x)); m.value = data.model; }
+  render();
+}
+function visible() { return data.cards.filter(c => c.deck === deck); }
+function render() {
+  const decksEl = $("#decks"); decksEl.innerHTML = "";
+  for (const d of data.decks) {
+    const cs = data.cards.filter(c => c.deck === d.id);
+    const missing = cs.filter(c => c.art && !c.artUrl).length, stale = cs.filter(c => c.stale).length;
+    const el = document.createElement("div"); el.className = "deck" + (d.id === deck ? " on" : "");
+    el.innerHTML = `<span>${esc(d.name)}</span><span class="n">${missing ? `<b>${missing}</b>/` : ""}${cs.length}${stale ? ` <span style="color:var(--amber)">~${stale}</span>` : ""}</span>`;
+    el.onclick = () => { deck = d.id; localStorage.setItem("cards.deck", deck); render(); };
+    decksEl.append(el);
+  }
+  const cs = visible();
+  $("#title").textContent = `${data.decks.find(d => d.id === deck)?.name ?? deck} · ${cs.length} cards`;
+  const g = $("#grid"); g.innerHTML = "";
+  for (const c of cs) {
+    const t = document.createElement("div"); t.className = "thumb" + (current === c.id ? " on" : "");
+    const tag = c.error ? `<span class="tag err" title="${esc(c.error)}">error</span>` : c.queued ? `<span class="tag queued">queued</span>` : (c.art && !c.artUrl) ? `<span class="tag">no art</span>` : c.stale ? `<span class="tag stale">stale</span>` : "";
+    t.innerHTML = `<div class="scale">${c.front}</div>${tag}<input type="checkbox" ${sel.has(c.id) ? "checked" : ""}>`;
+    t.querySelector("input").onclick = e => { e.stopPropagation(); if (e.target.checked) sel.add(c.id); else sel.delete(c.id); $("#printSel").disabled = !sel.size; };
+    t.onclick = () => { current = c.id; showStyle = false; render(); };
+    g.append(t);
+  }
+  $("#printSel").disabled = !sel.size;
+  drawDetail();
+}
+function drawDetail() {
+  const d = $("#detail");
+  if (showStyle) return drawStyle(d);
+  const c = data.cards.find(x => x.id === current);
+  if (!c) { d.innerHTML = `<h2>Pick a card</h2><p class="hint">Click a card to see it at size, edit its art prompt, or regenerate it.</p>`; return; }
+  d.innerHTML = `<h2>${esc(c.name || c.id)}</h2>
+    <div class="pair"><div class="scale">${c.front}</div>${c.back ? `<div class="scale">${c.back}</div>` : ""}</div>
+    <p class="hint">${esc(c.deckName)} · ${esc(c.type)}${c.slot ? " · " + esc(c.slot) : ""} · <a href="/preview/${c.id}" target="_blank">open at print size</a></p>
+    ${c.art !== undefined && c.type !== "envelope" ? `
+    <label class="k">Art prompt (subject only; the style prefix is added automatically)</label>
+    <textarea id="prompt">${esc(c.art)}</textarea>
+    <div class="row" style="margin-top:8px">
+      <button id="savePrompt">Save prompt</button>
+      <button id="genOne" class="primary">${c.artUrl ? "Regenerate art" : "Generate art"}</button>
+      ${c.artUrl ? `<a class="hint" href="${c.artUrl}" target="_blank">open png</a>` : ""}
+    </div>
+    ${c.stale ? `<p class="hint" style="color:var(--amber)">This art was made with a different prompt, style or model.</p>` : ""}
+    ${c.error ? `<p class="err">${esc(c.error)}</p>` : ""}
+    <label class="k">Full prompt as sent</label>
+    <pre class="log">${esc(c.prompt)}</pre>` : ""}
+    <label class="k">Generator</label>
+    <pre class="log" id="log"></pre>`;
+  const sp = $("#savePrompt"); if (sp) sp.onclick = async () => { await fetch("/api/prompt", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ id: c.id, art: $("#prompt").value }) }); await load(); };
+  const go = $("#genOne"); if (go) go.onclick = async () => {
+    await fetch("/api/prompt", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ id: c.id, art: $("#prompt").value }) });
+    await gen([c.id], true);
+  };
+}
+async function drawStyle(d) {
+  const s = await (await fetch("/api/style")).json();
+  d.innerHTML = `<h2>Art style</h2>
+    ${s.hasRef ? `<img class="ref" src="/art-style.png?${Date.now()}" alt="style reference">` : `<p class="err">No ../art-style.png found. Drop one in the project root and every prompt will carry it as a reference image.</p>`}
+    <label class="k">Style prefix (style.md)</label>
+    <textarea id="style" style="min-height:180px">${esc(s.style)}</textarea>
+    <div class="row" style="margin-top:8px"><button id="saveStyle" class="primary">Save style</button><span class="hint">Saving marks every card's art stale. Nothing regenerates until you ask.</span></div>`;
+  $("#saveStyle").onclick = async () => { await fetch("/api/style", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify({ style: $("#style").value }) }); showStyle = false; await load(); };
+}
+async function gen(ids, force) {
+  if (!ids.length) return;
+  await fetch("/api/gen", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ids, force, model: model() }) });
+  await load();
+}
+$("#genMissing").onclick = () => gen(visible().filter(c => c.art && !c.artUrl).map(c => c.id), false);
+$("#genStale").onclick = () => gen(visible().filter(c => c.stale).map(c => c.id), true);
+const backOffset = () => { try { const o = JSON.parse(localStorage.getItem("cards.backOffset") || "{}"); return `&bx=${o.bx || 0}&by=${o.by || 0}`; } catch { return ""; } };
+$("#printDeck").onclick = () => window.open(`/print?deck=${deck}&model=${encodeURIComponent(model())}${backOffset()}`, "_blank");
+$("#printSel").onclick = () => window.open(`/print?ids=${[...sel].join(",")}&model=${encodeURIComponent(model())}${backOffset()}`, "_blank");
+$("#styleBtn").onclick = () => { showStyle = true; current = null; render(); };
+$("#model").onchange = load;
+
+let lastDone = -1;
+async function poll() {
+  try {
+    const s = await (await fetch("/api/status")).json();
+    $("#status").textContent = s.running ? `generating ${s.running}${s.queue.length ? ` (+${s.queue.length} queued)` : ""}` : s.queue.length ? `${s.queue.length} queued` : "";
+    const lg = $("#log"); if (lg) lg.textContent = s.log.join("\n");
+    if (s.done !== lastDone) { lastDone = s.done; await load(); }
+    else if (s.running) { const busy = data.cards.some(c => c.queued !== (s.queue.includes(c.id) || s.running === c.id)); if (busy) await load(); }
+  } catch {}
+  setTimeout(poll, 1500);
+}
+load().then(poll);
+</script>
+</body>
+</html>

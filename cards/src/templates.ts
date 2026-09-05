@@ -1,0 +1,222 @@
+// Card layouts. Everything is sized in inches so print is exact; the editor
+// scales cards down with a CSS transform for thumbnails.
+import { DECK_NAMES, type Card, type Deck } from "./catalog";
+
+const esc = (s: string) => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
+
+/** Accent colour per deck. Backs use it as a thin stroke only, to save toner. */
+export const DECK_COLOR: Record<Deck, string> = {
+  kit: "#5b7a3a", pockets: "#8a6d2f", gear: "#3d5a80", biggear: "#7a3b5e", fan: "#6b4fa0",
+  monster: "#8b2e2e", player: "#2f6f6b", lootbox: "#b08d2c", envelope: "#555",
+};
+const DECK_GLYPH: Record<Deck, string> = {
+  kit: "🎒", pockets: "👖", gear: "🛠", biggear: "⚒", fan: "📣", monster: "💀", player: "🙂", lootbox: "🎁", envelope: "✉",
+};
+
+export const CARD_CSS = `
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Alegreya:ital,wght@0,400;0,700;1,400&family=Alegreya+SC:wght@700&display=swap');
+:root { --parch:#ecdfc4; --parch2:#e2d2ae; --ink:#2b1e14; --line:#3a2a1c; --gold:#e3b746; --gold2:#b8862b; --stone:#3b4756; --muted:#6a5a48; }
+.card { position:relative; width:2.5in; height:3.5in; box-sizing:border-box; overflow:hidden; border-radius:0;
+  background:var(--parch); border:.1in solid var(--line); padding:.08in .09in .07in; display:flex; flex-direction:column;
+  font-family:'Alegreya', Georgia, serif; color:var(--ink); -webkit-print-color-adjust:exact; print-color-adjust:exact; break-inside:avoid; }
+.card::before { content:""; position:absolute; inset:.025in; border:.012in solid var(--gold2); border-radius:.07in; pointer-events:none; opacity:.7; }
+.card .art { position:relative; height:1.35in; border:.02in solid var(--line); border-radius:.06in; background:var(--stone) center/cover no-repeat; flex:none; }
+.card .art.noart { display:flex; align-items:center; justify-content:center; color:#c9d3df; font-size:7pt; font-style:italic; text-align:center; padding:.1in;
+  background-image:repeating-linear-gradient(45deg, #3b4756 0 .12in, #43505f .12in .24in); }
+.card .banner { position:absolute; left:50%; transform:translateX(-50%); bottom:-.13in; background:var(--gold); border:.018in solid var(--line); border-radius:.04in;
+  padding:.015in .12in; font-family:'Cinzel', Georgia, serif; font-weight:800; font-size:11pt; white-space:nowrap; max-width:2.2in; overflow:hidden; text-overflow:ellipsis; letter-spacing:.01em;
+  box-shadow:0 .01in 0 var(--gold2); }
+.card .banner.long { font-size:9pt; } .card .banner.xlong { font-size:7.6pt; }
+.card .meta { display:flex; gap:.05in; justify-content:center; margin-top:.19in; flex-wrap:wrap; }
+.card .chip { font-family:'Alegreya SC', Georgia, serif; font-weight:700; font-size:7.2pt; letter-spacing:.06em; border:.012in solid var(--line); border-radius:.03in; padding:0 .05in; background:var(--parch2); }
+.card .chip.deck { color:#fff; background:var(--deck); border-color:var(--deck); }
+.card .rules { font-size:9pt; line-height:1.3; margin-top:.07in; flex:1; text-align:center; }
+.card .rules b { font-weight:700; }
+.card .flavor { font-size:7.6pt; line-height:1.25; font-style:italic; color:var(--muted); text-align:center; margin-top:.04in; }
+.card .foot { display:flex; justify-content:space-between; align-items:flex-end; font-family:'Alegreya SC', Georgia, serif; font-size:6.6pt; color:var(--muted); margin-top:.04in; letter-spacing:.04em; }
+.card .cd { display:flex; align-items:center; justify-content:center; gap:.08in; margin-top:.05in; }
+.card .die { width:.34in; height:.34in; border:.02in solid var(--line); border-radius:.06in; background:#fff; display:flex; align-items:center; justify-content:center; font-family:'Cinzel'; font-weight:800; font-size:13pt; }
+.card .cdlabel { font-family:'Alegreya SC'; font-size:7pt; letter-spacing:.06em; color:var(--muted); text-align:left; line-height:1.2; }
+.card .ticks { display:flex; gap:.05in; justify-content:center; margin-top:.04in; }
+.card .tick { width:.16in; height:.16in; border:.014in solid var(--line); border-radius:.02in; background:#fff; }
+.card .stats { display:flex; gap:.04in; justify-content:center; margin-top:.2in; }
+.card .stat { flex:1; border:.016in solid var(--line); border-radius:.04in; background:#fff; text-align:center; padding:.02in 0 .015in; }
+.card .stat .v { font-family:'Cinzel'; font-weight:800; font-size:12.5pt; line-height:1; }
+.card .stat .k { font-family:'Alegreya SC'; font-size:6pt; letter-spacing:.05em; color:var(--muted); }
+.card .loot { margin-top:.05in; font-size:8pt; line-height:1.3; }
+.card .loot .h { font-family:'Alegreya SC'; font-weight:700; font-size:7pt; letter-spacing:.08em; color:var(--muted); text-align:center; margin-bottom:.01in; }
+.card .loot .row { display:flex; justify-content:space-between; border-bottom:.008in dotted var(--gold2); padding:0 .1in; }
+.card .special { font-size:7.4pt; line-height:1.25; margin-top:.04in; }
+.card .special p { margin:0 0 .02in; }
+.card .nameline { margin-top:.2in; display:flex; align-items:flex-end; gap:.06in; }
+.card .nameline .k { font-family:'Alegreya SC'; font-size:7pt; letter-spacing:.08em; color:var(--muted); }
+.card .nameline .line { flex:1; border-bottom:.014in solid var(--line); height:.22in; }
+.card .slots { display:grid; grid-template-columns:1fr 1fr; gap:.02in .08in; margin-top:.05in; font-family:'Alegreya SC'; font-size:6.6pt; letter-spacing:.04em; color:var(--muted); }
+.card .slots div::before { content:"☐ "; }
+.card.fan { --parch:#e9e2f2; --parch2:#ddd3ec; --gold:#c8b3ee; --gold2:#8f76c4; --stone:#2d2540; }
+.card.player .art { height:1.55in; }
+.card.monster .art { height:1.25in; }
+.card.monster.boss .art { height:1.05in; }
+.card.companion .art { height:1.0in; }
+.card.text .art { height:1.0in; }
+.card.spell .art { height:1.1in; }
+.card.text .rules { font-size:9.5pt; font-style:italic; }
+/* ---- backs: white, one thin stroke, outlined type. Minimal toner. ---- */
+.card.back { background:#fff; border:none; padding:.1in; align-items:center; justify-content:center; gap:.1in; }
+.card.back::before { display:none; }
+.card.back .glyph { font-size:30pt; line-height:1; filter:grayscale(1); opacity:.6; }
+.card.back .word { font-family:'Cinzel'; font-weight:800; font-size:21pt; letter-spacing:.1em; color:var(--deck); text-align:center; line-height:1.1; }
+.card.back .word.small { font-size:16pt; }
+.card.back .sub { font-family:'Alegreya SC'; font-size:7.5pt; letter-spacing:.2em; color:var(--deck); opacity:.85; }
+/* ---- envelope labels: 4 x 2 in, low ink ---- */
+.label { position:relative; width:4in; height:2in; box-sizing:border-box; border:.02in solid #333; border-radius:0; background:#fff; padding:.12in .18in .1in .3in; display:flex; flex-direction:column; justify-content:center;
+  font-family:'Alegreya', Georgia, serif; color:#111; overflow:hidden; -webkit-print-color-adjust:exact; print-color-adjust:exact; break-inside:avoid; }
+.label .stripe { position:absolute; left:0; top:0; bottom:0; width:.14in; background:var(--tier); }
+.label .tier { font-family:'Alegreya SC'; font-weight:700; font-size:8.5pt; letter-spacing:.2em; color:var(--tier); }
+.label .name { font-family:'Cinzel'; font-weight:800; font-size:17pt; line-height:1.1; margin:.02in 0 .05in; }
+.label .name.long { font-size:13.5pt; }
+.label .trig { font-size:11pt; line-height:1.3; }
+.label .warn { position:absolute; right:.15in; bottom:.08in; font-family:'Alegreya SC'; font-size:6.5pt; letter-spacing:.15em; color:#777; }
+`;
+
+const TIER_COLOR: Record<string, string> = { Bronze: "#8a5a2b", Silver: "#6f7a86", Gold: "#b8862b", Platinum: "#3b4756", Companion: "#2f6f6b" };
+
+function bannerClass(name: string) { return name.length > 22 ? "xlong" : name.length > 16 ? "long" : ""; }
+
+function chips(c: Card): string {
+  const out: string[] = [];
+  if (c.type === "spell") out.push(`Spellbook · Mind ${c.mind}+`);
+  else if (c.type === "scroll") out.push("Scroll · One use");
+  else if (c.type === "consumable") out.push("One use");
+  else if (c.type === "companion") out.push("Companion");
+  else if (c.slot) out.push(c.slot);
+  if (c.deck === "kit") out.push("Starting kit");
+  return out.map(t => `<span class="chip">${esc(t)}</span>`).join("");
+}
+
+function artBlock(c: Card, artUrl: string | null, name = c.name): string {
+  const inner = name ? `<div class="banner ${bannerClass(name)}">${esc(name)}</div>` : "";
+  return artUrl
+    ? `<div class="art" style="background-image:url('${artUrl}')">${inner}</div>`
+    : `<div class="art noart">no art yet${inner}</div>`;
+}
+
+function statsRow(s: NonNullable<Card["stats"]>): string {
+  const cell = (v: string | number, k: string) => `<div class="stat"><div class="v">${v}</div><div class="k">${k}</div></div>`;
+  return `<div class="stats">${cell(s.att, "Attack")}${cell(s.def, "Defend")}${cell(s.hp, "Health")}${cell(s.mind, "Mind")}${cell(s.move, "Move")}</div>`;
+}
+
+export function renderFront(c: Card, artUrl: string | null): string {
+  if (c.type === "envelope") return renderLabel(c);
+  const deck = DECK_COLOR[c.deck];
+  const foot = `<div class="foot"><span>${esc(DECK_NAMES[c.deck])}</span><span>Floor 1</span></div>`;
+  const cls = `card ${c.type} ${c.deck === "fan" ? "fan" : ""}`;
+  const style = `--deck:${deck}`;
+
+  if (c.type === "monster") {
+    const s = c.stats!;
+    const loot = `<div class="loot"><div class="h">Loot · roll a d6</div>${c.loot!.map(l => {
+      const [a, ...rest] = l.split(/\s{2,}/); return rest.length ? `<div class="row"><span>${esc(a)}</span><span>${esc(rest.join(" "))}</span></div>` : `<div class="row"><span style="flex:1;text-align:center">${esc(l)}</span></div>`;
+    }).join("")}</div>`;
+    const special = c.special?.length ? `<div class="special">${c.special.map(p => `<p><b>${esc(p.split(":")[0])}:</b>${esc(p.slice(p.indexOf(":") + 1))}</p>`).join("")}</div>` : "";
+    const rules = c.rules ? `<div class="rules" style="flex:none;margin-top:.03in">${esc(c.rules)}</div>` : "";
+    return `<div class="${cls}${c.special?.length ? " boss" : ""}" style="${style}">${artBlock(c, artUrl)}${statsRow(s)}${loot}${special}${rules}<div style="flex:1"></div>${c.flavor ? `<div class="flavor">${esc(c.flavor)}</div>` : ""}${foot}</div>`;
+  }
+  if (c.type === "player") {
+    const slots = ["Main hand", "Off hand", "Body", "Head", "Feet", "Trinket ×2"].map(s => `<div>${s}</div>`).join("");
+    return `<div class="${cls}" style="${style}">${artBlock(c, artUrl, "")}
+      <div class="nameline"><span class="k">Name</span><span class="line"></span></div>
+      ${statsRow(c.stats!)}
+      <div class="slots">${slots}</div>
+      <div style="flex:1"></div>
+      <div class="flavor">You are a regular person. Loot will fix that.</div>${foot}</div>`;
+  }
+  const cooldown = c.type === "spell"
+    ? `<div class="cd"><div class="die">${c.cooldown}</div><div class="cdlabel">Cooldown<br>set a die here</div></div>
+       <div class="ticks">${"<div class=\"tick\"></div>".repeat(5)}</div>`
+    : "";
+  return `<div class="${cls}" style="${style}">${artBlock(c, artUrl)}
+    <div class="meta">${chips(c)}</div>
+    <div class="rules">${esc(c.rules)}</div>
+    ${cooldown}
+    ${c.flavor ? `<div class="flavor">${esc(c.flavor)}</div>` : ""}${foot}</div>`;
+}
+
+export function renderBack(c: Card): string {
+  if (c.type === "envelope") return "";
+  const deck = DECK_COLOR[c.deck];
+  const word = DECK_NAMES[c.deck].toUpperCase();
+  const sub = c.deck === "player" ? "pick one · name yourself" : c.deck === "monster" ? "for the announcer" : c.deck === "fan" ? "viewers only" : c.deck === "lootbox" ? "do not peek" : "floor 1";
+  return `<div class="card back" style="--deck:${deck}"><div class="glyph">${DECK_GLYPH[c.deck]}</div><div class="word ${word.length > 8 ? "small" : ""}">${esc(word)}</div><div class="sub">${esc(sub)}</div></div>`;
+}
+
+export function renderLabel(c: Card): string {
+  const tier = TIER_COLOR[c.tier ?? "Bronze"];
+  return `<div class="label" style="--tier:${tier}"><div class="stripe"></div>
+    <div class="tier">${esc(c.tier ?? "")} loot box</div>
+    <div class="name ${c.name.length > 18 ? "long" : ""}">${esc(c.name)}</div>
+    <div class="trig">${esc(c.trigger ?? "")}</div>
+    <div class="warn">do not open until earned</div></div>`;
+}
+
+/** A complete print document: letter pages, cards flush in a 3x3 grid, cut marks in the margins,
+ *  each front page followed by its back page mirrored for duplex. */
+export function renderPrint(items: { card: Card; art: string | null }[], opts: { flip: "long" | "short"; perPage: 6 | 9; title: string; flipUrl: string; backDx: number; backDy: number; nudge: (dx: number, dy: number) => string }): string {
+  const cardsOnly = items.filter(i => i.card.type !== "envelope");
+  const labels = items.filter(i => i.card.type === "envelope");
+  const cols = 3, rows = opts.perPage / 3;
+  const W = 2.5, H = 3.5, PW = 8.5, PH = 11;
+  const gx = (PW - cols * W) / 2, gy = (PH - rows * H) / 2;
+  const pages: string[] = [];
+
+  const marks = () => {
+    const m: string[] = [];
+    for (let c = 0; c <= cols; c++) { const x = gx + c * W; m.push(`<i style="left:${x}in;top:0;height:${gy - .08}in;border-left:1px solid #999"></i><i style="left:${x}in;bottom:0;height:${gy - .08}in;border-left:1px solid #999"></i>`); }
+    for (let r = 0; r <= rows; r++) { const y = gy + r * H; m.push(`<i style="top:${y}in;left:0;width:${gx - .08}in;border-top:1px solid #999"></i><i style="top:${y}in;right:0;width:${gx - .08}in;border-top:1px solid #999"></i>`); }
+    return m.join("");
+  };
+  const shift = `transform:translate(${opts.backDx}mm,${opts.backDy}mm)`;
+  const page = (cells: string[], back: boolean) => {
+    const slots = Array.from({ length: opts.perPage }, (_, i) => {
+      let r = Math.floor(i / cols), c = i % cols;
+      if (back) { if (opts.flip === "long") c = cols - 1 - c; else r = rows - 1 - r; }
+      const src = r * cols + c;
+      return `<div class="slot" style="left:${gx + (i % cols) * W}in;top:${gy + Math.floor(i / cols) * H}in;${back ? shift : ""}">${cells[src] ?? ""}</div>`;
+    }).join("");
+    return `<section class="page">${marks()}${slots}</section>`;
+  };
+  for (let i = 0; i < cardsOnly.length; i += opts.perPage) {
+    const chunk = cardsOnly.slice(i, i + opts.perPage);
+    pages.push(page(chunk.map(x => renderFront(x.card, x.art)), false));
+    pages.push(page(chunk.map(x => renderBack(x.card)), true));
+  }
+  // Labels: 2 x 5 per page (Avery 5163 shape), single-sided.
+  for (let i = 0; i < labels.length; i += 10) {
+    const chunk = labels.slice(i, i + 10);
+    const cells = chunk.map((x, j) => `<div class="slot" style="left:${.25 + (j % 2) * 4}in;top:${.5 + Math.floor(j / 2) * 2}in">${renderLabel(x.card)}</div>`).join("");
+    pages.push(`<section class="page">${cells}</section>`);
+  }
+  return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(opts.title)}</title>
+<meta name="color-scheme" content="light only">
+<style>${CARD_CSS}
+@page { size: letter; margin: 0; }
+html { color-scheme: light only; }
+html, body { margin:0; background:#888; }
+.page { position:relative; width:8.5in; height:11in; background:#fff; margin:0 auto .2in; overflow:hidden; page-break-after:always; break-after:page; }
+.page i { position:absolute; display:block; }
+.slot { position:absolute; }
+.bar { position:fixed; top:0; left:0; right:0; background:#222; color:#eee; font:13px system-ui; padding:8px 14px; display:flex; gap:16px; align-items:center; z-index:9; }
+.bar b { color:#fff; } .bar a { color:#9cf; } .bar .nudge a { text-decoration:none; padding:0 4px; border:1px solid #555; border-radius:4px; }
+.spacer { height:40px; }
+@media print { .bar, .spacer { display:none; } body { background:#fff; } .page { margin:0; } }
+</style></head><body>
+<div class="bar"><b>${esc(opts.title)}</b><span>${cardsOnly.length} cards · ${Math.ceil(cardsOnly.length / opts.perPage)} sheets front + back${labels.length ? ` · ${labels.length} labels` : ""}</span>
+<span>Print at 100% scale, duplex, flip on ${opts.flip} edge.</span>
+<span class="nudge">Back offset <a href="${esc(opts.nudge(-0.5, 0))}">&larr;</a> <b>${opts.backDx.toFixed(1)}</b> <a href="${esc(opts.nudge(0.5, 0))}">&rarr;</a> &nbsp; <a href="${esc(opts.nudge(0, -0.5))}">&uarr;</a> <b>${opts.backDy.toFixed(1)}</b> <a href="${esc(opts.nudge(0, 0.5))}">&darr;</a> mm</span>
+<a href="${esc(opts.flipUrl)}">flip on ${opts.flip === "long" ? "short" : "long"} edge instead</a>
+<span style="margin-left:auto">⌘P</span></div>
+<div class="spacer"></div>
+<script>try{localStorage.setItem("cards.backOffset",JSON.stringify({bx:${opts.backDx},by:${opts.backDy}}))}catch{}</script>
+${pages.join("\n")}
+</body></html>`;
+}

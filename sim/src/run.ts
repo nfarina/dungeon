@@ -2,7 +2,7 @@ import { simulate, type Config, type Result } from "./engine";
 import { RNG } from "./rng";
 
 const ALL_OPTIONAL = [3, 4, 6, 7, 8];
-const KIT_NAMES = ["Phone", "HockeyStick", "Multitool", "SnackBag", "Glasses"];
+const KIT_NAMES = ["Slingshot", "HockeyStick", "Multitool", "SnackBag", "Glasses"];
 
 export type Batch = {
   n: number;
