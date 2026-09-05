@@ -71,7 +71,8 @@ export function refArt(c: Card, all?: Card[]): Buffer | null {
 export function expectedHash(c: Card, model = DEFAULT_MODEL, all?: Card[]): string {
   const ref = styleRef();
   const ref2 = refArt(c, all);
-  return sha([model, readStyle(), ref ? sha(ref) : "noref", c.art, ...(c.ref ? [ref2 ? sha(ref2) : "noref2"] : [])].join(" ")).slice(0, 10);
+  // tiles take their shape from the map, so a resize there makes the art stale
+  return sha([model, readStyle(), ref ? sha(ref) : "noref", c.art, ...(c.ref ? [ref2 ? sha(ref2) : "noref2"] : []), ...(c.type === "tile" ? [aspectRatio(c)] : [])].join(" ")).slice(0, 10);
 }
 
 /** Cards that would get the exact same request as `c` (same prompt text and shape), e.g. the four Juice Boxes.

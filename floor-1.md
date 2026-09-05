@@ -31,7 +31,7 @@ Every player starts with:
 Attack and Defend are numbers of combat dice. Heroes block on white shields, monsters block on black shields, exactly like HeroQuest.
 
 **Mind** does three things on this floor:
-- Reading a Spellbook needs Mind 4 or more. Nobody starts there. Whoever finds Mind gear becomes the caster. That's the whole specialization system for spells.
+- Learning a Spellbook needs Mind 4 or more, and so does casting it, every time. Nobody starts there. Whoever wears the Mind gear is the caster, for exactly as long as they wear it. That's the whole specialization system for spells.
 - Picking a lock: roll dice equal to your Mind. Any skull opens it. Failing is loud (see the room notes).
 - Later floors: resisting mind attacks, reading higher spellbooks.
 
@@ -47,7 +47,7 @@ Attack and Defend are numbers of combat dice. Heroes block on white shields, mon
 | Trinket | 2 |
 | Backpack | unlimited, but backpack cards do nothing |
 
-Swap one item between slots and backpack at the start of your turn, free. Consumables can be used from the backpack at any time on your turn without costing your action.
+Out of combat, rearrange your slots and backpack freely at the start of your turn. **In combat**, swapping gear costs your action. You're in combat if a living monster is in your room, can see you, or is already loose in the corridors hunting; the announcer settles arguments. Consumables can be used from the backpack at any time on your turn without costing your action, in or out of combat.
 
 Slots are the equipment specialization system. A two-handed axe means no shield. A chainmail bib means you're slow. Nobody has to be told to specialize; the slots do it.
 
@@ -67,11 +67,11 @@ Death is the thing to avoid at all costs. It is not the end of your evening: see
 
 ### 1.5 Trading
 
-On your turn, hand any card to an adjacent player. Free. Trading is how the right person ends up with the glasses.
+On your turn, hand any card to an adjacent player. Free out of combat; in combat it costs your action, same as swapping gear. Trading is how the right person ends up with the glasses, and doing it under fire is how you lose a turn.
 
 ### 1.6 Turn order at the table
 
-1. Each hero: turn down cooldowns, then move and one action (attack, cast, search for traps, open chest, disarm, use rack) in either order.
+1. Each hero: turn down cooldowns, then move and one action (attack, cast, search for traps, open chest, disarm, use rack, or swap gear or trade while in combat) in either order.
 2. Announcer runs monsters using the rules in section 4.3, so the boys can predict them and the simulator can copy them.
 3. Loot rolls happen the moment a monster dies.
 4. End of round: turn the countdown die down one. At zero, the collapse deals its damage (1.7). Viewers draw.
@@ -145,7 +145,7 @@ The board is Side A, traced into the simulator's map file (`sim/src/content/floo
 
 **Room 9 door:** locked. Open it with the Skeleton Key, the Fire Axe, or by knocking. If you knock, the two Orcs open it and each get a free attack on the knocker before the round starts. There is always a way in; it's just not always a good way.
 
-**Room 9 pit:** Greg had a pit installed in front of his desk last week for visitor management and hasn't told the Orcs. They don't know it's there until one of them finds out. Anything Shoved, Whistled, or otherwise persuaded across it goes in, and most things on this floor have 1 Health.
+**Room 9 pit:** Greg had a pit installed beside his desk for visitor management. The Orcs step around it every morning. Anything Shoved across it does not get to step around it, and most things on this floor have 1 Health.
 
 **Monster count:** 7 Goblins, 4 Orcs, 3 Skeletons, 3 Zombies, 1 Abomination, 1 boss. Required path only: 9 monsters plus the boss. Substitute whatever cutouts the box actually has; only the stats matter.
 
@@ -192,7 +192,7 @@ Greg is a troll: too big for the room, too small for a dragon, exactly right for
 
 1. A monster moves toward the nearest hero it can reach, by shortest path.
 2. If it ends adjacent to more than one hero, it attacks the one with the fewest Defend dice. Ties: the one with the lowest Health.
-3. It never walks onto a trap it knows about. It happily walks onto one it doesn't (see Shove, and Greg's pit). A trap counts as known to monsters once it's been revealed or triggered.
+3. It never walks onto a trap, revealed or not. Monsters know their own floor. The only way a monster ends up in a trap is if something puts it there: a Shove, a Loose Floorboard. The announcer never has to pretend not to know where a pit is.
 4. Monsters don't leave their room unless the room's door is open and a hero is in line of sight, or something pulls them (Whistle, failed lockpick).
 5. The boss uses Performance Review whenever it's off cooldown, otherwise attacks in melee.
 6. Viewer cards (section 8) override any of the above for the round they're played.
@@ -211,7 +211,7 @@ HeroQuest's traps, with tokens.
 
 **Searching for traps** costs your action and reveals every trap in your room or corridor line of sight. Put tokens down. A **Torch** in the off hand does the same thing automatically when you enter a room.
 
-Monsters can be pushed onto traps (Shove), and the trap goes off on them. This is the best thing on the floor and the boys will find it.
+Monsters never walk into traps on their own, but they can be pushed onto them (Shove) or have one slid under them (Loose Floorboard), and the trap goes off. This is the best thing on the floor and the boys will find it.
 
 ---
 
@@ -272,7 +272,7 @@ Junk and consumables. What a goblin has on him.
 
 Spark starts the floor in the Armory rack and the Fire Axe starts in the Trap Chef envelope, so seven cards are actually shuffled.
 
-**Learning a Spellbook** costs your action and needs Mind 4 or more at that moment. Once learned, it's yours: put it in front of you, it doesn't use a slot, and it stays with you across floors. A learned book can't be traded. Scrolls can.
+**Learning a Spellbook** costs your action and needs Mind 4 or more. **Casting** needs Mind 4 or more too, every time. Take the glasses off and the book is just a book until you put them back on, so passing the glasses around the table to learn everything gets you three people who can't cast. Once learned, it's yours: put it in front of you, it doesn't use a slot, and it stays with you across floors. A learned book can't be traded. Scrolls can.
 
 **Future hook:** every learned spell card gets five tick boxes. Fill them by casting and the spell levels up on the next floor (Nick generates the level 2 card). Not on Floor 1, but print the boxes now.
 
@@ -290,7 +290,7 @@ Envelopes. Each has a printed label with the achievement name and its trigger on
 | **Why Would You Do That** | Bronze | Reach into the toilet | 1 Energy Drink, 1 Gold (2). Sticky. |
 | **Nerd** | Gold | First player to learn a Spellbook | Scroll: Firebolt, Bookmark |
 | **Sharing Is Caring** | Bronze | Give an item to another player | 2 gold. This fires on turn one of every game. It's a handout that teaches trading, so it's priced like one. |
-| **Trap Chef** | Gold | A monster dies from a trap | Fire Axe |
+| **Trap Chef** | Gold | A monster dies from a trap (they never walk in on their own, so this means Shove or a Loose Floorboard) | Fire Axe |
 | **Cartographer** | Silver | Open the doors to seven of the nine rooms | 5 gold |
 | **Sir Reginald** | Companion | Open the cage in Room 6 | The goose. See below. |
 | **Backseat Driver** | Bronze | A Viewer's card causes a monster's death | 3 gold for the Viewer, delivered on Floor 2 |

@@ -140,6 +140,10 @@ svg{display:block; touch-action:none; max-width:100%; user-select:none}
 .issues li::before{content:"▲"; position:absolute; left:0; color:var(--danger); font-size:9px; top:6px}
 .issues li.ok::before{content:"✓"; color:var(--ok)}
 .mono-sm{font-size:11px; color:var(--muted); word-break:break-all}
+.dmstats{display:flex; gap:6px; margin:6px 0 4px}
+.dmstats div{flex:1; text-align:center; border:1px solid var(--line-2); border-radius:4px; padding:4px 2px; background:var(--paper)}
+.dmstats b{display:block; font-size:16px}
+.dmstats span{font-size:9.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em}
 
 .key{list-style:none; margin:0; padding:0; font-size:11.5px; line-height:1.5; color:var(--ink-2)}
 .key li{display:flex; align-items:center; gap:8px; padding:2px 0}
@@ -169,7 +173,6 @@ svg{display:block; touch-action:none; max-width:100%; user-select:none}
   display:flex; gap:8px; align-items:baseline; padding:6px 7px; border-radius:4px; cursor:pointer; font-size:12.5px;
 }
 .roster li:hover{background:var(--sunk)}
-.roster li.done{opacity:.45; text-decoration:line-through}
 .roster li.req{box-shadow:inset 2px 0 0 var(--amber)}
 .roster .n{color:var(--muted); width:14px; flex:none}
 .roster .m{margin-left:auto; color:var(--muted); font-size:11px; white-space:nowrap}
@@ -290,8 +293,45 @@ const FEATURES = {
   blocker:{g:"▦",n:"Furniture",blocks:true},
 };
 const TRAPS = { pit:{g:"◍",n:"Pit"}, spear:{g:"✕",n:"Spear"} };
+/* Generic furniture that has its own printed tile. The tool value is "blocker:<label>"; the card workshop matches tiles by the label. */
+const BLOCKER_PRESETS = ["Desk", "Tiny Chairs", "Welcome Sign"];
+const furnTool = () => { const [kind, ...rest] = (tool.furniture || "").split(":"); return { kind, label: rest.join(":") || undefined }; };
 const DOORS = { normal:"Door", locked:"Locked", secret:"Secret", block:"Falling block" };
 const MONSTERS = ["goblin","orc","skeleton","zombie","abomination","boss"];
+
+/* What the DM sees when tapping a square. Mirrors the printed cards and floor-1.md; keep them in step. */
+const DM_MONSTERS = {
+  goblin:      { n:"Goblin", att:2, def:1, hp:1, mind:1, move:"10", loot:"1–3 nothing · 4–6 Pockets", flavor:"Unpaid intern. Has pockets. Full of stuff that isn't his." },
+  orc:         { n:"Orc", att:3, def:2, hp:1, mind:2, move:"8", loot:"1–2 nothing · 3–4 Pockets · 5–6 Gear", flavor:"Middle management. Hits hard, dies to a table leg." },
+  skeleton:    { n:"Skeleton", att:2, def:2, hp:1, mind:0, move:"6", loot:"1–4 nothing · 5 Pockets · 6 Gear", rules:"Immune to Sleep.", flavor:"No pockets. No brain. Occasionally a coin falls out." },
+  zombie:      { n:"Zombie", att:2, def:3, hp:1, mind:0, move:"5", loot:"1–3 nothing · 4 Pockets · 5–6 Gear", rules:"Immune to Sleep.", flavor:"Was somebody once. Still wearing their stuff." },
+  abomination: { n:"Abomination", att:3, def:3, hp:2, mind:3, move:"6", loot:"1–3 Gear · 4–6 Big Gear", flavor:"Big. Sad. Guards a goose for reasons it will not explain." },
+  boss:        { n:"The Floor Manager (Greg)", att:3, def:3, hp:4, mind:4, move:"6", loot:"Boss Box, plus one Big Gear to whoever carries the least",
+    rules:"Performance Review (cooldown 2): 2 attack dice at any hero in line of sight, aimed at whoever carries the most equipment. Delegation: while either Orc lives, defends with 4 dice instead of 3.",
+    flavor:"A troll named Greg." },
+};
+const DM_TRAPS = {
+  pit:   "Step on it: 1 damage and movement ends. Climbing out costs an action (free with a Rope, which also crosses a revealed pit). Monsters take it too, and most have 1 Health. Disarm with a Multitool or Trap Kit, or walk around it once revealed.",
+  spear: "Step on it: roll 1 combat die, skull = 2 damage, otherwise 1. Disarm with a Multitool or Trap Kit.",
+};
+const DM_DOORS = {
+  normal: "Opens as you walk through.",
+  locked: "Locked. Opens with a Skeleton Key, a Fire Axe, or Knock.",
+  secret: "Secret door. Players don't know it's there until someone searches or walks past it with a Torch.",
+  block:  "Falling block. 2 damage to whoever opens it unless they roll a white shield on 1 die. The block then fills the doorway: come in the other way or spend an action clearing it. A Football Helmet eats the damage.",
+};
+const DM_BLOCK = DM_DOORS.block;
+const DM_FEATURES = {
+  entrance: "Where the party comes in.",
+  stairs:   "Stairs down. Any hero on one of these squares at the end of a round has escaped the floor. Leaving with Greg alive forfeits the Boss Box.",
+  chest:    "Locked chest: 1 Big Gear draw. Opening it is an action and needs a Skeleton Key or a Fire Axe.",
+  rack:     "Weapon rack: 1 Gear draw plus the Spellbook: Spark. Using it is an action.",
+  table:    "Table: 1 Pockets draw, as an action.",
+  shelf:    "Bookshelf: 1 Big Gear draw if the reader has Mind 4 or more, otherwise 1 Gear draw. An action.",
+  toilet:   "Reach in as an action: 1 Pockets draw, and the Why Would You Do That loot box. Be audibly disgusted.",
+  cage:     "Open it as an action. Sir Reginald the goose joins whoever opened it, and does not like them. Hand over the Companion envelope.",
+  blocker:  "Blocks movement. Nothing to search.",
+};
 const MONSTER_GLYPH = { goblin:"g", orc:"O", skeleton:"S", zombie:"Z", abomination:"A", boss:"★" };
 
 const LAYERS = [
@@ -309,7 +349,7 @@ let vis = {}, lock = {}, active = "board", tool = {};
 let sel = null, mode = "edit", undoStack = [], dirty = false;
 let paintMode = localStorage.getItem("dungeon.paintMode") || "rect";
 let drag = null;                      // {x0,y0,x1,y1} while dragging out a rectangle
-let play = { cleared:{}, opened:{}, round:1, count:26 };
+let play = { round:1, count:26 };
 
 const $ = s => document.querySelector(s);
 const el = (t, a = {}, kids = []) => {
@@ -466,7 +506,7 @@ const playKey = () => "dungeon.play." + name;
 function loadPlay() {
   try { play = JSON.parse(localStorage.getItem(playKey())) || play; }
   catch { /* keep defaults */ }
-  play.cleared ??= {}; play.opened ??= {}; play.round ??= 1; play.count ??= 26;
+  play.round ??= 1; play.count ??= 26;
 }
 function savePlay() { localStorage.setItem(playKey(), JSON.stringify(play)); }
 
@@ -560,7 +600,7 @@ function drawMap() {
     let fill = "var(--corridor)";
     if (isRoomChar(ch)) {
       // in play -> tinted by floor number; not in play -> stone this floor
-      fill = room ? (play.cleared[room.id] && mode === "dm" ? "var(--sunk)" : roomTint(room.id))
+      fill = room ? roomTint(room.id)
                   : (vis.board ? boardTint(ch) : "var(--stone)");
       if (!room && !vis.board) fill = "var(--stone)";
     }
@@ -608,12 +648,11 @@ function drawMap() {
       const g = CS * .34;
       if (horiz) { seg(a[0],a[1],mid[0]-g,a[1]); seg(mid[0]+g,a[1],a[2],a[3]); }
       else       { seg(a[0],a[1],a[0],mid[1]-g); seg(a[0],mid[1]+g,a[2],a[3]); }
-      const opened = play.opened[doorKey(normDoor(x, y, dir))] && mode === "dm";
       const col = d.kind === "secret" ? "var(--muted)" : d.kind === "locked" ? "var(--danger)" : "var(--amber)";
       const dash = d.kind === "secret" ? ' stroke-dasharray="3 3"' : "";
       const bar = horiz ? `<line x1="${mid[0]-g}" y1="${a[1]}" x2="${mid[0]+g}" y2="${a[1]}"`
                         : `<line x1="${a[0]}" y1="${mid[1]-g}" x2="${a[0]}" y2="${mid[1]+g}"`;
-      p.push(`${bar} stroke="${col}" stroke-width="${opened ? 2 : 5}" stroke-linecap="round"${dash}/>`);
+      p.push(`${bar} stroke="${col}" stroke-width="5" stroke-linecap="round"${dash}/>`);
       if (d.trap === "block") p.push(`<circle cx="${mid[0]}" cy="${mid[1]}" r="${CS*.16}" fill="var(--danger)"/>`);
     }
   }
@@ -712,7 +751,7 @@ function drawTools() {
   const L = LAYERS.find(l => l.id === active);
   pane.append(el("h2", {}, mode === "dm" ? "Layer" : "Tools — " + L.name));
   if (mode === "dm") {
-    pane.append(el("p", { class:"hint" }, "Tap a room to mark it cleared, or a door to open it. Switch to Edit to change the map."));
+    pane.append(el("p", { class:"hint" }, "Tap any square to see what's there: the room, the monster standing on it, traps, furniture and doors, with the rules. Switch to Edit to change the map."));
     return;
   }
   if (lock[active]) {
@@ -733,8 +772,27 @@ function drawTools() {
     for (const [k, n] of Object.entries(DOORS)) t.append(tbtn("doors", k, n));
     t.append(tbtn("doors", "erase", "Remove"));
   } else if (active === "furniture") {
-    for (const [k, FF] of Object.entries(FEATURES)) t.append(tbtn("furniture", k, " " + FF.n, FF.g));
+    for (const [k, FF] of Object.entries(FEATURES)) if (k !== "blocker") t.append(tbtn("furniture", k, " " + FF.n, FF.g));
+    for (const name of BLOCKER_PRESETS) t.append(tbtn("furniture", "blocker:" + name, " " + name, FEATURES.blocker.g));
+    t.append(tbtn("furniture", "blocker", " Other furniture", FEATURES.blocker.g));
     t.append(tbtn("furniture", "erase", "Remove"));
+    pane.append(t);
+    pane.append(el("p", { class:"hint" }, "Drag a rectangle to place a piece at that size. Tap a placed piece to rename or resize it."));
+    const placed = [...F().features].sort((a, b) => a.y - b.y || a.x - b.x);
+    if (placed.length) {
+      pane.append(el("h2", { style:"margin-top:12px" }, "On the map"));
+      const ul = el("ul", { class:"roster" });
+      for (const f of placed) {
+        const FF = FEATURES[f.kind]; if (!FF) continue;
+        const cur = sel && sel.type === "cell" && featAt(sel.x, sel.y) >= 0 && F().features[featAt(sel.x, sel.y)] === f;
+        const li = el("li", { class: cur ? "req" : "", onclick: () => { sel = { type:"cell", x:f.x, y:f.y }; render(); } });
+        const unnamed = f.kind === "blocker" && !f.label;
+        li.append(el("span", { class:"n" }, FF.g), el("span", unnamed ? { style:"color:var(--danger)" } : {}, unnamed ? "Furniture — needs a label" : (f.label || FF.n)), el("span", { class:"m" }, `${f.w || 1}×${f.h || 1}`));
+        ul.append(li);
+      }
+      pane.append(ul);
+    }
+    return;
   } else if (active === "traps") {
     for (const [k, T] of Object.entries(TRAPS)) t.append(tbtn("traps", k, " " + T.n, T.g));
     t.append(tbtn("traps", "erase", "Remove"));
@@ -791,6 +849,8 @@ function takeOutOfPlay(letter) {
 /* ---------- inspector ---------- */
 function drawSel() {
   const pane = $("#selPane"); pane.innerHTML = "";
+  pane.hidden = mode === "dm" && !sel;   // in DM mode the Floor settings are just clutter
+  if (pane.hidden) return;
   if (!sel) {
     pane.append(el("h2", {}, "Floor"));
     pane.append(field("Floor name", F().name, v => { F().name = v; dirty = true; }));
@@ -811,7 +871,6 @@ function drawSel() {
       pane.append(el("p", { class:"disp", style:"font-size:20px" }, r.name));
       pane.append(el("p", { class:"mono-sm", style:"margin:4px 0 8px" }, r.monsters.length ? r.monsters.join(" · ") : "no monsters"));
       if (r.note) pane.append(el("p", { class:"hint" }, r.note));
-      pane.append(checkbox("Cleared", !!play.cleared[r.id], v => { play.cleared[r.id] = v; savePlay(); render(); }));
       return;
     }
     if (!r) {
@@ -837,15 +896,76 @@ function drawSel() {
     return;
   }
   const { x, y } = sel;
+  if (mode === "dm") { drawDmCell(pane, x, y); return; }
   pane.append(el("h2", {}, `Square ${x}, ${y}`));
   const c = at(x, y), r = roomAt(x, y);
   pane.append(el("p", { class:"mono-sm" },
     (isRoomChar(c) ? (r ? `room ${r.id} — ${r.name}` : `possible room ${c} — not in play, stone`) : "corridor")
     + (stoneAt(x, y) ? " · stone laid over it" : "")));
   const fi = featAt(x, y), ti = trapAt(x, y);
-  if (fi >= 0) { const f = F().features[fi]; pane.append(el("p", { class:"mono-sm" }, `${FEATURES[f.kind].g} ${FEATURES[f.kind].n} · ${f.w || 1}×${f.h || 1} at ${f.x},${f.y}${f.label ? " · " + f.label : ""}`)); }
+  if (fi >= 0) {
+    const f = F().features[fi], FF = FEATURES[f.kind];
+    pane.append(el("h2", { style:"margin-top:12px" }, `${FF.g} ${FF.n} at ${f.x},${f.y}`));
+    if (lock.furniture) pane.append(el("p", { class:"mono-sm" }, `${f.label || FF.n} · ${f.w || 1}×${f.h || 1}`));
+    else {
+      pane.append(field("Label (shown on the map)", f.label || "", v => { if (v.trim()) f.label = v; else delete f.label; dirty = true; drawMap(); }));
+      const size = el("div", { class:"row" });
+      const setSize = (w, h) => {
+        w = Math.max(1, Math.min(B().w - f.x, Math.round(w) || 1)); h = Math.max(1, Math.min(B().h - f.y, Math.round(h) || 1));
+        if (w > 1) f.w = w; else delete f.w;
+        if (h > 1) f.h = h; else delete f.h;
+        dirty = true; render();
+      };
+      size.append(numField("Width", f.w || 1, v => setSize(v, f.h || 1)), numField("Height", f.h || 1, v => setSize(f.w || 1, v)));
+      pane.append(size);
+      pane.append(el("p", { class:"hint" }, "The piece grows right and down from its top-left square. Anything it lands on stays put, so check the Issues pane."));
+      pane.append(el("button", { onclick: () => { snapshot(); F().features.splice(fi, 1); sel = null; dirty = true; render(); } }, "Remove piece"));
+    }
+  }
   if (ti >= 0) pane.append(el("p", { class:"mono-sm" }, TRAPS[F().traps[ti].kind].g + " " + TRAPS[F().traps[ti].kind].n + " trap"));
 }
+/** DM mode: everything on and around one square, with the rules, so nobody has to find the card. */
+function drawDmCell(pane, x, y) {
+  const c = at(x, y), r = roomAt(x, y);
+  const section = (title, body, cls = "hint") => { pane.append(el("h2", { style:"margin-top:12px" }, title)); if (body) pane.append(el("p", { class:cls, style:"margin-top:4px" }, body)); };
+  pane.append(el("h2", {}, `Square ${x}, ${y}`));
+  const place = stoneAt(x, y) ? "Solid stone" : isRoomChar(c) ? (r ? `Room ${r.id} — ${r.name}${r.required ? " (required)" : ""}` : `Possible room ${c}, not in play: stone`) : "Corridor";
+  pane.append(el("p", { class:"disp", style:"font-size:17px;margin-top:2px" }, place));
+  if (r) {
+    const placed = placedIn(r.at);
+    pane.append(el("p", { class:"mono-sm", style:"margin:4px 0 0" }, placed.length ? "Spawns: " + placed.map(m => DM_MONSTERS[m.id]?.n ?? m.id).join(", ") : r.monsters.length ? "Spawns: " + r.monsters.join(", ") : "No monsters"));
+    if (r.note) pane.append(el("p", { class:"hint" }, r.note));
+  }
+  const mi = monAt(x, y);
+  if (mi >= 0) {
+    const m = DM_MONSTERS[F().monsters[mi].id];
+    if (m) {
+      section(`${MONSTER_GLYPH[F().monsters[mi].id] || "?"} ${m.n}`);
+      const stats = el("div", { class:"dmstats" });
+      for (const [k, v] of [["Att", m.att], ["Def", m.def], ["Health", m.hp], ["Mind", m.mind], ["Move", m.move]]) stats.append(el("div", {}, [el("b", {}, String(v)), el("span", {}, k)]));
+      pane.append(stats);
+      if (m.rules) pane.append(el("p", { class:"hint", style:"color:var(--ink)" }, m.rules));
+      pane.append(el("p", { class:"hint" }, "Loot (d6): " + m.loot));
+      pane.append(el("p", { class:"hint", style:"font-style:italic" }, m.flavor));
+    }
+  }
+  const ti = trapAt(x, y);
+  if (ti >= 0) { const t = F().traps[ti]; section(`${TRAPS[t.kind].g} ${TRAPS[t.kind].n} trap`, DM_TRAPS[t.kind]); }
+  const fi = featAt(x, y);
+  if (fi >= 0) {
+    const f = F().features[fi], FF = FEATURES[f.kind];
+    section(`${FF.g} ${f.label || FF.n}${(f.w || 1) > 1 || (f.h || 1) > 1 ? ` · ${f.w || 1}×${f.h || 1}` : ""}`, DM_FEATURES[f.kind]);
+  }
+  for (const dir of ["N", "E", "S", "W"]) {
+    const di = findDoor(x, y, dir);
+    if (di < 0) continue;
+    const d = F().doors[di];
+    const name = { N:"north", E:"east", S:"south", W:"west" }[dir];
+    section(`Door on the ${name} wall — ${DOORS[d.kind] || d.kind}${d.trap === "block" ? ", falling block" : ""}`,
+      d.trap === "block" ? DM_BLOCK : (DM_DOORS[d.kind] || ""));
+  }
+}
+
 function field(label, val, on, kind = "input", focus = false) {
   const inp = el(kind === "textarea" ? "textarea" : "input", {});
   inp.value = val;
@@ -896,7 +1016,7 @@ function drawClock() {
   pane.append(el("div", { class:"tools", style:"margin-top:9px" }, [
     el("button", { onclick: () => { play.round++; play.count--; savePlay(); render(); } }, "End round"),
     el("button", { class:"on", onclick: () => { play.count = Math.min(play.count, 5); savePlay(); render(); } }, "Reset! (→5)"),
-    el("button", { onclick: () => { play.round = 1; play.count = 26; play.cleared = {}; play.opened = {}; savePlay(); render(); } }, "New floor"),
+    el("button", { onclick: () => { play.round = 1; play.count = 26; savePlay(); render(); } }, "New floor"),
   ]));
   pane.append(el("p", { class:"hint" }, "Each round: heroes (cooldowns down, move + action) → monsters (4.3) → loot rolls as they die → End round: die down, collapse damage at zero, Viewers draw."));
 }
@@ -1022,12 +1142,8 @@ function drawRoster() {
   pane.append(el("h2", {}, mode === "dm" ? "Rooms" : "Rooms this floor"));
   const ul = el("ul", { class:"roster" });
   for (const r of [...F().rooms].sort((a, b) => a.id - b.id)) {
-    const li = el("li", { class:(play.cleared[r.id] && mode === "dm" ? "done " : "") + (r.required ? "req" : ""),
-      onclick: () => {
-        if (mode === "dm") { play.cleared[r.id] = !play.cleared[r.id]; savePlay(); }
-        else active = "inplay";
-        sel = { type:"room", at:r.at }; render();
-      } });
+    const li = el("li", { class:(r.required ? "req" : ""),
+      onclick: () => { if (mode !== "dm") active = "inplay"; sel = { type:"room", at:r.at }; render(); } });
     li.append(el("span", { class:"n" }, String(r.id)), el("span", {}, r.name),
       el("span", { class:"m" }, r.monsters.join(" ")));
     ul.append(li);
@@ -1105,9 +1221,13 @@ function fillBox(b) {
   if (active === "furniture") {
     const w = b.x1 - b.x0 + 1, h = b.y1 - b.y0 + 1;
     // anything already under the new footprint goes; entrance and stairs are unique
-    F().features = F().features.filter(f => !featCells(f).some(c => c.x >= b.x0 && c.x <= b.x1 && c.y >= b.y0 && c.y <= b.y1));
-    if (tool.furniture === "entrance" || tool.furniture === "stairs") F().features = F().features.filter(f => f.kind !== tool.furniture);
-    F().features.push({ x:b.x0, y:b.y0, kind: tool.furniture, ...(w > 1 || h > 1 ? { w, h } : {}) });
+    const under = F().features.filter(f => featCells(f).some(c => c.x >= b.x0 && c.x <= b.x1 && c.y >= b.y0 && c.y <= b.y1));
+    F().features = F().features.filter(f => !under.includes(f));
+    const { kind, label: preset } = furnTool();
+    if (kind === "entrance" || kind === "stairs") F().features = F().features.filter(f => f.kind !== kind);
+    // a preset carries its label; redrawing a labelled piece at a new size keeps its label (the card workshop matches tiles by it)
+    const label = preset ?? under.find(f => f.kind === kind && f.label)?.label;
+    F().features.push({ x:b.x0, y:b.y0, kind, ...(label ? { label } : {}), ...(w > 1 || h > 1 ? { w, h } : {}) });
     sel = { type:"cell", x:b.x0, y:b.y0 }; dirty = true; render(); return;
   }
   for (let y = b.y0; y <= b.y1; y++) for (let x = b.x0; x <= b.x1; x++) {
@@ -1117,26 +1237,9 @@ function fillBox(b) {
   sel = null; dirty = true; render();
 }
 
-function nearestDoor(x, y, fx, fy) {
-  const px = fx - x, py = fy - y;
-  for (const [dir, d] of [["W", px], ["E", 1 - px], ["N", py], ["S", 1 - py]].sort((a, b) => a[1] - b[1])) {
-    if (d > .3) break;
-    const i = findDoor(x, y, dir);
-    if (i >= 0) return i;
-  }
-  return null;
-}
-
 function apply(c, dragging = false) {
   const { x, y, fx, fy } = c;
-  if (mode === "dm") {
-    const d = nearestDoor(x, y, fx, fy);
-    if (d !== null) { const k = doorKey(F().doors[d]); play.opened[k] = !play.opened[k]; savePlay(); render(); return; }
-    const r = roomAt(x, y);
-    if (r) { play.cleared[r.id] = !play.cleared[r.id]; savePlay(); sel = { type:"room", at:at(x, y) }; }
-    else sel = { type:"cell", x, y };
-    render(); return;
-  }
+  if (mode === "dm") { sel = { type:"cell", x, y }; render(); return; }
   if (lock[active]) { sel = { type:"cell", x, y }; render(); return; }
 
   switch (active) {
@@ -1173,9 +1276,9 @@ function apply(c, dragging = false) {
       const i = featAt(x, y);
       if (i >= 0) F().features.splice(i, 1);
       if (tool.furniture !== "erase") {
-        if (tool.furniture === "entrance" || tool.furniture === "stairs")
-          F().features = F().features.filter(f => f.kind !== tool.furniture);
-        F().features.push({ x, y, kind: tool.furniture });
+        const { kind, label } = furnTool();
+        if (kind === "entrance" || kind === "stairs") F().features = F().features.filter(f => f.kind !== kind);
+        F().features.push({ x, y, kind, ...(label ? { label } : {}) });
       }
       break;
     }

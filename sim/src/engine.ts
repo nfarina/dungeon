@@ -51,6 +51,12 @@ export type Config = {
   guaranteedSpellbook: boolean;
   /** Use the map's placed monster squares (false = scatter every room's list at random). */
   placedMonsters: boolean;
+  /** Rule 4.3.3: monsters never step on any trap (false = only revealed ones, the old rule). */
+  monstersAvoidAllTraps: boolean;
+  /** Rule 6.3: casting needs Mind 4+ every time (false = only learning). */
+  castNeedsMind: boolean;
+  /** Rules 1.2/1.5: swapping gear and trading cost the action in combat (false = always free). */
+  combatSwapCosts: boolean;
   maxRounds: number;
 };
 
@@ -78,6 +84,9 @@ export const DEFAULT_CONFIG: Config = {
   richRack: false,
   guaranteedSpellbook: false,
   placedMonsters: true,
+  monstersAvoidAllTraps: true,
+  castNeedsMind: true,
+  combatSwapCosts: true,
   maxRounds: 80,
 };
 
@@ -92,6 +101,8 @@ export type Hero = {
   gold: number;
   downed: boolean; downedRound: number; exited: boolean; dead: boolean;
   inPit: boolean;
+  /** Gear picked up in combat, waiting for a quiet turn to equip (rule 1.2). */
+  pending: Item[];
   trapImmuneUsed: boolean;
   rerollUsed: boolean;
   capeUsed: boolean;
@@ -236,7 +247,7 @@ export class Game {
         trinkets: [null, null], pack: [], learned: [], gold: 0,
         downed: false, downedRound: -99, exited: false, dead: false, inPit: false,
         trapImmuneUsed: false, rerollUsed: false, capeUsed: false, bookmarkUsed: false, energy: 0, stoneSkin: false,
-        goose: 0, deaths: 0,
+        goose: 0, deaths: 0, pending: [],
       };
       for (const item of KITS[this.cfg.kits[i]].map(clone)) this.give(h, item);
       this.heroes.push(h);
@@ -293,7 +304,26 @@ export class Game {
     if (item.gold) { h.gold += item.gold; this.stats.gold += item.gold; return; }
     if (item.slot === "pack" || item.inert) { h.pack.push(item); return; }
     if (item.slot === "learned") { h.pack.push(item); return; }   // must be learned first
+    // Rule 1.2: swapping gear in combat costs the action. The sim's heroes never spend it;
+    // they hold the item until a quiet turn, which is the conservative reading.
+    if (this.cfg.combatSwapCosts && this.inCombat(h)) { h.pending.push(item); return; }
     this.equipOrStash(h, item);
+  }
+
+  /** Rules 1.2 and 1.5: a living, awake monster in your room, or one already out hunting. */
+  inCombat(h: Hero): boolean {
+    const rid = this.board.roomIdAt(h.pos);
+    return this.monsters.some(m => m.alive && m.asleep === 0 && (m.active || (rid !== null && m.room === rid)));
+  }
+
+  /** A trap that hasn't gone off, on this square, revealed or not. */
+  private isLiveTrap(x: number, y: number): boolean {
+    const k = `${x},${y}`;
+    if (this.spentTraps.has(k)) return false;
+    const rid = this.board.roomIdAt({ x, y });
+    const room = rid !== null ? this.board.rooms.get(rid) : null;
+    if (room?.trap && room.trap.at.x === x && room.trap.at.y === y) return true;
+    return FLOOR1.corridorTraps.some(t => t.at.x === x && t.at.y === y);
   }
 
   private score(i: Item) {
@@ -365,10 +395,12 @@ export class Game {
     return {
       openDoors: this.openDoors, foundSecrets: this.foundSecrets,
       canOpenDoors: false, canUnlock: false,
+      // Rule 4.3.3: monsters know their own floor and never step on a trap, revealed or not.
+      // A live trap is simply not a square they can enter.
       occupied: (x, y) => this.monsters.some(o => o.alive && o !== m && o.pos.x === x && o.pos.y === y)
-        || this.standing().some(h => h.pos.x === x && h.pos.y === y),
-      // rule 3: never walks onto a revealed trap
-      avoid: undefined,
+        || this.standing().some(h => h.pos.x === x && h.pos.y === y)
+        || (this.cfg.monstersAvoidAllTraps ? this.isLiveTrap(x, y) : false),
+      avoid: this.cfg.monstersAvoidAllTraps ? undefined : (x, y) => this.revealedTraps.has(`${x},${y}`) && !this.spentTraps.has(`${x},${y}`),
     };
   }
 
@@ -475,7 +507,7 @@ export class Game {
     const readers = this.standing().filter(h => this.mind(h) >= 4);
     if (!readers.length) return;
     for (const h of this.heroes) {
-      if (h.exited || h.dead) continue;
+      if (h.exited || h.dead || (this.cfg.combatSwapCosts && this.inCombat(h))) continue;   // rule 1.5: trading in combat costs the action
       const books = h.pack.filter(i => i.slot === "learned");
       for (const b of books) {
         const to = readers.find(r => r !== h &&
@@ -517,6 +549,9 @@ export class Game {
     for (const l of h.learned) if (l.cd > 0) l.cd--;
     h.stoneSkin = false;
     if (h.downed) return;
+
+    // Out of combat, gear picked up during a fight gets equipped for free.
+    if (h.pending.length && !this.inCombat(h)) { for (const it of h.pending) this.equipOrStash(h, it); h.pending = []; }
 
     // Free: drink when hurt (consumables cost no action).
     this.maybeHeal(h);
@@ -868,7 +903,8 @@ export class Game {
       const cooling = h.learned.find(l => l.cd > 0 && l.item.spell?.id === "spark");
       if (cooling) { cooling.cd = 0; h.bookmarkUsed = true; }
     }
-    const spark = h.learned.find(l => l.item.spell?.id === "spark" && l.cd === 0);
+    // Rule 6.3: casting needs Mind 4+ every time, not just learning. Glasses off, book closed.
+    const spark = (!this.cfg.castNeedsMind || this.mind(h) >= 4) ? h.learned.find(l => l.item.spell?.id === "spark" && l.cd === 0) : undefined;
     if (spark && (!adjacent(h.pos, target.pos) || 2 > this.atk(h))) {
       spark.cd = spark.item.spell!.cooldown;
       this.resolveAttack(h, target, 2);
@@ -1039,7 +1075,7 @@ export class Game {
         for (const d of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
           const x = h.pos.x + d[0], y = h.pos.y + d[1];
           if (!this.board.inBounds(x, y)) continue;
-          if (this.revealedTraps.has(`${x},${y}`) && !this.spentTraps.has(`${x},${y}`)) continue;
+          if (this.cfg.monstersAvoidAllTraps ? this.isLiveTrap(x, y) : (this.revealedTraps.has(`${x},${y}`) && !this.spentTraps.has(`${x},${y}`))) continue;
           const dist = f.dist[this.board.idx(x, y)];
           if (dist <= m.def.move && dist < bd) { bd = dist; best = { x, y }; victim = h; }
         }
@@ -1048,9 +1084,9 @@ export class Game {
         const path = pathTo(this.board, f, best);
         for (let i = 1; i < path.length; i++) {
           const c = path[i];
-          const k = `${c.x},${c.y}`;
+          if (this.cfg.monstersAvoidAllTraps && this.isLiveTrap(c.x, c.y)) break;   // never, given the policy above
           m.pos = { ...c };
-          if (this.revealedTraps.has(k) && !this.spentTraps.has(k)) break;
+          if (!this.cfg.monstersAvoidAllTraps && this.revealedTraps.has(`${c.x},${c.y}`) && !this.spentTraps.has(`${c.x},${c.y}`)) break;
         }
         if (this.monsterStepTraps(m)) continue;
         if (adjacent(m.pos, victim.pos)) this.monsterAttack(m, victim);
@@ -1079,7 +1115,9 @@ export class Game {
     }
   }
 
-  /** Rule 4.3.3. Returns true if the trap killed it. This is how Trap Chef fires. */
+  /** A monster standing on a live trap sets it off. Monsters never walk in on their own (rule 4.3.3),
+   *  so this only fires when something puts them there: Shove or a Loose Floorboard, neither of which
+   *  the sim's heroes use. Trap Chef is therefore unmeasured here, not impossible. */
   private monsterStepTraps(m: Monster): boolean {
     const k = `${m.pos.x},${m.pos.y}`;
     if (this.spentTraps.has(k)) return false;
@@ -1112,7 +1150,7 @@ export class Game {
     if (this.fanShield > 0) { this.fanShield--; return; }
     // Goose: soaks a hit on a skull.
     if (h.goose > 0 && rollSkulls(this.rng, 1) > 0) { h.goose--; return; }
-    const nope = this.living().flatMap(x => x.learned).find(l => l.item.spell?.id === "nope" && l.cd === 0);
+    const nope = this.living().filter(x => !this.cfg.castNeedsMind || this.mind(x) >= 4).flatMap(x => x.learned).find(l => l.item.spell?.id === "nope" && l.cd === 0);
     if (nope && h.hp <= 2) { nope.cd = 3; return; }
     const skulls = rollSkulls(this.rng, diceOverride ?? m.def.atk);
     const shields = rollShields(this.rng, this.def(h), false);

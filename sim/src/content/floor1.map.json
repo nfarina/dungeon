@@ -137,16 +137,16 @@
     ],
     "features": [
       { "x": 0, "y": 9, "kind": "entrance" },
-      { "x": 23, "y": 14, "kind": "stairs", "w": 2, "h": 2 },
-      { "x": 21, "y": 16, "kind": "blocker", "label": "Desk", "w": 2, "h": 1 },
+      { "x": 22, "y": 15, "kind": "blocker", "label": "Desk", "w": 1, "h": 2 },
       { "x": 6, "y": 6, "kind": "table", "w": 2, "h": 1 },
-      { "x": 2, "y": 11, "kind": "chest" },
       { "x": 12, "y": 8, "kind": "rack", "w": 2, "h": 2 },
-      { "x": 2, "y": 15, "kind": "toilet" },
-      { "x": 19, "y": 11, "kind": "shelf", "w": 2, "h": 1 },
       { "x": 6, "y": 2, "kind": "blocker", "label": "Tiny Chairs", "w": 2, "h": 1 },
-      { "x": 1, "y": 4, "kind": "blocker", "label": "Welcome Sign" },
-      { "x": 16, "y": 14, "kind": "cage", "w": 2, "h": 2 }
+      { "x": 16, "y": 14, "kind": "cage", "w": 2, "h": 2 },
+      { "x": 4, "y": 11, "kind": "chest", "w": 1, "h": 2 },
+      { "x": 4, "y": 16, "kind": "toilet" },
+      { "x": 24, "y": 14, "kind": "stairs", "w": 1, "h": 2 },
+      { "x": 18, "y": 12, "kind": "shelf", "w": 2, "h": 1 },
+      { "x": 2, "y": 6, "kind": "blocker", "label": "Welcome Sign", "w": 2, "h": 2 }
     ],
     "traps": [
       { "x": 6, "y": 8, "kind": "pit" },
@@ -170,37 +170,57 @@
       { "x": 1, "y": 14, "id": "zombie" },
       { "x": 20, "y": 12, "id": "skeleton" },
       { "x": 17, "y": 12, "id": "goblin" },
-      { "x": 22, "y": 15, "id": "boss" },
+      { "x": 22, "y": 14, "id": "boss" },
       { "x": 21, "y": 15, "id": "orc" },
       { "x": 24, "y": 16, "id": "orc" },
       { "x": 16, "y": 16, "id": "abomination" }
     ],
     "speeches": [
-      { "title": "Welcome to the Dungeon", "when": "Before the first door. About two minutes.", "lines": [
-        "Good evening, Crawlers, and welcome! For those of you who did not read the terms and conditions, a brief summary of recent events.",
-        "Per Syndicate rules, subsection 543 of the Precious Elemental Reserves Code, having failed to file a proper appeal for mineral and elemental rights within 50 Solars of first contact, your planet has been sucessfully siezed and is currently being mined of all requested elemental deposits by the assigned planetary regent.",
-        "Every interior of your world has been crushed and all raw materials are in the process of being mined for the requested elements. If you were indoors at the time, you are no longer with us. If you were outdoors, you are here, and you have been offered an exciting opportunity.",
-        "Beneath your feet is a dungeon. It has eighteen floors. Every floor has a staircase down. Reach the staircase before the floor closes and you continue. Don't, and you don't. The company recommends continuing.",
-        "Please select a crawler from the eight in front of you. They were all outdoors at three this morning, for reasons printed on the card. Write a name on them. They won't mind, and they did not get much of a say in anything else tonight either.",
-        "Should you die, and statistically one of you will, please do so quietly. The viewers are trying to concentrate.",
-        "Floor 1 is a learning floor. Most of you will survive it. Please enjoy responsibly."
-      ] },
-      { "title": "Emergency Floor Reset", "when": "The moment the Office door opens. Slam the die to 5.", "lines": [
-        "Attention, Crawlers. The Floor Manager has initiated an Emergency Floor Reset. This is a standard retention measure and is not a reflection on your performance.",
-        "You have five rounds. Cheers!"
-      ] },
-      { "title": "Participation Trophy", "when": "When a hero dies. Fill in the name.", "lines": [
-        "Attention. A Crawler has left the floor. The company thanks them for their participation and awards a Participation Trophy, which is non-transferable and made of plastic.",
-        "Please join the audience. The audience has been waiting for you. Draw two."
-      ] },
-      { "title": "The Collapse Begins", "when": "When the count hits zero.", "lines": [
-        "The floor is now closing. Anyone still on it at the end of this round will be, in a very real sense, part of it.",
-        "The stairs are behind Greg. Greg is aware of this."
-      ] },
-      { "title": "Down the Stairs", "when": "When the last living hero reaches the stairs.", "lines": [
-        "Congratulations on descending. Floor 2 is being prepared. It is not ready. Please wait in the stairwell and do not touch the walls.",
-        "Any Crawlers who did not make it will be returned to you on the next floor, lightly used, at a cost to be announced."
-      ] }
+      {
+        "title": "Welcome to the Dungeon",
+        "when": "Before the first door. About two minutes.",
+        "lines": [
+      "Good evening, Crawlers, and welcome! For those of you who did not read the terms and conditions, a brief summary of recent events.",
+      "Per Syndicate rules, subsection 543 of the Precious Elemental Reserves Code, having failed to file a proper appeal for mineral and elemental rights within 50 Solars of first contact, your planet has been sucessfully siezed and is currently being mined of all requested elemental deposits by the assigned planetary regent.",
+      "Every interior of your world has been crushed and all raw materials are in the process of being mined for the requested elements. If you were indoors at the time, you are no longer with us. If you were outdoors, you are here, and you have been offered an exciting opportunity.",
+      "Beneath your feet is a dungeon. It has eighteen floors. Every floor has a staircase down. Reach the staircase before the floor closes and you continue. Don't, and you don't. The company recommends continuing.",
+      "Please select a crawler from the eight in front of you. They were all outdoors at three this morning, for reasons printed on the card. Write a name on them. They won't mind, and they did not get much of a say in anything else tonight either.",
+      "Should you die, and statistically one of you will, please do so quietly. The viewers are trying to concentrate.",
+      "Floor 1 is a learning floor. Most of you will survive it. Please enjoy responsibly."
+    ]
+      },
+      {
+        "title": "Emergency Floor Reset",
+        "when": "The moment the Office door opens. Slam the die to 5.",
+        "lines": [
+      "Attention, Crawlers. The Floor Manager has initiated an Emergency Floor Reset. This is a standard retention measure and is not a reflection on your performance.",
+      "You have five rounds. Cheers!"
+    ]
+      },
+      {
+        "title": "Participation Trophy",
+        "when": "When a hero dies. Fill in the name.",
+        "lines": [
+      "Attention. A Crawler has left the floor. The company thanks them for their participation and awards a Participation Trophy, which is non-transferable and made of plastic.",
+      "Please join the audience. The audience has been waiting for you. Draw two."
+    ]
+      },
+      {
+        "title": "The Collapse Begins",
+        "when": "When the count hits zero.",
+        "lines": [
+      "The floor is now closing. Anyone still on it at the end of this round will be, in a very real sense, part of it.",
+      "The stairs are behind Greg. Greg is aware of this."
+    ]
+      },
+      {
+        "title": "Down the Stairs",
+        "when": "When the last living hero reaches the stairs.",
+        "lines": [
+      "Congratulations on descending. Floor 2 is being prepared. It is not ready. Please wait in the stairwell and do not touch the walls.",
+      "Any Crawlers who did not make it will be returned to you on the next floor, lightly used, at a cost to be announced."
+    ]
+      }
     ],
     "stone": [
       "..............x...........",

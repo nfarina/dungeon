@@ -90,7 +90,7 @@ plain furniture — is a `feature`; traps are their own list.
 HeroQuest combat dice (3 skulls / 2 white / 1 black), 2d6 movement, orthogonal
 adjacency, wall-and-door geometry with real line of sight, doors as free actions,
 monster behaviour rules 4.3.1-4.3.5 including Delegation and Performance Review,
-traps (including monsters walking onto unrevealed ones), Downed → dead-for-the-floor after one round (rule 1.4),
+traps (monsters never step on one; only a hero can put them there), Downed → dead-for-the-floor after one round (rule 1.4),
 equipment slots and two-handed conflicts, cooldowns, the d6 monster loot tables,
 the three decks with loot-box exclusives pulled out per section 7, Mind-gated
 spellbook learning, and card-to-nerd trading.

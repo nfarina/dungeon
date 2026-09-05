@@ -281,12 +281,12 @@ export function renderReference(c: Card): string {
     <h4>Your turn</h4>
     <p><b>1.</b> Turn every cooldown die down 1.</p>
     <p><b>2.</b> Move <b>2d6</b> and take <b>one action</b>, either order.</p>
-    <p><b>Actions:</b> attack · cast · search for traps · open a chest or rack · disarm · pick up a Downed friend · learn a spellbook (Mind 4+).</p>
-    <p><b>Free:</b> open doors · swap one item at turn start · use consumables · hand a card to an adjacent player.</p>
+    <p><b>Actions:</b> attack · cast · search for traps · open a chest or rack · disarm · pick up a Downed friend · learn a spellbook · in combat, swap gear or hand a card to an adjacent player.</p>
+    <p><b>Free:</b> open doors · use consumables · out of combat, swap gear and hand cards freely.</p>
     <h4>Downed</h4>
     <p>At 0 Health lie down; skip turns, monsters ignore you. An adjacent friend spends an action to get you up with 1 Health. A Bandage does it free. Still down at the end of the <b>next round</b>: dead for the floor.</p>
     <h4>Spells and Mind</h4>
-    <p><b>Scrolls:</b> anyone, once. <b>Spellbooks:</b> Mind 4+, yours for good, cooldown: set a d6 on the card. <b>Lockpick:</b> roll your Mind in dice, any skull opens it.</p>
+    <p><b>Scrolls:</b> anyone, once. <b>Spellbooks:</b> Mind 4+ to learn <i>and</i> to cast, yours for good, cooldown: set a d6 on the card. <b>Lockpick:</b> roll your Mind in dice, any skull opens it.</p>
     <h4>End of round</h4>
     <p>Monsters act, loot drops as they die, the countdown drops 1. On the stairs at round end: you're out.</p>
   </div>`;

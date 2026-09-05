@@ -15,7 +15,7 @@ does anything clever and never does anything stupid.
 
 Combat dice, 2d6 movement, orthogonal adjacency, wall-and-door geometry, line of
 sight, doors opening free, monster rules 4.3.1–4.3.5 including Delegation and
-Performance Review, traps (heroes *and* monsters trigger unrevealed ones),
+Performance Review, traps (heroes trigger unrevealed ones; monsters never step on any),
 equipment slots and two-handed conflicts, stat stacking, cooldowns, the d6 loot
 tables, deck composition with loot-box exclusives pulled, Mind-gated spellbook
 learning, Downed → dead after one round, the floor cap and the Office fuse, the collapse

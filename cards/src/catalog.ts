@@ -46,6 +46,8 @@ export type Card = {
   contents?: string;
   /** Tiles: footprint in board squares (1 square = 1 inch). Standees: printed size in inches, tab included. */
   tile?: { w: number; h: number; kind: "furniture" | "trap" | "standee" };
+  /** Tiles: which map piece this is, so size and count follow the map editor. A feature kind, a blocker's label, a trap kind, "secret door" or "falling block". */
+  mapKey?: string;
   /** Subject description for the art generator. The style prefix lives in style.md. */
   art: string;
   /** Id of a card whose current art is sent along as a second reference image: "this exact character". */
@@ -346,23 +348,24 @@ const envelopes: Card[] = [
 ];
 
 // Floor tiles. Sizes are a proposal; the map file is the source of truth once they agree.
-const tile = (id: string, name: string, w: number, h: number, kind: "furniture" | "trap", art: string, qty = 1): Card =>
-  ({ id: `tile-${id}`, name, deck: "tile", type: "tile", tile: { w, h, kind }, qty, rules: "", art });
+// Sizes and counts here are fallbacks: cards() replaces them with whatever the map file has for `mapKey`.
+const tile = (id: string, name: string, w: number, h: number, kind: "furniture" | "trap", art: string, mapKey: string, qty = 1): Card =>
+  ({ id: `tile-${id}`, name, deck: "tile", type: "tile", tile: { w, h, kind }, qty, rules: "", art, mapKey });
 const tiles: Card[] = [
-  tile("stairs", "Stairs Down", 2, 2, "furniture", "a wide stone staircase descending into darkness, worn steps, a faint glow from below"),
-  tile("desk", "Manager's Desk", 2, 1, "furniture", "a big dark wooden office desk with a nameplate, coffee mug, stapler and a stack of paperwork"),
-  tile("table", "Break Room Table", 2, 1, "furniture", "a scratched wooden table with a half-eaten sandwich, a juice box and scattered crumbs"),
-  tile("chest", "Locked Chest", 1, 1, "furniture", "an iron-banded wooden treasure chest with a heavy padlock"),
-  tile("rack", "Weapon Rack", 2, 2, "furniture", "a low wooden weapon stand lying on the floor, seen from directly above, with mismatched weapons laid flat across it: a fire axe, a shortbow, a frying pan, a table leg and an open spellbook"),
-  tile("toilet", "Latrine", 1, 1, "furniture", "a grimy dungeon toilet with a cracked wooden seat and a suspicious green glow inside"),
-  tile("shelf", "Bookshelf", 2, 1, "furniture", "a tall wooden bookshelf crammed with old leather spellbooks and scrolls, one book glowing faintly blue"),
-  tile("cage", "The Cage", 2, 2, "furniture", "a large rusted iron cage with an angry white goose inside, feathers on the floor around it"),
-  tile("chairs", "Tiny Chairs", 2, 1, "furniture", "a cluster of tiny wooden chairs and a small round table with crayons and a half-finished drawing of a goblin"),
-  tile("sign", "Welcome Sign", 1, 1, "furniture", "a cheerful corporate welcome sign on a metal stand, blank face, with a small bronze bell beside it"),
-  tile("pit", "Pit Trap", 1, 1, "trap", "a square hole in a stone dungeon floor, a dark pit with a few broken planks around the edge", 3),
-  tile("spear", "Spear Trap", 1, 1, "trap", "a stone floor square with several sharp iron spikes thrust up through cracked flagstones"),
-  tile("block", "Falling Block", 1, 1, "trap", "a heap of massive broken stone rubble and dust filling a square of dungeon floor"),
-  tile("secret", "Secret Door", 1, 1, "trap", "a stone floor square with a thin hidden crack outlining a doorway and a small iron ring pull"),
+  tile("stairs", "Stairs Down", 2, 2, "furniture", "a wide stone staircase descending into darkness, worn steps, a faint glow from below", "stairs"),
+  tile("desk", "Manager's Desk", 2, 1, "furniture", "a big dark wooden office desk with a nameplate, coffee mug, stapler and a stack of paperwork", "desk"),
+  tile("table", "Break Room Table", 2, 1, "furniture", "a scratched wooden table with a half-eaten sandwich, a juice box and scattered crumbs", "table"),
+  tile("chest", "Locked Chest", 1, 1, "furniture", "an iron-banded wooden treasure chest with a heavy padlock", "chest"),
+  tile("rack", "Weapon Rack", 2, 2, "furniture", "a low wooden weapon stand lying on the floor, seen from directly above, with mismatched weapons laid flat across it: a fire axe, a shortbow, a frying pan, a table leg and an open spellbook", "rack"),
+  tile("toilet", "Latrine", 1, 1, "furniture", "a grimy dungeon toilet with a cracked wooden seat and a suspicious green glow inside", "toilet"),
+  tile("shelf", "Bookshelf", 2, 1, "furniture", "a tall wooden bookshelf crammed with old leather spellbooks and scrolls, one book glowing faintly blue", "shelf"),
+  tile("cage", "The Cage", 2, 2, "furniture", "a large rusted iron cage with an angry white goose inside, feathers on the floor around it", "cage"),
+  tile("chairs", "Tiny Chairs", 2, 1, "furniture", "a cluster of tiny wooden chairs and a small round table with crayons and a half-finished drawing of a goblin", "tiny chairs"),
+  tile("sign", "Welcome Sign", 1, 1, "furniture", "a cheerful corporate welcome sign on a metal stand, blank face, with a small bronze bell beside it", "welcome sign"),
+  tile("pit", "Pit Trap", 1, 1, "trap", "a square hole in a stone dungeon floor, a dark pit with a few broken planks around the edge", "pit"),
+  tile("spear", "Spear Trap", 1, 1, "trap", "a stone floor square with several sharp iron spikes thrust up through cracked flagstones", "spear"),
+  tile("block", "Falling Block", 1, 1, "trap", "a heap of massive broken stone rubble and dust filling a square of dungeon floor", "falling block"),
+  tile("secret", "Secret Door", 1, 1, "trap", "a stone floor square with a thin hidden crack outlining a doorway and a small iron ring pull", "secret door"),
 ];
 
 export const CARDS: Card[] = [...kits, ...pockets, ...gear, ...biggear, ...lootbox, ...fan, ...monsters, ...players, ...envelopes, ...tiles, ...standees];
@@ -389,7 +392,45 @@ export function saveOverride(id: string, patch: { art?: string }) {
   writeFileSync(OVERRIDES, JSON.stringify(o, null, 2) + "\n");
 }
 /** The catalog with any edited prompts applied. */
+/** The map editor's file. Tiles read their footprint and count from it, so a resize there shows up here. */
+export const MAP_FILE = join(ROOT, "..", "sim", "src", "content", "floor1.map.json");
+export type Footprint = { w: number; h: number; n: number };
+
+/** Every piece on the map, keyed the way `Card.mapKey` is, as one entry per distinct size with a count. */
+export function mapFootprints(): Record<string, Footprint[]> {
+  if (!existsSync(MAP_FILE)) return {};
+  const fl = JSON.parse(readFileSync(MAP_FILE, "utf8")).floor ?? {};
+  const out: Record<string, Footprint[]> = {};
+  const add = (key: string, w = 1, h = 1) => {
+    const list = out[key.trim().toLowerCase()] ??= [];
+    const e = list.find(s => s.w === w && s.h === h);
+    if (e) e.n++; else list.push({ w, h, n: 1 });
+  };
+  for (const f of fl.features ?? []) {
+    if (f.kind === "blocker") { if (f.label) add(f.label, f.w, f.h); }
+    else add(f.kind, f.w, f.h);
+  }
+  for (const t of fl.traps ?? []) add(t.kind);
+  for (const d of fl.doors ?? []) { if (d.kind === "secret") add("secret door"); if (d.trap === "block") add("falling block"); }
+  return out;
+}
+
+/** Unlabeled generic furniture on the map: it can't be matched to a tile, so it's worth flagging. */
+export function unlabeledBlockers(): { x: number; y: number; w: number; h: number }[] {
+  if (!existsSync(MAP_FILE)) return [];
+  const fl = JSON.parse(readFileSync(MAP_FILE, "utf8")).floor ?? {};
+  return (fl.features ?? []).filter((f: any) => f.kind === "blocker" && !f.label).map((f: any) => ({ x: f.x, y: f.y, w: f.w ?? 1, h: f.h ?? 1 }));
+}
+
 export function cards(): Card[] {
   const o = loadOverrides();
-  return CARDS.map(c => o[c.id]?.art ? { ...c, art: o[c.id].art! } : c);
+  const fp = mapFootprints();
+  return CARDS.flatMap(c => {
+    const base = o[c.id]?.art ? { ...c, art: o[c.id].art! } : c;
+    if (c.type !== "tile" || !c.mapKey) return [base];
+    const sizes = fp[c.mapKey];
+    if (!sizes?.length) return [base];
+    // one card per distinct size on the map; the first keeps the plain id so existing art and overrides still apply
+    return sizes.map((s, i) => ({ ...base, id: i ? `${c.id}-${s.w}x${s.h}` : c.id, qty: s.n, tile: { ...c.tile!, w: s.w, h: s.h } }));
+  });
 }

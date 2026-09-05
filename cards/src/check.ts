@@ -1,5 +1,5 @@
 // Does the printed catalog match what the simulator plays with? Compares by name.
-import { CARDS } from "./catalog";
+import { CARDS, mapFootprints, unlabeledBlockers } from "./catalog";
 import { BIG_GEAR, EXTRA, GEAR, KITS, POCKETS } from "../../sim/src/content/items";
 import { MONSTERS } from "../../sim/src/content/monsters";
 
@@ -26,5 +26,12 @@ for (const m of Object.values(MONSTERS) as any[]) {
   const n = String(m.name ?? m.id).toLowerCase();
   if (!monsterCards.has(n) && !(m.boss && monsterCards.has("the floor manager"))) { bad++; console.log(`sim monster "${n}" has no card`); }
 }
-console.log(bad ? `${bad} mismatch(es)` : "catalog and sim agree");
+// Every piece on the map needs a tile, and every tile should be on the map (the entrance is a printed board feature).
+const fp = mapFootprints();
+const keyed = new Set(CARDS.filter(c => c.type === "tile" && c.mapKey).map(c => c.mapKey!));
+for (const k of Object.keys(fp)) if (k !== "entrance" && !keyed.has(k)) { bad++; console.log(`map has "${k}" (${fp[k].map(s => `${s.n}× ${s.w}x${s.h}`).join(", ")}) but no tile card`); }
+for (const k of keyed) if (!fp[k]) { bad++; console.log(`tile "${k}" is not on the map`); }
+for (const b of unlabeledBlockers()) { bad++; console.log(`map has unlabeled furniture at ${b.x},${b.y} (${b.w}x${b.h}); give it a label so it gets a tile`); }
+
+console.log(bad ? `${bad} mismatch(es)` : "catalog, sim and map agree");
 process.exit(bad ? 1 : 0);
