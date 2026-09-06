@@ -67,5 +67,11 @@
   },
   "human-8": {
     "art": "waist-up portrait of a pale goth teenage girl with short black hair, all black clothes, big headphones around her neck, bored, ordinary modern everyday clothes, standing in a dark stone dungeon looking slightly alarmed but game for it, no weapons"
+  },
+  "boo": {
+    "art": "a shadowy crowd of audience silhouettes with cupped hands shouting, a big speech bubble shape"
+  },
+  "bookmark": {
+    "art": "a worn leather bookmark with a frayed gold tassel, glowing faintly, lying across an open spellbook"
   }
 }

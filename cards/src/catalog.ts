@@ -50,8 +50,10 @@ export type Card = {
   mapKey?: string;
   /** Subject description for the art generator. The style prefix lives in style.md. */
   art: string;
-  /** Id of a card whose current art is sent along as a second reference image: "this exact character". */
+  /** Id of a card whose current art is sent along as a second reference image: "this exact character" (or object). */
   ref?: string;
+  /** Tiles: this card is the printed back of that tile (the looted or used state). It follows that tile's size and count. */
+  backOf?: string;
   /** Name of the matching entry in the sim, when it differs. */
   simName?: string;
 };
@@ -368,7 +370,25 @@ const tiles: Card[] = [
   tile("secret", "Secret Door", 1, 1, "trap", "a stone floor square with a thin hidden crack outlining a doorway and a small iron ring pull", "secret door"),
 ];
 
-export const CARDS: Card[] = [...kits, ...pockets, ...gear, ...biggear, ...lootbox, ...fan, ...monsters, ...players, ...envelopes, ...tiles, ...standees];
+// The other side of a furniture tile: what it looks like once the party has been through it.
+// Flip the tile on the board when it's looted. Generated with the front as a reference so it's clearly the same object.
+const used = (id: string, art: string): Card => {
+  const front = tiles.find(t => t.id === `tile-${id}`)!;
+  return { id: `${front.id}-used`, name: `${front.name}, used`, deck: "tile", type: "tile", tile: { ...front.tile! }, rules: "", art, ref: front.id, backOf: front.id };
+};
+const tileBacks: Card[] = [
+  used("desk", "the same desk after being ransacked: every drawer pulled out, papers scattered everywhere, the mug tipped over and the nameplate knocked askew"),
+  used("table", "the same table after the party has been through it: the sandwich gone, only crumbs left, the juice box crushed flat"),
+  used("chest", "the same chest with its lid thrown wide open and nothing inside, the broken padlock lying on the floor beside it"),
+  used("rack", "the same weapon stand, now completely empty, only dust outlines and a broken strap where the weapons were"),
+  used("toilet", "the same toilet with the lid off and the seat up, the green glow gone, a dropped rubber glove beside it"),
+  used("shelf", "the same bookshelf half emptied, the remaining books toppled over, one shelf sagging, a torn page on the floor"),
+  used("cage", "the same cage with its door hanging open and nothing inside, a few white feathers scattered on the floor of it"),
+  used("chairs", "the same tiny chairs knocked over, crayons scattered across the floor, the drawing torn in half"),
+  used("sign", "the same welcome sign knocked flat on its face on the floor, the bell dented and lying on its side"),
+];
+
+export const CARDS: Card[] = [...kits, ...pockets, ...gear, ...biggear, ...lootbox, ...fan, ...monsters, ...players, ...envelopes, ...tiles, ...tileBacks, ...standees];
 
 export const DECK_ORDER: Deck[] = ["player", "kit", "pockets", "gear", "biggear", "lootbox", "fan", "monster", "envelope", "tile", "standee"];
 
@@ -425,12 +445,18 @@ export function unlabeledBlockers(): { x: number; y: number; w: number; h: numbe
 export function cards(): Card[] {
   const o = loadOverrides();
   const fp = mapFootprints();
-  return CARDS.flatMap(c => {
+  const fronts = CARDS.flatMap(c => {
     const base = o[c.id]?.art ? { ...c, art: o[c.id].art! } : c;
     if (c.type !== "tile" || !c.mapKey) return [base];
     const sizes = fp[c.mapKey];
     if (!sizes?.length) return [base];
     // one card per distinct size on the map; the first keeps the plain id so existing art and overrides still apply
     return sizes.map((s, i) => ({ ...base, id: i ? `${c.id}-${s.w}x${s.h}` : c.id, qty: s.n, tile: { ...c.tile!, w: s.w, h: s.h } }));
+  });
+  // tile backs follow their front: one per size variant, same footprint and count
+  return fronts.flatMap(c => {
+    if (!c.backOf) return [c];
+    const of = fronts.filter(f => !f.backOf && (f.id === c.backOf || (f.id.startsWith(c.backOf + "-") && /-\d+x\d+$/.test(f.id))));
+    return of.map((f, i) => ({ ...c, id: i ? `${c.id}-${f.tile!.w}x${f.tile!.h}` : c.id, backOf: f.id, qty: f.qty, tile: { ...c.tile!, w: f.tile!.w, h: f.tile!.h } }));
   });
 }

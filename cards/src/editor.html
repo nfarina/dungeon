@@ -65,7 +65,7 @@ a { color:var(--amber); }
 <main>
   <div class="bar">
     <span id="title" style="font-weight:600"></span>
-    <label class="hint">Model <select id="model"></select></label>
+    <label class="hint">Model <select id="model"></select> <span id="imageSize" title="Output resolution, set in gen.ts (IMAGE_SIZE)"></span></label>
     <span class="status" id="status"></span>
   </div>
   <div class="grid" id="grid"></div>
@@ -85,6 +85,7 @@ async function load() {
   data = await r.json();
   const m = $("#model");
   if (!m.options.length) { for (const x of data.models) m.append(new Option(x, x)); m.value = data.model; }
+  $("#imageSize").textContent = data.imageSize ? `@ ${data.imageSize}${data.imageSize === "512px" ? " (drafts)" : ""}` : "";
   render();
 }
 function visible() { return data.cards.filter(c => c.deck === deck); }

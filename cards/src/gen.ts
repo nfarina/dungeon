@@ -18,7 +18,14 @@ const KEY_FILE = join(ROOT, "..", ".gemini.key");
 export const DEFAULT_MODEL = process.env.GEMINI_IMAGE_MODEL ?? "gemini-3.1-flash-image";
 export const MODELS = ["gemini-3.1-flash-image", "gemini-3.1-flash-lite-image", "gemini-3-pro-image", "gemini-2.5-flash-image"];
 
-export type ManifestEntry = { file: string; hash: string; prompt: string; model: string; at: string };
+/** Output resolution. TEMPORARY: 512px drafts while the deck is in flux (about a third the cost of 1K).
+ *  Switch to "1K" for the final print run; art made at a smaller size than this setting shows as stale. */
+export const IMAGE_SIZE = process.env.GEMINI_IMAGE_SIZE ?? "512px";
+const SIZE_RANK: Record<string, number> = { "512px": 0, "1K": 1, "2K": 2, "4K": 3 };
+/** Is art made at `made` good enough for the current setting? Absent = 1K, the API default before this setting existed. */
+const bigEnough = (made?: string) => (SIZE_RANK[made ?? "1K"] ?? 1) >= (SIZE_RANK[IMAGE_SIZE] ?? 1);
+
+export type ManifestEntry = { file: string; hash: string; prompt: string; model: string; at: string; size?: string };
 export type Manifest = Record<string, ManifestEntry>;
 
 export function loadManifest(): Manifest {
@@ -40,7 +47,9 @@ export function fullPrompt(c: Card): string {
   if (c.type === "tile") {
     return `${style}\n\nThis is a board game floor tile seen DIRECTLY FROM ABOVE, like a map: flat top-down orthographic view, no horizon, no walls, nothing hanging or standing upright, no perspective. Objects lie flat on dark grey stone dungeon flagstones as seen from the ceiling, and fill the frame edge to edge.\n\nSubject: ${c.art}.`;
   }
-  const same = c.ref ? " The second reference image shows this exact character: match their face, hair, skin, build and clothing, but take ONLY the character from it, not its background or framing." : "";
+  const same = !c.ref ? ""
+    : c.type === "tile" ? " The second reference image shows this exact object before it was used: keep the same object, colours, materials, viewpoint and framing, and change only what the description says."
+    : " The second reference image shows this exact character: match their face, hair, skin, build and clothing, but take ONLY the character from it, not its background or framing.";
   if (c.type === "standee") {
     return `${style}\n\nThis is a stand-up game figure: one character shown full length, standing upright and facing the viewer, head near the top of the frame and feet near the bottom, nothing cropped. Plain flat pale parchment background with a simple ground shadow, no scenery. Portrait (tall) composition.\n\nSubject: ${c.art}.${same}`;
   }
@@ -88,8 +97,8 @@ export function artFor(c: Card, model = DEFAULT_MODEL, all?: Card[]): { file: st
   const m = loadManifest();
   const hash = expectedHash(c, model, all);
   const entries = [c, ...linked(c, all)].map(x => m[x.id]).filter(e => e && existsSync(join(ART_DIR, e.file)));
-  const e = entries.find(e => e.hash === hash) ?? entries[0];
-  return e ? { file: e.file, stale: e.hash !== hash } : null;
+  const e = entries.find(e => e.hash === hash && bigEnough(e.size)) ?? entries.find(e => e.hash === hash) ?? entries[0];
+  return e ? { file: e.file, stale: e.hash !== hash || !bigEnough(e.size) } : null;
 }
 
 function apiKey(): string {
@@ -109,7 +118,7 @@ export async function generate(c: Card, opts: { force?: boolean; model?: string;
   const record = (entry: ManifestEntry) => { const m = loadManifest(); for (const id of ids) m[id] = entry; saveManifest(m); };
   if (!opts.force) {
     const manifest = loadManifest();
-    const have = ids.map(id => manifest[id]).find(e => e && e.hash === hash && existsSync(join(ART_DIR, e.file)));
+    const have = ids.map(id => manifest[id]).find(e => e && e.hash === hash && bigEnough(e.size) && existsSync(join(ART_DIR, e.file)));
     if (have) { record(have); log(`= ${c.id} (cached${twins.length ? `, shared with ${twins.length} linked` : ""})`); return have; }
   }
 
@@ -122,9 +131,9 @@ export async function generate(c: Card, opts: { force?: boolean; model?: string;
   if (ref2) parts.push({ inline_data: { mime_type: "image/png", data: ref2.toString("base64") } });
   const body = {
     contents: [{ parts }],
-    generationConfig: { responseModalities: ["IMAGE"], imageConfig: { aspectRatio: aspectRatio(c) } },
+    generationConfig: { responseModalities: ["IMAGE"], imageConfig: { aspectRatio: aspectRatio(c), imageSize: IMAGE_SIZE } },
   };
-  log(`> ${c.id} via ${model}`);
+  log(`> ${c.id} via ${model} @ ${IMAGE_SIZE}`);
   const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
     method: "POST", headers: { "content-type": "application/json", "x-goog-api-key": apiKey() }, body: JSON.stringify(body),
   });
@@ -139,7 +148,7 @@ export async function generate(c: Card, opts: { force?: boolean; model?: string;
   const file = `${c.id}.${hash}.png`;
   mkdirSync(ART_DIR, { recursive: true });
   writeFileSync(join(ART_DIR, file), Buffer.from(data, "base64"));
-  const entry: ManifestEntry = { file, hash, prompt, model, at: new Date().toISOString() };
+  const entry: ManifestEntry = { file, hash, prompt, model, at: new Date().toISOString(), size: IMAGE_SIZE };
   record(entry);
   log(`ok ${c.id} -> art/${file}${twins.length ? ` (also ${twins.map(t => t.id).join(", ")})` : ""}`);
   return entry;

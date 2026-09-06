@@ -166,10 +166,10 @@ export function renderFront(c: Card, artUrl: string | null): string {
     ${c.flavor ? `<div class="flavor">${esc(c.flavor)}</div>` : ""}${foot}</div>`;
 }
 
-/** Backs need the art only for standees, which show the figure mirrored on the reverse. */
+/** `artUrl` is what goes on the back: the same figure for standees (mirrored), the used-state art for furniture tiles. */
 export function renderBack(c: Card, artUrl: string | null = null): string {
   if (c.type === "envelope") return "";
-  if (c.type === "tile") return renderTileBack(c);
+  if (c.type === "tile") return artUrl ? renderTile(c, artUrl) : renderTileBack(c);
   if (c.type === "standee") return renderStandee(c, artUrl, true);
   if (c.type === "player") return renderReference(c);
   const deck = DECK_COLOR[c.deck];
@@ -204,7 +204,7 @@ export function renderStandee(c: Card, artUrl: string | null, back: boolean): st
 
 /** Tiles on letter pages, arranged for a guillotine cutter: rows of equal height, so every
  *  horizontal cut runs the full page width and vertical cuts are made per strip. */
-export function renderTileSheet(items: { card: Card; art: string | null }[], opts: { title: string; flip: "long" | "short"; flipUrl: string; backDx: number; backDy: number; nudge: (dx: number, dy: number) => string }): string {
+export function renderTileSheet(items: { card: Card; art: string | null; back?: string | null }[], opts: { title: string; flip: "long" | "short"; flipUrl: string; backDx: number; backDy: number; nudge: (dx: number, dy: number) => string }): string {
   const title = opts.title;
   const PW = 8.5, PH = 11, M = 0.25, maxW = PW - 2 * M, maxH = PH - 2 * M;
   // expand copies, tallest first, widest first within a height
@@ -240,7 +240,7 @@ export function renderTileSheet(items: { card: Card; art: string | null }[], opt
       for (const it of r.items) {
         const w = it.card.tile!.w;
         const tx = back && opts.flip === "long" ? PW - x - w : x;
-        out.push(`<div class="slot" style="left:${tx}in;top:${ty}in;${back ? shift : ""}">${back ? renderBack(it.card, it.art) : renderFront(it.card, it.art)}</div>`);
+        out.push(`<div class="slot" style="left:${tx}in;top:${ty}in;${back ? shift : ""}">${back ? renderBack(it.card, it.back ?? null) : renderFront(it.card, it.art)}</div>`);
         x += w;
         if (!back && x < M + r.w) out.push(`<i style="left:${x}in;top:${y}in;height:.1in;border-left:1px solid #fff;opacity:.9"></i><i style="left:${x}in;top:${y + r.h - .1}in;height:.1in;border-left:1px solid #fff;opacity:.9"></i>`);
       }
