@@ -80,22 +80,23 @@ On your turn, hand any card to an adjacent player. Free out of combat; in combat
 
 Two timers, one clock. The countdown lives on the iPad DM view (the map editor in DM mode, which also holds the announcer speeches and the round checklist). Bring a d12 out onto the table once the count is 12 or under, so the slam to 5 happens in front of everyone.
 
-- **Floor cap: 26 rounds.** Announced at the start and counted down out loud every round. It exists so the party can't clear every room at leisure. In most games it never actually binds. A threat, not a guillotine.
+- **Floor cap: 22 rounds.** Announced at the start and counted down out loud every round. It exists so the party can't clear every room at leisure. In most games it never actually binds. A threat, not a guillotine. (It was 26 before the walls forced the route; the shorter route needed a shorter cap to stay a threat at all.)
 - **Emergency Floor Reset: 5 rounds.** The moment the Manager's Office door opens, the countdown drops to 5, or stays put if it's already lower. The die visibly slamming from 12 to 5 is the drama beat. Announcer: "Attention, Crawlers. The Floor Manager has initiated an Emergency Floor Reset. This is a standard retention measure and is not a reflection on your performance. You have five rounds. Cheers!"
 - **The collapse is a ramp.** When the count hits zero the floor starts coming down. At the end of each round, every hero still on the floor takes 1, 1, 2, 2, then 3 damage. After the fifth round, nobody left up there is walking down the stairs.
 - **You can leave without killing Greg.** Any hero on a stairs square at the end of a round has escaped. Escaping with the boss alive forfeits the Boss Box. Say this out loud before the fight, so the last three rounds are a decision and not arithmetic.
 - **What the collapse means.** Heroes who reached the stairs continue to Floor 2 as they are. Heroes who died, in the collapse or before it, are revived on Floor 2 at a cost decided when that floor is generated. Greg, if alive, remembers all of this.
 
-On the real Side A map with the final furniture, placed monsters, monsters that never step on traps, Mind 4 to cast, and in-combat swap costs, the simulator reports (3,000 runs):
+On the real Side A map with the forced route, final furniture, placed monsters, monsters that never step on traps, Mind 4 to cast, and in-combat swap costs, the simulator reports (3,000 runs):
 
 | Measure | Result |
 |---|---|
-| Party wins (Greg dead, everyone alive down the stairs) | 80% |
+| Party wins (Greg dead, everyone alive down the stairs) | 81% |
 | Escaped down the stairs with Greg alive | 14% |
 | Games where the clock never mattered | 0% |
-| Games where someone dies | 36% |
+| Games where someone dies | 37% |
 | Full wipe | under 1% |
-| Round the Office door opens, on average | 18 |
+| Round the Office door opens, on average | 14.5 |
+| Rounds to finish, median | 20 |
 
 Eighty percent is the chosen target: nearly every game is decided in the last two rounds, a death is common enough to fear, and a wipe is a story. The two dials that move this most are the fuse length (6 rounds instead of 5 is worth about eight points) and how many squares Greg can be attacked from (he stands against the back wall with two, and one row forward would be worth about five). Re-run whenever the route or the furniture changes; geometry moves these numbers more than anything else.
 
@@ -119,7 +120,7 @@ Five kits for three people. Whoever takes the glasses is volunteering to be the 
 
 ## 3. Floor layout
 
-The board is Side A, traced into the simulator's map file (`sim/src/content/floor1.map.json`), which is the source of truth for room placement, doors, furniture, traps and where each monster stands. Rooms 1, 2, 5 and 9 sit on the path from the entrance to the stairs, and the other five branch off it. The floor is clearable in an hour if the party only does the required rooms; the optional rooms are where the good loot is, and the announcer should say so.
+The board is Side A, traced into the simulator's map file (`sim/src/content/floor1.map.json`), which is the source of truth for room placement, doors, furniture, traps and where each monster stands. Rooms 1, 2 and 5 are required by the walls, quest-sheet style: the entrance corridor dead-ends at the Welcome Center, the Welcome Center opens straight into the Break Room, and the corridor beyond leads only into the Armory. After the Armory the floor opens up, and the other five rooms branch off it. Storage is hidden behind a secret door in the Latrine, so its chest is a reward for a Torch or a search, not a stop on the tour. The floor is clearable in an hour if the party only does the required rooms; the optional rooms are where the good loot is, and the announcer should say so.
 
 | # | Room | Monsters | Furniture | Trap | Required |
 |---|---|---|---|---|---|
@@ -133,7 +134,7 @@ The board is Side A, traced into the simulator's map file (`sim/src/content/floo
 | 8 | **Library** | 1 Skeleton, 1 Goblin | Bookshelf: 1 Big Gear draw if reader has Mind 4+, else 1 Gear draw | none | no |
 | 9 | **Manager's Office** | The Floor Manager, 2 Orcs | Long desk in front of Greg; stairwell down behind him | Pit trap beside the desk | yes (boss) |
 
-**Corridors:** one pit trap somewhere on the required path (so five traps on the floor, counting the Office), and one secret door that shortcuts to Room 9. The secret door is found by searching or by walking past it with a Torch.
+**Corridors:** one pit trap in the bottom-left corridor (so five traps on the floor, counting the Office), and two secret doors: one from the Latrine into Storage, one from the east corridor straight onto Greg's stairs. Secret doors are found by searching or by walking past them with a Torch.
 
 **Room 3 chest:** open with the Skeleton Key, chop it with the Fire Axe, or pick it (roll Mind dice, any skull). A failed pick makes the chest scream, and one Goblin from the nearest uncleared room comes running.
 
@@ -141,7 +142,7 @@ The board is Side A, traced into the simulator's map file (`sim/src/content/floo
 
 **Room 6 cage:** open it as an action. The goose is a Companion card (section 7). It goes with whoever opened the cage. It does not like them.
 
-**Room 7 toilet:** any player may spend an action to reach into the toilet. One Pockets draw. Also an achievement (section 7). The announcer should be audibly disgusted.
+**Room 7 toilet:** any player may spend an action to reach into the toilet. One Pockets draw. Also an achievement (section 7), whose envelope holds the Soggy Note, a memo from Greg: "Don't forget to grab supplies from storage. I don't care if someone is in the bathroom already!!!" That is the only clue to the hidden vault, and it's enough: the party has to work out that Storage is reached through the Latrine and then spend a search action to find the door. A Torch carried past the west wall finds it too. The announcer should be audibly disgusted throughout.
 
 **Room 9 door:** locked. Open it with the Skeleton Key, the Fire Axe, or by knocking. If you knock, the two Orcs open it and each get a free attack on the knocker before the round starts. There is always a way in; it's just not always a good way.
 
@@ -287,11 +288,11 @@ Envelopes. Each has a printed label with the achievement name and its trigger on
 | **First Blood** | Bronze | First monster killed on the floor | 3 gold, 1 Juice Box |
 | **Found It With Your Face** | Silver | First player to trigger a trap | Football Helmet |
 | **You Monster** | Bronze | Kill all three goblins in the Daycare | 2 gold and a card that just says "You did that. We all saw." Trinket, no effect. |
-| **Why Would You Do That** | Bronze | Reach into the toilet | 1 Energy Drink, 1 Gold (2). Sticky. |
+| **Why Would You Do That** | Bronze | Reach into the toilet | 1 Energy Drink, 1 Gold (2), and the Soggy Note. Sticky. |
 | **Nerd** | Gold | First player to learn a Spellbook | Scroll: Firebolt, Bookmark |
 | **Sharing Is Caring** | Bronze | Give an item to another player | 2 gold. This fires on turn one of every game. It's a handout that teaches trading, so it's priced like one. |
 | **Trap Chef** | Gold | A monster dies from a trap (they never walk in on their own, so this means Shove or a Loose Floorboard) | Fire Axe |
-| **Cartographer** | Silver | Open the doors to seven of the nine rooms | 5 gold |
+| **Cartographer** | Silver | Open the doors to six of the nine rooms | 5 gold |
 | **Sir Reginald** | Companion | Open the cage in Room 6 | The goose. See below. |
 | **Backseat Driver** | Bronze | A Viewer's card causes a monster's death | 3 gold for the Viewer, delivered on Floor 2 |
 | **Boss Box** | Platinum | Kill the Floor Manager | Spellbook: Nope, 5 gold, and the Save-the-Date |
@@ -373,7 +374,7 @@ Counts for the card pipeline. Poker size, nine per letter sheet.
 | Pockets deck | 16 |
 | Gear deck | 14 |
 | Big Gear deck | 9 |
-| Loot Box exclusives (Nope, Bookmark, Companion, Save-the-Date, "You did that") | 5 |
+| Loot Box exclusives (Nope, Bookmark, Companion, Save-the-Date, "You did that", Soggy Note) | 6 |
 | Loot Box envelope labels | 11 |
 | Fan deck | 14 |
 | Trap tokens (pit, spear, block, revealed-secret-door) | 9 |

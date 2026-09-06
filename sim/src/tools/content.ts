@@ -8,7 +8,7 @@ const KITS = ["Slingshot", "HockeyStick", "Multitool", "SnackBag", "Glasses"];
 const N = Number(process.argv[2] ?? 2000);
 const base: Partial<Config> = process.argv[3] === "rec"
   ? { lootRich: true, richRack: true, guaranteedSpellbook: true, collapseStart: "both",
-      collapseRound: 26, collapseAfterDoor: 5, collapseMode: "soft", collapseGrace: 5 }
+      collapseRound: 22, collapseAfterDoor: 5, collapseMode: "soft", collapseGrace: 5 }
   : {};
 
 const rng = new RNG(99);

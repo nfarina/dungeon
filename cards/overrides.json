@@ -73,5 +73,8 @@
   },
   "bookmark": {
     "art": "a worn leather bookmark with a frayed gold tassel, glowing faintly, lying across an open spellbook"
+  },
+  "soggy-note": {
+    "art": "a torn, damp scrap of parchment with smeared handwriting and a crude arrow, held between two fingers at arm's length"
   }
 }

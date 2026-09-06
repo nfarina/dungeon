@@ -273,7 +273,7 @@ if (cmd === "softfuse") {
 
 export const RECOMMENDED: Partial<Config> = {
   lootRich: true, richRack: true, guaranteedSpellbook: true,
-  collapseStart: "both", collapseRound: 26, collapseAfterDoor: 5,
+  collapseStart: "both", collapseRound: 22, collapseAfterDoor: 5,
   collapseMode: "soft", collapseGrace: 4, collapseEscalation: "gentle",
   bossHp: 4,
 };

@@ -655,5 +655,13 @@
     "model": "gemini-3.1-flash-image",
     "at": "2026-09-06T15:34:39.899Z",
     "size": "512px"
+  },
+  "soggy-note": {
+    "file": "soggy-note.600c5f03c8.png",
+    "hash": "600c5f03c8",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a torn, damp scrap of parchment with smeared handwriting and a crude arrow, held between two fingers at arm's length. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-06T16:26:22.272Z",
+    "size": "512px"
   }
 }

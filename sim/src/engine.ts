@@ -478,9 +478,16 @@ export class Game {
   private checkAchievements() {
     if (!this.monsters.some(m => m.alive && m.room === 4) && this.board.rooms.get(4)!.monsters.length)
       this.award("You Monster", [{ name: "Gold (2)", slot: "pack", gold: 2 }]);
-    // Cartographer: doors to seven of the nine rooms opened (section 7). Secret doors don't count.
-    if (this.board.doors.filter((d, i) => d.kind !== "secret" && this.openDoors[i] === 1).length >= 7)
-      this.award("Cartographer", [{ name: "Gold (5)", slot: "pack", gold: 5 }]);
+    // Cartographer: six of the nine rooms entered (section 7). Secret doors don't count; Storage is a hidden vault.
+    {
+      // Count rooms entered, not doors: a room with two doors is still one room.
+      const opened = new Set<number>();
+      this.board.doors.forEach((d, i) => {
+        if (d.kind === "secret" || this.openDoors[i] !== 1) return;
+        for (const c of [d.a, d.b]) { const r = this.board.roomIdAt(c); if (r !== null) opened.add(r); }
+      });
+      if (opened.size >= 6) this.award("Cartographer", [{ name: "Gold (5)", slot: "pack", gold: 5 }]);
+    }
     if (this.heroes.some(h => h.goose > 0)) this.achievements.add("Sir Reginald");
   }
 

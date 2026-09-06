@@ -349,7 +349,7 @@ let vis = {}, lock = {}, active = "board", tool = {};
 let sel = null, mode = "edit", undoStack = [], dirty = false;
 let paintMode = localStorage.getItem("dungeon.paintMode") || "rect";
 let drag = null;                      // {x0,y0,x1,y1} while dragging out a rectangle
-let play = { round:1, count:26 };
+let play = { round:1, count:22 };
 
 const $ = s => document.querySelector(s);
 const el = (t, a = {}, kids = []) => {
@@ -506,7 +506,7 @@ const playKey = () => "dungeon.play." + name;
 function loadPlay() {
   try { play = JSON.parse(localStorage.getItem(playKey())) || play; }
   catch { /* keep defaults */ }
-  play.round ??= 1; play.count ??= 26;
+  play.round ??= 1; play.count ??= 22;
 }
 function savePlay() { localStorage.setItem(playKey(), JSON.stringify(play)); }
 
@@ -1074,7 +1074,7 @@ function drawClock() {
   pane.append(el("div", { class:"tools", style:"margin-top:9px" }, [
     el("button", { onclick: () => { play.round++; play.count--; savePlay(); render(); } }, "End round"),
     el("button", { class:"on", onclick: () => { play.count = Math.min(play.count, 5); savePlay(); render(); } }, "Reset! (→5)"),
-    el("button", { onclick: () => { play.round = 1; play.count = 26; savePlay(); render(); } }, "New floor"),
+    el("button", { onclick: () => { play.round = 1; play.count = 22; savePlay(); render(); } }, "New floor"),
   ]));
   pane.append(el("p", { class:"hint" }, "Each round: heroes (cooldowns down, move + action) → monsters (4.3) → loot rolls as they die → End round: die down, collapse damage at zero, Viewers draw."));
 }
