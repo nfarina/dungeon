@@ -840,6 +840,48 @@ function putInPlay(letter) {
   F().rooms.sort((a, b) => a.id - b.id);
   dirty = true;
 }
+/** Move a room in play, with everything placed in it, to another possible room that isn't in use.
+ *  Contents shift by the offset between the two rooms' top-left corners; anything that would land
+ *  outside the new room is dropped. Doors on the old room's walls move the same way when the new
+ *  wall has something open on the far side; the rest are dropped, so check the map afterwards. */
+function relocateRoom(from, to) {
+  const r = F().rooms.find(q => q.at === from);
+  if (!r || inPlay(to)) return null;
+  const a = cellsOf(from), b = cellsOf(to);
+  if (!a.length || !b.length) return null;
+  const min = cells => ({ x: Math.min(...cells.map(c => c.x)), y: Math.min(...cells.map(c => c.y)) });
+  const dx = min(b).x - min(a).x, dy = min(b).y - min(a).y;
+  const inA = (x, y) => at(x, y) === from, inBnew = (x, y) => at(x, y) === to;
+  const dropped = { monsters:0, features:0, traps:0, doors:0 };
+  snapshot();
+  F().monsters = (F().monsters || []).flatMap(m => {
+    if (!inA(m.x, m.y)) return [m];
+    const n = { ...m, x: m.x + dx, y: m.y + dy };
+    if (inBnew(n.x, n.y)) return [n]; dropped.monsters++; return [];
+  });
+  F().features = F().features.flatMap(f => {
+    if (!featCells(f).some(c => inA(c.x, c.y))) return [f];
+    const n = { ...f, x: f.x + dx, y: f.y + dy };
+    if (featCells(n).every(c => inBnew(c.x, c.y))) return [n]; dropped.features++; return [];
+  });
+  F().traps = F().traps.flatMap(t => {
+    if (!inA(t.x, t.y)) return [t];
+    const n = { ...t, x: t.x + dx, y: t.y + dy };
+    if (inBnew(n.x, n.y)) return [n]; dropped.traps++; return [];
+  });
+  r.at = to;   // from here on the new letter is in play, so open() sees it
+  F().doors = F().doors.flatMap(d => {
+    const [ox, oy] = DELTA[d.dir], far = { x: d.x + ox, y: d.y + oy };
+    if (!inA(d.x, d.y) && !inA(far.x, far.y)) return [d];
+    const n = { ...d, x: d.x + dx, y: d.y + dy }, nfar = { x: n.x + ox, y: n.y + oy };
+    const ok = (inBnew(n.x, n.y) && open(nfar.x, nfar.y) && !inBnew(nfar.x, nfar.y))
+            || (inBnew(nfar.x, nfar.y) && open(n.x, n.y) && !inBnew(n.x, n.y));
+    if (ok) return [n]; dropped.doors++; return [];
+  });
+  dirty = true;
+  return dropped;
+}
+
 function takeOutOfPlay(letter) {
   snapshot();
   F().rooms = F().rooms.filter(r => r.at !== letter);
@@ -892,6 +934,22 @@ function drawSel() {
     const bad = r.monsters.filter(x => !MONSTERS.includes(x));
     if (bad.length) pane.append(el("p", { class:"hint", style:"color:var(--danger)" }, "Unknown: " + bad.join(", ") + ". Known: " + MONSTERS.join(", ")));
     pane.append(field("DM note", r.note || "", v => { r.note = v; dirty = true; }, "textarea"));
+    const free = possibleRooms().filter(c => c !== letter && !inPlay(c));
+    if (free.length) {
+      const pick = el("select", {});
+      pick.append(new Option("Move to…", ""));
+      const dims = c => { const cs = cellsOf(c); const w = Math.max(...cs.map(q => q.x)) - Math.min(...cs.map(q => q.x)) + 1, h = Math.max(...cs.map(q => q.y)) - Math.min(...cs.map(q => q.y)) + 1; return `${w}×${h}`; };
+      for (const c of free) pick.append(new Option(`${c}  (${dims(c)})`, c));
+      pick.addEventListener("change", () => {
+        const to = pick.value; if (!to) return;
+        const d = relocateRoom(letter, to);
+        if (!d) { status("couldn't move the room", "bad"); return; }
+        const lost = Object.entries(d).filter(([, n]) => n).map(([k, n]) => `${n} ${k}`).join(", ");
+        status(`moved ${r.name} to ${to}` + (lost ? ` — dropped ${lost} that didn't fit` : ""), lost ? "bad" : "good");
+        sel = { type:"room", at:to }; render();
+      });
+      pane.append(el("div", { class:"field" }, [el("label", {}, "Relocate this room, with its furniture, traps, monsters and doors"), pick]));
+    }
     pane.append(el("button", { onclick: () => { takeOutOfPlay(letter); sel = null; render(); } }, "Take out of play"));
     return;
   }
