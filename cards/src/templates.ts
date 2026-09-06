@@ -20,7 +20,7 @@ export const CARD_CSS = `
   background:var(--parch); border:.1in solid var(--line); padding:.08in .09in .07in; display:flex; flex-direction:column;
   font-family:'Alegreya', Georgia, serif; color:var(--ink); -webkit-print-color-adjust:exact; print-color-adjust:exact; break-inside:avoid; }
 .card::before { content:""; position:absolute; inset:.025in; border:.012in solid var(--gold2); border-radius:.07in; pointer-events:none; opacity:.7; }
-.card .art { position:relative; flex:0 1 1.6in; min-height:.75in; border:.02in solid var(--line); border-radius:.06in; background:var(--stone) center/cover no-repeat; }
+.card .art { position:relative; flex:100 1 1.575in; min-height:.75in; max-height:1.575in; border:.02in solid var(--line); border-radius:.06in; background:var(--stone) center/cover no-repeat; }
 .card .gap { flex:1 1 0; min-height:0; }
 .card > *:not(.art):not(.gap) { flex-shrink:0; }
 .card .art.noart { display:flex; align-items:center; justify-content:center; color:#c9d3df; font-size:7pt; font-style:italic; text-align:center; padding:.1in;
@@ -56,7 +56,7 @@ export const CARD_CSS = `
 .card .slots { display:grid; display: none; grid-template-columns:1fr 1fr; gap:.02in .08in; margin-top:.05in; font-family:'Alegreya SC'; font-size:6.6pt; letter-spacing:.04em; color:var(--muted); }
 .card .slots div::before { content:"☐ "; }
 .card.fan { --parch:#e9e2f2; --parch2:#ddd3ec; --gold:#c8b3ee; --gold2:#8f76c4; --stone:#2d2540; }
-.card.player .art { flex-basis:1.85in; }
+.card.player .art { flex-basis:1.85in; max-height:1.95in; }
 .card.text .art { flex-basis:1.2in; }
 .card.text .rules { font-size:9.5pt; font-style:italic; }
 /* ---- backs: white, one thin stroke, outlined type. Minimal toner. ---- */
