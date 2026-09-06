@@ -79,5 +79,62 @@
   },
   "tile-table-used": {
     "art": "the same table after the party has been through it: the sandwich gone, only crumbs left, the juice box crushed flat"
+  },
+  "standee-human-7": {
+    "art": "full-body figure of a muscular young man with brown skin in a tank top and gym shorts, a towel around his neck, confused, ordinary modern everyday clothes, standing facing the viewer, whole body visible from head to shoes, no weapons"
+  },
+  "tile-rack": {
+    "art": "a low wooden weapon stand lying on the floor, seen from directly above, with mismatched weapons laid flat across it: a fire axe, a shortbow, a frying pan, a table leg and an open spellbook"
+  },
+  "tile-desk": {
+    "art": "a big dark wooden office desk with a nameplate, coffee mug, stapler and a stack of paperwork"
+  },
+  "tile-stairs": {
+    "art": "a wide stone staircase descending into darkness, worn steps, a faint glow from below"
+  },
+  "tile-shelf": {
+    "art": "a tall wooden bookshelf crammed with old leather spellbooks and scrolls"
+  },
+  "tile-toilet": {
+    "art": "a grimy dungeon toilet with a cracked wooden seat and a suspicious green glow inside"
+  },
+  "tile-cage": {
+    "art": "a large rusted iron cage with an angry white goose inside, feathers on the floor around it"
+  },
+  "tile-spear": {
+    "art": "a stone floor square with several sharp iron spikes thrust up through cracked flagstones"
+  },
+  "tile-sign": {
+    "art": "a cheerful corporate welcome sign on a metal stand, reading \"Welcome Crawlers!\""
+  },
+  "tile-chairs": {
+    "art": "a cluster of tiny wooden chairs and a small round table with crayons and a half-finished drawing of a goblin"
+  },
+  "tile-block": {
+    "art": "a heap of massive broken stone rubble and dust filling a square of dungeon floor"
+  },
+  "tile-secret": {
+    "art": "a stone floor square with a thin hidden crack outlining a doorway and a small iron ring pull"
+  },
+  "tile-desk-used": {
+    "art": "the same desk after being ransacked: every drawer pulled out, papers scattered everywhere, the mug tipped over and the nameplate knocked askew"
+  },
+  "tile-rack-used": {
+    "art": "the same weapon stand, now completely empty, only dust outlines and a broken strap where the weapons were"
+  },
+  "tile-toilet-used": {
+    "art": "the same toilet with the lid off and the seat up, the green glow gone, a dropped rubber glove beside it"
+  },
+  "tile-shelf-used": {
+    "art": "the same bookshelf half emptied, the remaining books toppled over, one shelf sagging, a torn page on the floor"
+  },
+  "tile-cage-used": {
+    "art": "the same cage with its door hanging open and nothing inside, a few white feathers scattered on the floor of it"
+  },
+  "tile-chairs-used": {
+    "art": "the same tiny chairs knocked over, crayons scattered across the floor, the drawing torn in half"
+  },
+  "tile-sign-used": {
+    "art": "the same welcome sign knocked flat on its face on the floor"
   }
 }

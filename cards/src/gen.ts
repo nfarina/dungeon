@@ -21,6 +21,8 @@ export const MODELS = ["gemini-3.1-flash-image", "gemini-3.1-flash-lite-image", 
 /** Output resolution. TEMPORARY: 512px drafts while the deck is in flux (about a third the cost of 1K).
  *  Switch to "1K" for the final print run; art made at a smaller size than this setting shows as stale. */
 export const IMAGE_SIZE = process.env.GEMINI_IMAGE_SIZE ?? "512px";
+/** Bump when the tile framing text in fullPrompt changes, so existing tile art shows as stale. */
+const TILE_VIEW = "v2-threequarter";
 const SIZE_RANK: Record<string, number> = { "512px": 0, "1K": 1, "2K": 2, "4K": 3 };
 /** Is art made at `made` good enough for the current setting? Absent = 1K, the API default before this setting existed. */
 const bigEnough = (made?: string) => (SIZE_RANK[made ?? "1K"] ?? 1) >= (SIZE_RANK[IMAGE_SIZE] ?? 1);
@@ -45,13 +47,19 @@ const sha = (b: string | Buffer) => createHash("sha1").update(b).digest("hex");
 export function fullPrompt(c: Card): string {
   const style = readStyle();
   if (c.type === "tile") {
-    return `${style}\n\nThis is a board game floor tile seen DIRECTLY FROM ABOVE, like a map: flat top-down orthographic view, no horizon, no walls, nothing hanging or standing upright, no perspective. Objects lie flat on dark grey stone dungeon flagstones as seen from the ceiling, and fill the frame edge to edge.\n\nSubject: ${c.art}.`;
+    // Furniture gets a high-angle three-quarter view so it reads as an object (legs, sides, height); traps stay flat.
+    // Both are cropped tight: the object IS the tile, with floor only in the gaps.
+    const view = c.tile?.kind === "trap"
+      ? "This is a board game floor tile seen DIRECTLY FROM ABOVE: flat top-down orthographic view of a floor feature, no horizon, no walls, no perspective."
+      : "This is a board game furniture token: high-angle three-quarter view, camera tilted about 60 degrees down and looking straight at the FRONT of the object (no diagonal rotation, the footprint stays a rectangle aligned with the frame), so the top surface AND the front side and legs are visible. No walls, no horizon.";
+    const same = c.ref ? " The second reference image shows this exact object before it was used: keep the same object, colours, materials, viewpoint and framing, and change only what the description says." : "";
+    return `${style}\n\n${view} The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: ${c.art}.${same}`;
   }
   const same = !c.ref ? ""
     : c.type === "tile" ? " The second reference image shows this exact object before it was used: keep the same object, colours, materials, viewpoint and framing, and change only what the description says."
     : " The second reference image shows this exact character: match their face, hair, skin, build and clothing, but take ONLY the character from it, not its background or framing.";
   if (c.type === "standee") {
-    return `${style}\n\nThis is a stand-up game figure: one character shown full length, standing upright and facing the viewer, head near the top of the frame and feet near the bottom, nothing cropped. Plain flat pale parchment background with a simple ground shadow, no scenery. Portrait (tall) composition.\n\nSubject: ${c.art}.${same}`;
+    return `${style}\n\nThis is a stand-up game figure: one character shown full length, standing upright and facing the viewer, head near the top of the frame and feet near the bottom, nothing cropped. Portrait (tall) composition.\n\nSubject: ${c.art}.${same}\n\nBACKGROUND OVERRIDE: ignore the dungeon background described in the style above. The background here must be a plain, flat, uniform pale cream parchment colour, edge to edge, with only a soft ground shadow under the feet. No stone, no walls, no scenery, no gradient.`;
   }
   const subject = c.type === "player"
     ? `Subject: ${c.art}. This is a character portrait for a game card, landscape composition.`
@@ -80,8 +88,8 @@ export function refArt(c: Card, all?: Card[]): Buffer | null {
 export function expectedHash(c: Card, model = DEFAULT_MODEL, all?: Card[]): string {
   const ref = styleRef();
   const ref2 = refArt(c, all);
-  // tiles take their shape from the map, so a resize there makes the art stale
-  return sha([model, readStyle(), ref ? sha(ref) : "noref", c.art, ...(c.ref ? [ref2 ? sha(ref2) : "noref2"] : []), ...(c.type === "tile" ? [aspectRatio(c)] : [])].join(" ")).slice(0, 10);
+  // tiles take their shape from the map, so a resize there makes the art stale; TILE_VIEW bumps when the tile framing prompt changes
+  return sha([model, readStyle(), ref ? sha(ref) : "noref", c.art, ...(c.ref ? [ref2 ? sha(ref2) : "noref2"] : []), ...(c.type === "tile" ? [aspectRatio(c), TILE_VIEW] : [])].join(" ")).slice(0, 10);
 }
 
 /** Cards that would get the exact same request as `c` (same prompt text and shape), e.g. the four Juice Boxes.
