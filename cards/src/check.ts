@@ -3,16 +3,22 @@ import { CARDS, mapFootprints, unlabeledBlockers } from "./catalog";
 import { BIG_GEAR, EXTRA, GEAR, KITS, POCKETS } from "../../sim/src/content/items";
 import { MONSTERS } from "../../sim/src/content/monsters";
 
+// Shuffled decks: the sim's deck lists must match the cards that are NOT bound to an envelope.
+// Envelope copies only matter to the sim when it models them (EXTRA); gold and spare consumables are handouts it ignores.
 const simNames = new Map<string, number>();
 const bump = (n: string) => simNames.set(n, (simNames.get(n) ?? 0) + 1);
 for (const i of [...POCKETS, ...GEAR, ...BIG_GEAR]) bump(i.name);
-for (const i of Object.values(EXTRA)) bump(i.name);
 for (const items of Object.values(KITS)) for (const i of items) bump(i.name);
+const simExtra = new Set(Object.values(EXTRA).map(i => i.name));
 
 const cardNames = new Map<string, number>();
 for (const c of CARDS) {
-  if (["kit", "pockets", "gear", "biggear", "lootbox"].includes(c.deck) && c.type !== "companion" && c.type !== "text")
-    cardNames.set(c.simName ?? c.name, (cardNames.get(c.simName ?? c.name) ?? 0) + 1);
+  const n = c.simName ?? c.name;
+  if (!["kit", "pockets", "gear", "biggear"].includes(c.deck) || c.type === "companion" || c.type === "text") continue;
+  const qty = c.qty ?? 1, reserved = c.envelope ? Math.min(qty, c.reserved ?? qty) : 0;
+  if (reserved && simExtra.has(n)) simNames.set(n, (simNames.get(n) ?? 0) + reserved);   // the sim models this envelope item
+  const counted = qty - reserved + (reserved && simExtra.has(n) ? reserved : 0);
+  if (counted) cardNames.set(n, (cardNames.get(n) ?? 0) + counted);
 }
 // The sim keeps the Snack Bag as two Juice Boxes; the catalog has one kit card.
 cardNames.delete("Snack Bag"); cardNames.set("Juice Box", (cardNames.get("Juice Box") ?? 0) + 2);

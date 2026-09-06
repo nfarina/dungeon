@@ -7,10 +7,10 @@ const esc = (s: string) => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;
 /** Accent colour per deck. Backs use it as a thin stroke only, to save toner. */
 export const DECK_COLOR: Record<Deck, string> = {
   kit: "#5b7a3a", pockets: "#8a6d2f", gear: "#3d5a80", biggear: "#7a3b5e", fan: "#6b4fa0",
-  monster: "#8b2e2e", player: "#2f6f6b", lootbox: "#b08d2c", envelope: "#555", tile: "#4a4036", standee: "#556b2f",
+  monster: "#8b2e2e", player: "#2f6f6b", companion: "#b08d2c", junk: "#7a6a5a", envelope: "#555", tile: "#4a4036", standee: "#556b2f",
 };
 const DECK_GLYPH: Record<Deck, string> = {
-  kit: "🎒", pockets: "👖", gear: "🛠", biggear: "⚒", fan: "📣", monster: "💀", player: "🙂", lootbox: "🎁", envelope: "✉", tile: "🧱", standee: "🧍",
+  kit: "🎒", pockets: "👖", gear: "🛠", biggear: "⚒", fan: "📣", monster: "💀", player: "🙂", companion: "🪿", junk: "🗑", envelope: "✉", tile: "🧱", standee: "🧍",
 };
 
 export const CARD_CSS = `
@@ -97,6 +97,7 @@ export const CARD_CSS = `
 .label .name { font-family:'Cinzel'; font-weight:800; font-size:20pt; line-height:1.1; margin:.03in 0 .05in; }
 .label .name.long { font-size:15pt; }
 .label .trig { font-size:11pt; line-height:1.3; }
+.label .pull { position:absolute; left:.24in; bottom:.06in; font-size:10pt; color:#555; }
 .label .warn { position:absolute; right:.15in; bottom:.08in; font-family:'Alegreya SC'; font-size:6.5pt; letter-spacing:.15em; color:#777; }
 `;
 
@@ -174,7 +175,7 @@ export function renderBack(c: Card, artUrl: string | null = null): string {
   if (c.type === "player") return renderReference(c);
   const deck = DECK_COLOR[c.deck];
   const word = DECK_NAMES[c.deck].toUpperCase();
-  const sub = c.deck === "player" ? "pick one · name yourself" : c.deck === "monster" ? "for the announcer" : c.deck === "fan" ? "viewers only" : c.deck === "lootbox" ? "do not peek" : "floor 1";
+  const sub = c.deck === "player" ? "pick one · name yourself" : c.deck === "monster" ? "for the announcer" : c.deck === "fan" ? "viewers only" : c.deck === "companion" ? "moves with you" : c.deck === "junk" ? "no effect. keep it." : "floor 1";
   return `<div class="card back" style="--deck:${deck}"><div class="glyph">${DECK_GLYPH[c.deck]}</div><div class="word ${word.length > 8 ? "small" : ""}">${esc(word)}</div><div class="sub">${esc(sub)}</div></div>`;
 }
 
@@ -297,13 +298,14 @@ export function renderLabel(c: Card): string {
   return `<div class="label" style="--tier:${tier}"><div class="stripe"></div>
     <div class="tier">${esc(c.tier ?? "")} loot box</div>
     <div class="name ${c.name.length > 18 ? "long" : ""}">${esc(c.name)}</div>
-    <div class="warn">do not open until earned</div></div>`;
+    ${c.pull ? `<div class="pull" title="${esc(c.pull)}">◆</div>` : ""}<div class="warn">do not open until earned</div></div>`;
 }
 
 /** A complete print document: letter pages, cards flush in a 3x3 grid, cut marks in the margins,
  *  each front page followed by its back page mirrored for duplex. */
 export function renderPrint(items: { card: Card; art: string | null }[], opts: { flip: "long" | "short"; perPage: 6 | 9; title: string; flipUrl: string; backDx: number; backDy: number; nudge: (dx: number, dy: number) => string }): string {
-  const cardsOnly = items.filter(i => i.card.type !== "envelope");
+  // qty copies print as identical cards (Gold (5) ×2, and so on)
+  const cardsOnly = items.filter(i => i.card.type !== "envelope").flatMap(i => Array.from({ length: i.card.qty ?? 1 }, () => i));
   const labels = items.filter(i => i.card.type === "envelope");
   const cols = 3, rows = opts.perPage / 3;
   const W = 2.5, H = 3.5, PW = 8.5, PH = 11;

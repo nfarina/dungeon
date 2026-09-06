@@ -86,6 +86,9 @@ Bun.serve({
       const ids = url.searchParams.get("ids")?.split(",").filter(Boolean);
       const flip = url.searchParams.get("flip") === "short" ? "short" : "long";
       const perPage = url.searchParams.get("perPage") === "6" ? 6 : 9;
+      // per-card print counts from the workshop badges: counts=juice-box:1,gold-2:0
+      const counts: Record<string, number> = {};
+      for (const kv of url.searchParams.get("counts")?.split(",") ?? []) { const [id, n] = kv.split(":"); if (id && n !== undefined && !isNaN(+n)) counts[id] = Math.max(0, +n | 0); }
       const all = cards();
       let list = all;
       if (ids?.length) list = ids.map(id => list.find(c => c.id === id)!).filter(Boolean);
@@ -94,6 +97,7 @@ Bun.serve({
       const alt = new URL(url); alt.searchParams.set("flip", flip === "long" ? "short" : "long");
       const backDx = Number(url.searchParams.get("bx") ?? 0) || 0, backDy = Number(url.searchParams.get("by") ?? 0) || 0;
       const nudge = (dx: number, dy: number) => { const u = new URL(url); u.searchParams.set("bx", String(+(backDx + dx).toFixed(1))); u.searchParams.set("by", String(+(backDy + dy).toFixed(1))); return u.pathname + u.search; };
+      list = list.map(c => counts[c.id] !== undefined ? { ...c, qty: counts[c.id] } : c).filter(c => (c.qty ?? 1) > 0);
       if (list.length && list.every(c => c.type === "tile" || c.type === "standee")) return html(renderTileSheet(list.filter(c => !c.backOf).map(c => ({ card: c, art: artUrl(c, model, all), back: backArtUrl(c, model, all) })), { title: deck === "tile" ? "Floor tiles" : deck === "standee" ? "Standees" : title, flip, flipUrl: alt.pathname + alt.search, backDx, backDy, nudge }));
       list = list.filter(c => c.type !== "tile" && c.type !== "standee");
       return html(renderPrint(list.map(c => ({ card: c, art: artUrl(c, model) })), { flip, perPage, title, flipUrl: alt.pathname + alt.search, backDx, backDy, nudge }));

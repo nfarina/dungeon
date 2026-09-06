@@ -10,7 +10,8 @@ export type Deck =
   | "fan"        // Fan deck (Viewers)
   | "monster"    // Monster cards, for the announcer
   | "player"     // Crawler cards: pick a human, name yourself
-  | "lootbox"    // Cards that live only inside an envelope
+  | "companion"  // Companion cards (the goose)
+  | "junk"       // Keepsakes with no effect: notes, trophies, invitations
   | "envelope"   // The envelope labels themselves (label size, not card size)
   | "tile"       // Floor tiles: furniture and traps, integer inches, top-down art
   | "standee";   // Stand-up figures for the plastic stands: the nine crawlers and the boss
@@ -40,10 +41,16 @@ export type Card = {
   stats?: Stats;
   loot?: string[];
   special?: string[];
+  /** Which loot box(es) copies of this card start in. Set aside at setup, not shuffled into the deck. */
+  envelope?: string;
+  /** How many of the `qty` copies go into envelopes. Default: all of them, when `envelope` is set. */
+  reserved?: number;
   /** Envelopes. */
   tier?: "Bronze" | "Silver" | "Gold" | "Platinum" | "Companion";
   trigger?: string;
   contents?: string;
+  /** Envelopes: contents that have no dedicated copy and must be pulled from a deck when stuffing. Marked ◆ on the label. */
+  pull?: string;
   /** Tiles: footprint in board squares (1 square = 1 inch). Standees: printed size in inches, tab included. */
   tile?: { w: number; h: number; kind: "furniture" | "trap" | "standee" };
   /** Tiles: which map piece this is, so size and count follow the map editor. A feature kind, a blocker's label, a trap kind, "secret door" or "falling block". */
@@ -60,7 +67,7 @@ export type Card = {
 
 export const DECK_NAMES: Record<Deck, string> = {
   kit: "Starting Kit", pockets: "Pockets", gear: "Gear", biggear: "Big Gear", fan: "Fan Deck",
-  monster: "Monster", player: "Crawler", lootbox: "Loot Box", envelope: "Loot Box Label", tile: "Floor Tile", standee: "Standee",
+  monster: "Monster", player: "Crawler", companion: "Companion", junk: "Junk", envelope: "Loot Box Label", tile: "Floor Tile", standee: "Standee",
 };
 
 const HUMAN: Stats = { att: 2, def: 2, hp: 6, mind: 3, move: "2d6" };
@@ -86,18 +93,26 @@ const kits: Card[] = [
     art: "a pair of thick black-rimmed glasses with tape on the bridge, lenses glinting" },
 ];
 
-const juice = (n: number): Card => ({ id: `juice-box-${n}`, name: "Juice Box", deck: "pockets", type: "consumable",
-  rules: "Heal 3. One use.", flavor: "Fruit punch. Probably.", qty: 1,
-  art: "a dented cardboard juice box with a bendy straw, cartoon fruit on the label" });
-const energy = (n: number): Card => ({ id: `energy-drink-${n}`, name: "Energy Drink", deck: "pockets", type: "consumable",
+// Identical cards are one entry with a qty. `reserved` copies start in loot boxes instead of the deck.
+const juice: Card = { id: "juice-box", name: "Juice Box", deck: "pockets", type: "consumable", qty: 5, envelope: "First Blood", reserved: 1,
+  rules: "Heal 3. One use.", flavor: "Fruit punch. Probably.",
+  art: "a dented cardboard juice box with a bendy straw, cartoon fruit on the label" };
+const energy: Card = { id: "energy-drink", name: "Energy Drink", deck: "pockets", type: "consumable", qty: 3, envelope: "Why Would You Do That", reserved: 1,
   rules: "+1 attack die on your next attack this turn. One use.", flavor: "DO NOT GIVE TO CHILDREN.",
-  art: "a tall neon green energy drink can crackling with little lightning bolts" });
-const gold = (n: number, v: number): Card => ({ id: `gold-${n}`, name: `Gold (${v})`, deck: "pockets", type: "consumable",
-  rules: `${v} gold. Spend it at the Stairwell Shop between floors.`, flavor: v === 3 ? "A goblin was saving up." : "Slightly sticky.",
-  art: v === 1 ? "a single dull gold coin with a goblin face stamped on it" : v === 2 ? "two gold coins, one bitten" : "a small handful of gold coins spilling out of a torn pocket" });
+  art: "a tall neon green energy drink can crackling with little lightning bolts" };
+const GOLD_ART: Record<number, string> = {
+  1: "a single dull gold coin with a goblin face stamped on it", 2: "two gold coins, one bitten",
+  3: "a small handful of gold coins spilling out of a torn pocket", 5: "a fat leather coin pouch tipped over, gold coins spilling out across the floor",
+};
+const gold = (v: number, qty: number, envelope?: string, reserved?: number, flavor = "Slightly sticky."): Card => ({
+  id: `gold-${v}`, name: `Gold (${v})`, deck: "pockets", type: "consumable", qty, envelope, reserved,
+  rules: `${v} gold. Spend it at the Stairwell Shop between floors.`, flavor, art: GOLD_ART[v] });
 
 const pockets: Card[] = [
-  juice(1), juice(2), juice(3), juice(4), energy(1), energy(2), gold(1, 1), gold(2, 1), gold(3, 2), gold(4, 3),
+  juice, energy, gold(1, 2),
+  gold(2, 4, "You Monster, Why Would You Do That, Sharing Is Caring", 3),
+  gold(3, 3, "First Blood, Backseat Driver", 2, "A goblin was saving up."),
+  gold(5, 2, "Cartographer, Boss Box", 2, "Payroll."),
   { id: "firecracker", name: "Firecracker", deck: "pockets", type: "consumable",
     rules: "1 attack die against every adjacent monster. One use.", flavor: "Illegal in this dungeon. Everything is.",
     art: "a red paper firecracker with a lit fuse throwing sparks" },
@@ -194,26 +209,28 @@ const biggear: Card[] = [
     art: "a bright red superhero cape with an enormous garish corporate logo of a smiling soda can printed on it" },
 ];
 
-const lootbox: Card[] = [
-  { id: "bookmark", name: "Bookmark", deck: "lootbox", type: "item", slot: "Trinket",
+// Cards printed for the loot boxes. Each belongs to a real deck (its back says so) and `envelope` names the box it starts in.
+// Anything an envelope needs that is NOT here (Fire Axe, Firebolt, Football Helmet) is pulled from its deck when stuffing.
+const extras: Card[] = [
+  { id: "bookmark", name: "Bookmark", deck: "gear", type: "item", slot: "Trinket", envelope: "Nerd",
     rules: "Once per floor, set one of your cooldown dice to 0. Tick the box. ☐",
     flavor: "For the caster who just proved they're the caster.",
     art: "a worn leather bookmark with a frayed gold tassel, glowing faintly, lying across an open spellbook" },
-  { id: "nope", name: "Spellbook: Nope", deck: "lootbox", type: "spell", mind: 4, cooldown: 3,
+  { id: "nope", name: "Spellbook: Nope", deck: "biggear", type: "spell", mind: 4, cooldown: 3, envelope: "Boss Box",
     rules: "After a monster rolls an attack against anyone in your room, cancel it.", flavor: "The announcer sighs.",
     art: "a small black leather spellbook, open, with a single glowing red stop-sign hand hovering above the page" },
-  { id: "sir-reginald", name: "Sir Reginald", deck: "lootbox", type: "companion",
+  { id: "sir-reginald", name: "Sir Reginald", deck: "companion", type: "companion", envelope: "Sir Reginald",
     rules: "Companion. Moves with the player who freed him, occupies no square. Once per turn, 1 attack die at a monster adjacent to his person. When a monster attacks his person, roll 1 die: on a skull it attacks the goose instead. Health 2. He does not come back.",
     flavor: "An ill-tempered goose.",
     art: "a furious white goose with an orange beak, wings half spread, wearing a tiny crooked knight's helmet" },
-  { id: "soggy-note", name: "Soggy Note", deck: "lootbox", type: "text",
+  { id: "soggy-note", name: "Soggy Note", deck: "junk", type: "text", envelope: "Why Would You Do That",
     rules: "Don't forget to grab supplies from storage. I don't care if someone is in the bathroom already!!!",
     flavor: "Signed G. Smells exactly how you'd expect.",
     art: "a torn, damp scrap of parchment with smeared handwriting and a crude arrow, held between two fingers at arm's length" },
-  { id: "you-did-that", name: "You did that.", deck: "lootbox", type: "text", slot: "Trinket",
+  { id: "you-did-that", name: "You did that.", deck: "junk", type: "text", envelope: "You Monster",
     rules: "We all saw.", flavor: "No effect.",
     art: "three tiny empty goblin-sized chairs in a dark room, a single spotlight, nothing else" },
-  { id: "save-the-date", name: "Save the Date", deck: "lootbox", type: "text",
+  { id: "save-the-date", name: "Save the Date", deck: "junk", type: "text", envelope: "Boss Box",
     rules: "Congratulations on surviving Floor 1. Class selection is available at the bottom of Floor 2. This offer is non-transferable and the company is not responsible for what you choose.",
     art: "a fancy gold-embossed invitation card with a wax seal shaped like a dungeon stairwell" },
 ];
@@ -337,16 +354,16 @@ const standees: Card[] = [
   standee("greg", "Greg", 1.5, 2.25, "a huge lumpy grey-green cave troll in a too-tight short-sleeved dress shirt with a clip-on tie and a lanyard, a name badge reading GREG, reading glasses, standing upright facing the viewer, holding a coffee mug in one hand and a rolled-up stack of paperwork in the other, whole body visible", "floor-manager"),
 ];
 
-const env = (id: string, name: string, tier: Card["tier"], trigger: string, contents: string): Card =>
-  ({ id: `env-${id}`, name, deck: "envelope", type: "envelope", tier, trigger, contents, rules: "", art: "" });
+const env = (id: string, name: string, tier: Card["tier"], trigger: string, contents: string, pull?: string): Card =>
+  ({ id: `env-${id}`, name, deck: "envelope", type: "envelope", tier, trigger, contents, pull, rules: "", art: "" });
 const envelopes: Card[] = [
   env("first-blood", "First Blood", "Bronze", "First monster killed on the floor", "3 gold, 1 Juice Box"),
-  env("face", "Found It With Your Face", "Silver", "First player to trigger a trap", "Football Helmet"),
+  env("face", "Found It With Your Face", "Silver", "First player to trigger a trap", "Football Helmet", "Football Helmet, from Gear"),
   env("you-monster", "You Monster", "Bronze", "Kill all three goblins in the Daycare", "2 gold, You did that."),
   env("toilet", "Why Would You Do That", "Bronze", "Reach into the toilet", "1 Energy Drink, Gold (2), Soggy Note"),
-  env("nerd", "Nerd", "Gold", "First player to learn a Spellbook", "Scroll: Firebolt, Bookmark"),
+  env("nerd", "Nerd", "Gold", "First player to learn a Spellbook", "Scroll: Firebolt, Bookmark", "Scroll: Firebolt, from Pockets"),
   env("sharing", "Sharing Is Caring", "Bronze", "Give an item to another player", "2 gold"),
-  env("trap-chef", "Trap Chef", "Gold", "A monster dies from a trap", "Fire Axe"),
+  env("trap-chef", "Trap Chef", "Gold", "A monster dies from a trap", "Fire Axe", "Fire Axe, from Big Gear"),
   env("cartographer", "Cartographer", "Silver", "Open the doors to six of the nine rooms", "5 gold"),
   env("reginald", "Sir Reginald", "Companion", "Open the cage in Room 6", "Sir Reginald"),
   env("backseat", "Backseat Driver", "Bronze", "A Viewer's card causes a monster's death", "3 gold for the Viewer, on Floor 2"),
@@ -392,9 +409,9 @@ const tileBacks: Card[] = [
   used("sign", "the same welcome sign knocked flat on its face on the floor, the bell dented and lying on its side"),
 ];
 
-export const CARDS: Card[] = [...kits, ...pockets, ...gear, ...biggear, ...lootbox, ...fan, ...monsters, ...players, ...envelopes, ...tiles, ...tileBacks, ...standees];
+export const CARDS: Card[] = [...kits, ...pockets, ...gear, ...biggear, ...extras, ...fan, ...monsters, ...players, ...envelopes, ...tiles, ...tileBacks, ...standees];
 
-export const DECK_ORDER: Deck[] = ["player", "kit", "pockets", "gear", "biggear", "lootbox", "fan", "monster", "envelope", "tile", "standee"];
+export const DECK_ORDER: Deck[] = ["player", "kit", "pockets", "gear", "biggear", "companion", "junk", "fan", "monster", "envelope", "tile", "standee"];
 
 const byId = new Map(CARDS.map(c => [c.id, c]));
 export const card = (id: string) => byId.get(id);

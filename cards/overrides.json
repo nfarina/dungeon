@@ -23,9 +23,6 @@
   "sir-reginald": {
     "art": "a furious white goose with an orange beak, wings half spread, wearing a tiny crooked knight's helmet"
   },
-  "juice-box-1": {
-    "art": "a dented cardboard juice box with a bendy straw, cartoon fruit on the label"
-  },
   "human-1": {
     "art": "waist-up portrait of a skinny teenage boy with messy brown hair in an oversized grey hoodie and basketball shorts, holding a flashlight, ordinary modern everyday clothes, standing in a dark stone dungeon looking slightly alarmed but game for it, no weapons"
   },
@@ -35,14 +32,8 @@
   "firecracker": {
     "art": "a red paper firecracker with a lit fuse throwing sparks"
   },
-  "juice-box-2": {
-    "art": "a dented cardboard juice box with a bendy straw, cartoon fruit on the label"
-  },
   "bandage": {
     "art": "a roll of white gauze bandage with a cartoon band-aid stuck to it"
-  },
-  "energy-drink-1": {
-    "art": "a tall neon green energy drink can crackling with little lightning bolts"
   },
   "orc-monocle": {
     "art": "a large brass monocle on a chain, comically oversized, one lens cracked"
@@ -76,5 +67,17 @@
   },
   "soggy-note": {
     "art": "a torn, damp scrap of parchment with smeared handwriting and a crude arrow, held between two fingers at arm's length"
+  },
+  "tile-chest": {
+    "art": "an iron-banded wooden treasure chest with a heavy padlock"
+  },
+  "tile-table": {
+    "art": "a scratched wooden table with a half-eaten sandwich, a juice box and scattered crumbs"
+  },
+  "tile-chest-used": {
+    "art": "the same chest with its lid thrown wide open and nothing inside, the broken padlock lying on the floor beside it"
+  },
+  "tile-table-used": {
+    "art": "the same table after the party has been through it: the sandwich gone, only crumbs left, the juice box crushed flat"
   }
 }

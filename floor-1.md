@@ -374,14 +374,14 @@ Counts for the card pipeline. Poker size, nine per letter sheet.
 | Pockets deck | 16 |
 | Gear deck | 14 |
 | Big Gear deck | 9 |
-| Loot Box exclusives (Nope, Bookmark, Companion, Save-the-Date, "You did that", Soggy Note) | 6 |
-| Loot Box envelope labels | 11 |
+| Envelope copies, printed as ordinary deck cards and set aside at setup: Nope (Big Gear), Bookmark (Gear), Sir Reginald (Companion), Save-the-Date, "You did that" and Soggy Note (Junk), seven Gold and one Juice Box and one Energy Drink (Pockets) | 15 |
+| Loot Box envelope labels. A ◆ on a label means something inside is pulled from a deck when stuffing: Football Helmet, Scroll: Firebolt, Fire Axe | 11 |
 | Fan deck | 14 |
 | Trap tokens (pit, spear, block, revealed-secret-door) | 9 |
 | Room signs (optional, but the Daycare deserves one) | 9 |
 | Player reference on the back of each crawler card: turn order, the dice, Downed, cooldowns, trading | 8 |
 | Announcer speeches: in the map file, read from the iPad DM view | 5 |
-| Countdown die: a d12. Cooldown dice: any d6s. Gold: coins from the HeroQuest box or printed tokens. | |
+| Countdown die: a d12. Cooldown dice: any d6s. Gold: Pockets cards. | |
 
 Card template types: Player, Monster, Item (slot, effect, flavor, art), Spell (cooldown box, tick boxes, Mind requirement), Consumable, Companion, Fan (the Item layout with its own color and back), Envelope label. Eight HTML templates, one data file.
 

@@ -30,6 +30,8 @@ the margins. Print at **100% scale, duplex, flip on long edge**; `?flip=short` i
 `?perPage=6` if the bottom row clips. Backs are white with a single outlined word and no border, so duplex costs almost no toner and a slightly misregistered back side is invisible.
 
 If the backs land a millimetre or two off the fronts, use the **Back offset** arrows in the print bar (`?bx=1&by=0`, in mm). The print page remembers the last value and the workshop's print buttons reuse it. Cards have a thick square outer frame so the cut line can wander a bit into the frame without showing parchment.
+There is no loot box deck: every card belongs to a real deck and `envelope` on a card names the box it starts in, so cards can be reused between floors. A ◆ on a label means the box also needs something pulled from a deck (the label's `pull` field says what).
+
 Envelope labels print single-sided, 10 per sheet, on plain paper or Avery 5163.
 
 **Floor tiles** (`?deck=tile`) and **standees** (`?deck=standee`) share a guillotine layout: rows of equal height, so every horizontal cut runs the full page width and each strip is then cut at the white ticks. Both print duplex. Tiles carry their name on the back; standees show the figure mirrored on the back with a 0.3 in tab at the bottom for the plastic clip stands. Print standees on cardstock.
