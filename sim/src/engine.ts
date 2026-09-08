@@ -150,6 +150,9 @@ export type Result = {
   collapseScheduled: number | null;
   /** Round the Manager's Office was opened -- when the fuse gets lit. */
   doorRound: number | null;
+  room2ExitRound: number | null;
+  /** Rooms the party opened a (non-secret) door into by the end. */
+  roomsOpened: number;
   /** True if the floor-wide cap, not the boss fuse, is what started the collapse. */
   capBound: boolean;
 };
@@ -177,6 +180,8 @@ export class Game {
   bossKilledRound: number | null = null;
   bossEngagedRound: number | null = null;
   bossDoorRound: number | null = null;
+  /** Round the party first opened a door leading out of Room 2 (the snack table). */
+  room2ExitRound: number | null = null;
   collapseFrom: number | null = null;
   heroesLost = 0;
   lastDownRound: number | null = null;
@@ -459,6 +464,10 @@ export class Game {
       collapseBegan: this.collapseFrom,
       collapseScheduled: this.collapseBegins(),
       doorRound: this.bossDoorRound,
+      room2ExitRound: this.room2ExitRound,
+      roomsOpened: (() => { const o = new Set<number>(); this.board.doors.forEach((d, i) => {
+        if (d.kind === "secret" || this.openDoors[i] !== 1) return;
+        for (const c of [d.a, d.b]) { const r = this.board.roomIdAt(c); if (r !== null) o.add(r); } }); return o.size; })(),
       capBound: this.cfg.collapseRound !== null && this.bossDoorRound !== null &&
         this.cfg.collapseRound <= this.bossDoorRound + this.cfg.collapseAfterDoor,
       downs: this.stats.downs, respawns: this.stats.respawns, monstersKilled: this.stats.kills,
@@ -824,6 +833,10 @@ export class Game {
     }
     if ((this.board.roomIdAt(from) === 9 || this.board.roomIdAt(to) === 9) && this.bossDoorRound === null)
       this.bossDoorRound = this.round;
+    {
+      const ra = this.board.roomIdAt(d.a), rb = this.board.roomIdAt(d.b);
+      if ((ra === 2 || rb === 2) && ra !== 1 && rb !== 1 && this.room2ExitRound === null) this.room2ExitRound = this.round;
+    }
     if (d.kind === "locked" && !this.has(h, i => !!i.unlocks)) {
       // Knocking: the two Orcs each get a free swing at the knocker.
       for (const m of this.monsters.filter(m => m.alive && m.room === 9 && !m.def.boss)) {

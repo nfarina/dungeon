@@ -1,0 +1,120 @@
+{
+    "error_string": "Success.",
+    "layer_height": 0.1599999964237213,
+    "peak_rss_mb": 76.828125,
+    "plate_index": 0,
+    "return_code": 0,
+    "sliced_plates": [
+        {
+            "feature_type_times": {
+                "Bottom surface": 37.719757080078125,
+                "Bridge": 8.953963279724121,
+                "Custom": 370.5011291503906,
+                "Flush": 28.0,
+                "Gap infill": 0.34559375047683716,
+                "Inner wall": 235.9559783935547,
+                "Internal solid infill": 138.66685485839844,
+                "Outer wall": 229.73062133789063,
+                "Overhang wall": 0.07509993761777878,
+                "Sparse infill": 36.48850631713867,
+                "Top surface": 40.315887451171875,
+                "Travel": 149.3194122314453,
+                "Undefined": 131.25241088867188
+            },
+            "filament_change_times": 0,
+            "filaments": [
+                {
+                    "filament_id": "GFA00",
+                    "id": 1,
+                    "main_used_g": 3.6526498794555664,
+                    "total_used_g": 3.6526498794555664
+                }
+            ],
+            "id": 1,
+            "layer_filament_change": 0,
+            "main_predication": 849.5816040039063,
+            "obj_cached_cnt": 0,
+            "objects": [
+                {
+                    "bbox": {
+                        "depth": 35.19999694824219,
+                        "height": 5.199999809265137,
+                        "width": 19.999998092651367,
+                        "x": 87.00009155273438,
+                        "y": 79.35011291503906,
+                        "z": 0.0
+                    },
+                    "id": 5,
+                    "name": "test-rail-3-stops",
+                    "triangle_count": 936
+                },
+                {
+                    "bbox": {
+                        "depth": 18.5,
+                        "height": 7.5,
+                        "width": 11.999999046325684,
+                        "x": 72.99993133544922,
+                        "y": 89.9255599975586,
+                        "z": 0.0
+                    },
+                    "id": 9,
+                    "name": "slider-standard",
+                    "triangle_count": 350
+                },
+                {
+                    "bbox": {
+                        "depth": 11.899999618530273,
+                        "height": 7.5,
+                        "width": 18.499998092651367,
+                        "x": 88.50009155273438,
+                        "y": 65.44989013671875,
+                        "z": 0.0
+                    },
+                    "id": 13,
+                    "name": "slider-gentle",
+                    "triangle_count": 350
+                }
+            ],
+            "times": {
+                "conflict_check_time": 3,
+                "detect_overhangs_time": 0,
+                "export_gcode_time": 174,
+                "flush_plan_time": 0,
+                "generate_support_material_time": 3,
+                "infill_generate_time": 18,
+                "infill_time": 52,
+                "ironing_time": 0,
+                "make_perimeters_time": 21,
+                "multifilament_segment_2d_time": 0,
+                "other_slice_time": 2,
+                "prepare_infill_time": 34,
+                "region_split_time": 0,
+                "skirt_brim_time": 0,
+                "slice_layers_time": 5,
+                "sliced_time": 260,
+                "sliced_time_with_cache": 174,
+                "support_detect_time": 0,
+                "support_interface_time": 0,
+                "support_normal_generate_time": 0,
+                "support_toolpath_time": 0,
+                "support_tree_generate_time": 0,
+                "toolpath_time": 4,
+                "wall_time": 16,
+                "wipe_tower_time": 1
+            },
+            "total_predication": 1258.0157470703125,
+            "triangle_count": 1636,
+            "warning_message": ""
+        }
+    ],
+    "sparse_infill_density": 20.0,
+    "times": {
+        "export_3mf_time": 0,
+        "export_slicedata_time": 0,
+        "export_time": 0,
+        "import_time": 7,
+        "load_slicedata_time": 0,
+        "prepare_time": 16
+    },
+    "wall_loops": 3
+}

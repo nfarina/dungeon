@@ -1,0 +1,62 @@
+{
+  "00-small-latch-test": {
+    "return_code": 0,
+    "layer_height": 0.1599999964237213,
+    "wall_loops": 3,
+    "warnings": "",
+    "seconds": 3000.90673828125,
+    "filaments": [
+      {
+        "filament_id": "GFA00",
+        "id": 1,
+        "main_used_g": 11.167501449584961,
+        "total_used_g": 11.167501449584961
+      }
+    ]
+  },
+  "01-test-and-reusable-parts": {
+    "return_code": 0,
+    "layer_height": 0.1599999964237213,
+    "wall_loops": 3,
+    "warnings": "",
+    "seconds": 10703.9130859375,
+    "filaments": [
+      {
+        "filament_id": "GFA00",
+        "id": 1,
+        "main_used_g": 65.67359924316406,
+        "total_used_g": 65.67359924316406
+      }
+    ]
+  },
+  "02-full-frame": {
+    "return_code": 0,
+    "layer_height": 0.1599999964237213,
+    "wall_loops": 3,
+    "warnings": "",
+    "seconds": 5026.95263671875,
+    "filaments": [
+      {
+        "filament_id": "GFA00",
+        "id": 1,
+        "main_used_g": 25.743576049804688,
+        "total_used_g": 25.743576049804688
+      }
+    ]
+  },
+  "03-base-and-ceiling": {
+    "return_code": 0,
+    "layer_height": 0.1599999964237213,
+    "wall_loops": 3,
+    "warnings": "",
+    "seconds": 8672.0986328125,
+    "filaments": [
+      {
+        "filament_id": "GFA00",
+        "id": 1,
+        "main_used_g": 53.139278411865234,
+        "total_used_g": 53.139278411865234
+      }
+    ]
+  }
+}

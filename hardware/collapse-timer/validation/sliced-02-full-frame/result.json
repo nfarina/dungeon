@@ -1,0 +1,78 @@
+{
+    "error_string": "Success.",
+    "layer_height": 0.1599999964237213,
+    "peak_rss_mb": 168.53125,
+    "plate_index": 0,
+    "return_code": 0,
+    "sliced_plates": [
+        {
+            "feature_type_times": {
+                "Bottom surface": 192.9058837890625,
+                "Bridge": 184.5995330810547,
+                "Custom": 370.4474792480469,
+                "Flush": 28.0,
+                "Gap infill": 5.04089879989624,
+                "Inner wall": 1338.6585693359375,
+                "Internal solid infill": 719.8343505859375,
+                "Outer wall": 1144.5535888671875,
+                "Sparse infill": 633.1231079101563,
+                "Top surface": 190.42518615722656,
+                "Travel": 238.21234130859375,
+                "Undefined": 219.83592224121094
+            },
+            "filament_change_times": 0,
+            "filaments": [
+                {
+                    "filament_id": "GFA00",
+                    "id": 1,
+                    "main_used_g": 25.743576049804688,
+                    "total_used_g": 25.743576049804688
+                }
+            ],
+            "id": 1,
+            "layer_filament_change": 0,
+            "main_predication": 4618.88134765625,
+            "obj_cached_cnt": 0,
+            "times": {
+                "conflict_check_time": 0,
+                "detect_overhangs_time": 1,
+                "export_gcode_time": 246,
+                "flush_plan_time": 0,
+                "generate_support_material_time": 13,
+                "infill_generate_time": 79,
+                "infill_time": 224,
+                "ironing_time": 0,
+                "make_perimeters_time": 206,
+                "multifilament_segment_2d_time": 0,
+                "other_slice_time": 0,
+                "prepare_infill_time": 145,
+                "region_split_time": 0,
+                "skirt_brim_time": 0,
+                "slice_layers_time": 13,
+                "sliced_time": 702,
+                "sliced_time_with_cache": 246,
+                "support_detect_time": 0,
+                "support_interface_time": 0,
+                "support_normal_generate_time": 0,
+                "support_toolpath_time": 0,
+                "support_tree_generate_time": 0,
+                "toolpath_time": 9,
+                "wall_time": 193,
+                "wipe_tower_time": 1
+            },
+            "total_predication": 5026.95263671875,
+            "triangle_count": 8208,
+            "warning_message": ""
+        }
+    ],
+    "sparse_infill_density": 20.0,
+    "times": {
+        "export_3mf_time": 0,
+        "export_slicedata_time": 0,
+        "export_time": 0,
+        "import_time": 9,
+        "load_slicedata_time": 0,
+        "prepare_time": 11
+    },
+    "wall_loops": 3
+}

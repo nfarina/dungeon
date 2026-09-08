@@ -53,7 +53,7 @@ Slots are the equipment specialization system. A two-handed axe means no shield.
 
 ### 1.3 Cooldowns
 
-Any card with **Cooldown N** gets a d6 set to N when used. At the start of your turn, turn every cooldown die on your cards down by one. At 0, remove the die: the card is ready. Using a spell costs your action (you still move).
+Any card with **Cooldown N** gets a cooldown die set to N when used. At the start of your turn, turn every cooldown die on your cards down by one. At 0, remove the die: the card is ready. Using a spell costs your action (you still move).
 
 Cooldown replaces "save it for the boss." A Spark you don't cast is a Spark you wasted.
 
@@ -381,7 +381,7 @@ Counts for the card pipeline. Poker size, nine per letter sheet.
 | Room signs (optional, but the Daycare deserves one) | 9 |
 | Player reference on the back of each crawler card: turn order, the dice, Downed, cooldowns, trading | 8 |
 | Announcer speeches: in the map file, read from the iPad DM view | 5 |
-| Countdown die: a d12. Cooldown dice: any d6s. Gold: Pockets cards. | |
+| Floor clock: a split-flap counter (00–99). Cooldown dice: d12 spindowns, one colour per player. Gold: Pockets cards. | |
 
 Card template types: Player, Monster, Item (slot, effect, flavor, art), Spell (cooldown box, tick boxes, Mind requirement), Consumable, Companion, Fan (the Item layout with its own color and back), Envelope label. Eight HTML templates, one data file.
 
