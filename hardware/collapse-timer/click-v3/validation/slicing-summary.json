@@ -1,0 +1,96 @@
+{
+  "00-test-frame-only": {
+    "return_code": 0,
+    "layer_height": 0.20000000298023224,
+    "wall_loops": 3,
+    "warnings": "",
+    "seconds": 2771.069091796875,
+    "filaments": [
+      {
+        "filament_id": "GFA00",
+        "id": 1,
+        "main_used_g": 12.013262748718262,
+        "total_used_g": 13.795242309570312
+      },
+      {
+        "filament_id": "GFA00",
+        "id": 2,
+        "main_used_g": 0.006475419271737337,
+        "total_used_g": 1.418431043624878
+      }
+    ],
+    "filament_selection_sequence": [
+      0,
+      1,
+      0,
+      1
+    ],
+    "filament_changes": 3
+  },
+  "01-ceiling-only": {
+    "return_code": 0,
+    "layer_height": 0.20000000298023224,
+    "wall_loops": 3,
+    "warnings": "",
+    "seconds": 3196.55078125,
+    "filaments": [
+      {
+        "filament_id": "GFA00",
+        "id": 1,
+        "main_used_g": 16.877634048461914,
+        "total_used_g": 16.877634048461914
+      }
+    ],
+    "filament_selection_sequence": [
+      0
+    ],
+    "filament_changes": 0
+  },
+  "02-full-frame": {
+    "return_code": 0,
+    "layer_height": 0.20000000298023224,
+    "wall_loops": 3,
+    "warnings": "",
+    "seconds": 5192.20947265625,
+    "filaments": [
+      {
+        "filament_id": "GFA00",
+        "id": 1,
+        "main_used_g": 24.583572387695312,
+        "total_used_g": 26.365549087524414
+      },
+      {
+        "filament_id": "GFA00",
+        "id": 2,
+        "main_used_g": 0.09268996119499207,
+        "total_used_g": 1.5046454668045044
+      }
+    ],
+    "filament_selection_sequence": [
+      0,
+      1,
+      0,
+      1
+    ],
+    "filament_changes": 3
+  },
+  "03-base-and-ceiling": {
+    "return_code": 0,
+    "layer_height": 0.20000000298023224,
+    "wall_loops": 3,
+    "warnings": "",
+    "seconds": 7151.80615234375,
+    "filaments": [
+      {
+        "filament_id": "GFA00",
+        "id": 1,
+        "main_used_g": 51.38258743286133,
+        "total_used_g": 51.38258743286133
+      }
+    ],
+    "filament_selection_sequence": [
+      0
+    ],
+    "filament_changes": 0
+  }
+}

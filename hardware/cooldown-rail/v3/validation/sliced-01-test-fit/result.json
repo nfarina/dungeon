@@ -1,0 +1,168 @@
+{
+    "error_string": "Success.",
+    "layer_height": 0.20000000298023224,
+    "peak_rss_mb": 84.65625,
+    "plate_index": 0,
+    "return_code": 0,
+    "sliced_plates": [
+        {
+            "feature_type_times": {
+                "Bottom surface": 53.519020080566406,
+                "Bridge": 13.749135971069336,
+                "Custom": 367.2734069824219,
+                "Flush": 410.8999328613281,
+                "Gap infill": 0.46844518184661865,
+                "Inner wall": 298.3255310058594,
+                "Internal solid infill": 136.82725524902344,
+                "Outer wall": 311.9401550292969,
+                "Overhang wall": 2.7710182666778564,
+                "Prime tower": 204.01625061035156,
+                "Sparse infill": 43.7546501159668,
+                "Top surface": 56.932193756103516,
+                "Travel": 290.89599609375,
+                "Undefined": 272.0597839355469
+            },
+            "filament_change_times": 4,
+            "filaments": [
+                {
+                    "filament_id": "GFA00",
+                    "id": 1,
+                    "main_used_g": 5.4624505043029785,
+                    "total_used_g": 7.217162609100342
+                },
+                {
+                    "filament_id": "GFA00",
+                    "id": 2,
+                    "main_used_g": 0.023889988660812378,
+                    "total_used_g": 1.5517655611038208
+                }
+            ],
+            "id": 1,
+            "layer_filament_change": 0,
+            "main_predication": 1181.1695556640625,
+            "obj_cached_cnt": 0,
+            "objects": [
+                {
+                    "bbox": {
+                        "depth": 48.400001525878906,
+                        "height": 5.800000190734863,
+                        "width": 20.0,
+                        "x": 20.0,
+                        "y": 20.0,
+                        "z": -4.632568550988481e-09
+                    },
+                    "id": 5,
+                    "name": "test-rail-body",
+                    "triangle_count": 2712
+                },
+                {
+                    "bbox": {
+                        "depth": 22.5,
+                        "height": 8.0,
+                        "width": 12.75,
+                        "x": 48.0,
+                        "y": 20.0,
+                        "z": 0.0
+                    },
+                    "id": 9,
+                    "name": "slider-A-firm",
+                    "triangle_count": 468
+                },
+                {
+                    "bbox": {
+                        "depth": 22.5,
+                        "height": 8.0,
+                        "width": 12.75,
+                        "x": 65.0,
+                        "y": 20.0,
+                        "z": 0.0
+                    },
+                    "id": 13,
+                    "name": "slider-B-firmer",
+                    "triangle_count": 484
+                },
+                {
+                    "bbox": {
+                        "depth": 5.199999809265137,
+                        "height": 3.5999999046325684,
+                        "width": 20.0,
+                        "x": 85.0,
+                        "y": 20.0,
+                        "z": -2.3162842754942403e-09
+                    },
+                    "id": 17,
+                    "name": "end-cap",
+                    "triangle_count": 36
+                },
+                {
+                    "bbox": {
+                        "depth": 8.0,
+                        "height": 5.0,
+                        "width": 30.0,
+                        "x": 48.0,
+                        "y": 55.0,
+                        "z": 0.0
+                    },
+                    "id": 21,
+                    "name": "clip-card-left-0.50mm",
+                    "triangle_count": 190
+                }
+            ],
+            "times": {
+                "conflict_check_time": 4,
+                "detect_overhangs_time": 1,
+                "export_gcode_time": 217,
+                "flush_plan_time": 0,
+                "generate_support_material_time": 3,
+                "infill_generate_time": 14,
+                "infill_time": 29,
+                "ironing_time": 0,
+                "make_perimeters_time": 33,
+                "multifilament_segment_2d_time": 0,
+                "other_slice_time": 1,
+                "prepare_infill_time": 15,
+                "region_split_time": 0,
+                "skirt_brim_time": 0,
+                "slice_layers_time": 6,
+                "sliced_time": 301,
+                "sliced_time_with_cache": 217,
+                "support_detect_time": 0,
+                "support_interface_time": 0,
+                "support_normal_generate_time": 0,
+                "support_toolpath_time": 0,
+                "support_tree_generate_time": 0,
+                "toolpath_time": 3,
+                "wall_time": 27,
+                "wipe_tower_time": 9
+            },
+            "total_predication": 2172.52294921875,
+            "triangle_count": 3890,
+            "warning_message": ""
+        }
+    ],
+    "sparse_infill_density": 20.0,
+    "times": {
+        "export_3mf_time": 0,
+        "export_slicedata_time": 0,
+        "export_time": 0,
+        "import_time": 7,
+        "load_slicedata_time": 0,
+        "prepare_time": 8
+    },
+    "upward_compatible_machine": [
+        "Bambu Lab P1S 0.4 nozzle",
+        "Bambu Lab P1P 0.4 nozzle",
+        "Bambu Lab X1 0.4 nozzle",
+        "Bambu Lab X1 Carbon 0.4 nozzle",
+        "Bambu Lab X1E 0.4 nozzle",
+        "Bambu Lab A1 0.4 nozzle",
+        "Bambu Lab H2D 0.4 nozzle",
+        "Bambu Lab H2D Pro 0.4 nozzle",
+        "Bambu Lab H2S 0.4 nozzle",
+        "Bambu Lab P2S 0.4 nozzle",
+        "Bambu Lab H2C 0.4 nozzle",
+        "Bambu Lab X2D 0.4 nozzle",
+        "Bambu Lab A2L 0.4 nozzle"
+    ],
+    "wall_loops": 3
+}

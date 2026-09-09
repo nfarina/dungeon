@@ -1,0 +1,44 @@
+{
+  "01-test-fit": {
+    "return_code": 0,
+    "layer_height": 0.20000000298023224,
+    "wall_loops": 3,
+    "warnings": "",
+    "seconds": 2033.1944580078125,
+    "filaments": [
+      {
+        "filament_id": "GFA00",
+        "id": 1,
+        "main_used_g": 5.036412239074707,
+        "total_used_g": 6.791123867034912
+      },
+      {
+        "filament_id": "GFA00",
+        "id": 2,
+        "main_used_g": 0.023889988660812378,
+        "total_used_g": 1.5517655611038208
+      }
+    ]
+  },
+  "02-full-tracker": {
+    "return_code": 0,
+    "layer_height": 0.20000000298023224,
+    "wall_loops": 3,
+    "warnings": "",
+    "seconds": 2536.622314453125,
+    "filaments": [
+      {
+        "filament_id": "GFA00",
+        "id": 1,
+        "main_used_g": 7.654348373413086,
+        "total_used_g": 9.40906047821045
+      },
+      {
+        "filament_id": "GFA00",
+        "id": 2,
+        "main_used_g": 0.05479612946510315,
+        "total_used_g": 1.5826716423034668
+      }
+    ]
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "00-test-frame-only": {
+    "colors": 2,
+    "palette": [
+      "#626E74",
+      "#FFFFFF"
+    ]
+  },
+  "01-ceiling-only": {
+    "colors": 1,
+    "palette": [
+      "#626E74",
+      "#FFFFFF"
+    ]
+  },
+  "02-full-frame": {
+    "colors": 2,
+    "tower_xy": [
+      125,
+      60
+    ],
+    "palette": [
+      "#626E74",
+      "#FFFFFF"
+    ]
+  },
+  "03-base-and-ceiling": {
+    "colors": 1,
+    "palette": [
+      "#626E74",
+      "#FFFFFF"
+    ]
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "00-small-number-test": {
+    "return_code": 0,
+    "layer_height": 0.20000000298023224,
+    "wall_loops": 3,
+    "warnings": "",
+    "seconds": 1255.3648681640625,
+    "filaments": [
+      {
+        "filament_id": "GFA00",
+        "id": 1,
+        "main_used_g": 3.27890944480896,
+        "total_used_g": 4.397349834442139
+      },
+      {
+        "filament_id": "GFA00",
+        "id": 2,
+        "main_used_g": 0.008405674248933792,
+        "total_used_g": 0.6564234495162964
+      }
+    ],
+    "filament_selection_sequence": [
+      0,
+      1
+    ],
+    "filament_changes": 1
+  },
+  "01-track-only": {
+    "return_code": 0,
+    "layer_height": 0.20000000298023224,
+    "wall_loops": 3,
+    "warnings": "",
+    "seconds": 1640.795654296875,
+    "filaments": [
+      {
+        "filament_id": "GFA00",
+        "id": 1,
+        "main_used_g": 5.847475528717041,
+        "total_used_g": 6.965915679931641
+      },
+      {
+        "filament_id": "GFA00",
+        "id": 2,
+        "main_used_g": 0.020362911745905876,
+        "total_used_g": 0.6683806777000427
+      }
+    ],
+    "filament_selection_sequence": [
+      0,
+      1
+    ],
+    "filament_changes": 1
+  },
+  "02-slider-cap-clips": {
+    "return_code": 0,
+    "layer_height": 0.20000000298023224,
+    "wall_loops": 3,
+    "warnings": "",
+    "seconds": 944.5864868164062,
+    "filaments": [
+      {
+        "filament_id": "GFA00",
+        "id": 1,
+        "main_used_g": 1.891958475112915,
+        "total_used_g": 1.891958475112915
+      }
+    ],
+    "filament_selection_sequence": [
+      0
+    ],
+    "filament_changes": 0
+  }
+}

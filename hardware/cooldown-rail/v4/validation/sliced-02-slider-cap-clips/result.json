@@ -1,0 +1,148 @@
+{
+    "error_string": "Success.",
+    "layer_height": 0.20000000298023224,
+    "peak_rss_mb": 74.515625,
+    "plate_index": 0,
+    "return_code": 0,
+    "sliced_plates": [
+        {
+            "feature_type_times": {
+                "Bottom surface": 11.418508529663086,
+                "Bridge": 0.2968328893184662,
+                "Custom": 365.9694519042969,
+                "Flush": 28.0,
+                "Gap infill": 0.628678023815155,
+                "Inner wall": 152.39926147460938,
+                "Internal solid infill": 34.72693634033203,
+                "Outer wall": 195.47813415527344,
+                "Overhang wall": 1.1322081089019775,
+                "Sparse infill": 9.118928909301758,
+                "Top surface": 17.308120727539063,
+                "Travel": 146.74888610839844,
+                "Undefined": 128.11660766601563
+            },
+            "filament_change_times": 0,
+            "filaments": [
+                {
+                    "filament_id": "GFA00",
+                    "id": 1,
+                    "main_used_g": 1.891958475112915,
+                    "total_used_g": 1.891958475112915
+                }
+            ],
+            "id": 1,
+            "layer_filament_change": 0,
+            "main_predication": 541.249267578125,
+            "obj_cached_cnt": 0,
+            "objects": [
+                {
+                    "bbox": {
+                        "depth": 22.5,
+                        "height": 8.0,
+                        "width": 12.75,
+                        "x": 40.0,
+                        "y": 35.0,
+                        "z": 0.0
+                    },
+                    "id": 5,
+                    "name": "slider-A-firm",
+                    "triangle_count": 468
+                },
+                {
+                    "bbox": {
+                        "depth": 5.199999809265137,
+                        "height": 3.5999999046325684,
+                        "width": 20.0,
+                        "x": 65.0,
+                        "y": 35.0,
+                        "z": -2.3162842754942403e-09
+                    },
+                    "id": 9,
+                    "name": "end-cap",
+                    "triangle_count": 36
+                },
+                {
+                    "bbox": {
+                        "depth": 8.0,
+                        "height": 5.0,
+                        "width": 30.0,
+                        "x": 40.0,
+                        "y": 70.0,
+                        "z": 0.0
+                    },
+                    "id": 13,
+                    "name": "clip-card-left-0.50mm",
+                    "triangle_count": 190
+                },
+                {
+                    "bbox": {
+                        "depth": 8.0,
+                        "height": 5.0,
+                        "width": 30.0,
+                        "x": 80.0,
+                        "y": 70.0,
+                        "z": 0.0
+                    },
+                    "id": 17,
+                    "name": "clip-card-left-0.50mm",
+                    "triangle_count": 190
+                }
+            ],
+            "times": {
+                "conflict_check_time": 2,
+                "detect_overhangs_time": 0,
+                "export_gcode_time": 94,
+                "flush_plan_time": 0,
+                "generate_support_material_time": 2,
+                "infill_generate_time": 11,
+                "infill_time": 16,
+                "ironing_time": 0,
+                "make_perimeters_time": 19,
+                "multifilament_segment_2d_time": 0,
+                "other_slice_time": 1,
+                "prepare_infill_time": 5,
+                "region_split_time": 0,
+                "skirt_brim_time": 0,
+                "slice_layers_time": 3,
+                "sliced_time": 138,
+                "sliced_time_with_cache": 94,
+                "support_detect_time": 0,
+                "support_interface_time": 0,
+                "support_normal_generate_time": 0,
+                "support_toolpath_time": 0,
+                "support_tree_generate_time": 0,
+                "toolpath_time": 2,
+                "wall_time": 16,
+                "wipe_tower_time": 1
+            },
+            "total_predication": 944.5864868164063,
+            "triangle_count": 884,
+            "warning_message": ""
+        }
+    ],
+    "sparse_infill_density": 20.0,
+    "times": {
+        "export_3mf_time": 0,
+        "export_slicedata_time": 0,
+        "export_time": 0,
+        "import_time": 4,
+        "load_slicedata_time": 0,
+        "prepare_time": 5
+    },
+    "upward_compatible_machine": [
+        "Bambu Lab P1S 0.4 nozzle",
+        "Bambu Lab P1P 0.4 nozzle",
+        "Bambu Lab X1 0.4 nozzle",
+        "Bambu Lab X1 Carbon 0.4 nozzle",
+        "Bambu Lab X1E 0.4 nozzle",
+        "Bambu Lab A1 0.4 nozzle",
+        "Bambu Lab H2D 0.4 nozzle",
+        "Bambu Lab H2D Pro 0.4 nozzle",
+        "Bambu Lab H2S 0.4 nozzle",
+        "Bambu Lab P2S 0.4 nozzle",
+        "Bambu Lab H2C 0.4 nozzle",
+        "Bambu Lab X2D 0.4 nozzle",
+        "Bambu Lab A2L 0.4 nozzle"
+    ],
+    "wall_loops": 3
+}

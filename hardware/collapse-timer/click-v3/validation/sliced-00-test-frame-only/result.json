@@ -1,0 +1,115 @@
+{
+    "error_string": "Success.",
+    "layer_height": 0.20000000298023224,
+    "peak_rss_mb": 96.078125,
+    "plate_index": 0,
+    "return_code": 0,
+    "sliced_plates": [
+        {
+            "feature_type_times": {
+                "Bottom surface": 95.14800262451172,
+                "Bridge": 87.47340393066406,
+                "Custom": 367.2294006347656,
+                "Flush": 329.9273986816406,
+                "Gap infill": 0.7818070650100708,
+                "Inner wall": 504.10650634765625,
+                "Internal solid infill": 204.66311645507813,
+                "Outer wall": 387.34613037109375,
+                "Prime tower": 220.9590606689453,
+                "Sparse infill": 272.33282470703125,
+                "Top surface": 73.01346588134766,
+                "Travel": 247.00596618652344,
+                "Undefined": 228.22274780273438
+            },
+            "filament_change_times": 3,
+            "filaments": [
+                {
+                    "filament_id": "GFA00",
+                    "id": 1,
+                    "main_used_g": 12.013262748718262,
+                    "total_used_g": 13.795242309570313
+                },
+                {
+                    "filament_id": "GFA00",
+                    "id": 2,
+                    "main_used_g": 0.006475419271737337,
+                    "total_used_g": 1.418431043624878
+                }
+            ],
+            "id": 1,
+            "layer_filament_change": 0,
+            "main_predication": 1843.7364501953125,
+            "obj_cached_cnt": 0,
+            "objects": [
+                {
+                    "bbox": {
+                        "depth": 64.0,
+                        "height": 8.0,
+                        "width": 100.0,
+                        "x": 6.0,
+                        "y": 20.0,
+                        "z": 0.0
+                    },
+                    "id": 5,
+                    "name": "test-frame-body-0-to-4",
+                    "triangle_count": 4104
+                }
+            ],
+            "times": {
+                "conflict_check_time": 5,
+                "detect_overhangs_time": 1,
+                "export_gcode_time": 68,
+                "flush_plan_time": 0,
+                "generate_support_material_time": 5,
+                "infill_generate_time": 18,
+                "infill_time": 43,
+                "ironing_time": 0,
+                "make_perimeters_time": 51,
+                "multifilament_segment_2d_time": 0,
+                "other_slice_time": 0,
+                "prepare_infill_time": 25,
+                "region_split_time": 0,
+                "skirt_brim_time": 0,
+                "slice_layers_time": 8,
+                "sliced_time": 186,
+                "sliced_time_with_cache": 68,
+                "support_detect_time": 0,
+                "support_interface_time": 0,
+                "support_normal_generate_time": 0,
+                "support_toolpath_time": 0,
+                "support_tree_generate_time": 0,
+                "toolpath_time": 2,
+                "wall_time": 43,
+                "wipe_tower_time": 9
+            },
+            "total_predication": 2771.069091796875,
+            "triangle_count": 4104,
+            "warning_message": ""
+        }
+    ],
+    "sparse_infill_density": 20.0,
+    "times": {
+        "export_3mf_time": 0,
+        "export_slicedata_time": 0,
+        "export_time": 0,
+        "import_time": 6,
+        "load_slicedata_time": 0,
+        "prepare_time": 7
+    },
+    "upward_compatible_machine": [
+        "Bambu Lab P1S 0.4 nozzle",
+        "Bambu Lab P1P 0.4 nozzle",
+        "Bambu Lab X1 0.4 nozzle",
+        "Bambu Lab X1 Carbon 0.4 nozzle",
+        "Bambu Lab X1E 0.4 nozzle",
+        "Bambu Lab A1 0.4 nozzle",
+        "Bambu Lab H2D 0.4 nozzle",
+        "Bambu Lab H2D Pro 0.4 nozzle",
+        "Bambu Lab H2S 0.4 nozzle",
+        "Bambu Lab P2S 0.4 nozzle",
+        "Bambu Lab H2C 0.4 nozzle",
+        "Bambu Lab X2D 0.4 nozzle",
+        "Bambu Lab A2L 0.4 nozzle"
+    ],
+    "wall_loops": 3
+}

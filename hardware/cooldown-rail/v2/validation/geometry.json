@@ -1,0 +1,152 @@
+{
+  "rail-body": {
+    "nonmanifold_edges": 0,
+    "connected_components": 1,
+    "volume_mm3": 5830.603,
+    "dimensions_mm": [
+      20.0,
+      88.9,
+      5.2
+    ]
+  },
+  "rail-numerals": {
+    "nonmanifold_edges": 0,
+    "connected_components": 16,
+    "volume_mm3": 46.124,
+    "dimensions_mm": [
+      5.197,
+      65.0,
+      0.6
+    ]
+  },
+  "test-rail-body": {
+    "nonmanifold_edges": 0,
+    "connected_components": 1,
+    "volume_mm3": 3212.374,
+    "dimensions_mm": [
+      20.0,
+      48.4,
+      5.2
+    ]
+  },
+  "test-rail-numerals": {
+    "nonmanifold_edges": 0,
+    "connected_components": 7,
+    "volume_mm3": 20.26,
+    "dimensions_mm": [
+      5.197,
+      24.2,
+      0.6
+    ]
+  },
+  "rail-one-color": {
+    "nonmanifold_edges": 0,
+    "connected_components": 1,
+    "volume_mm3": 5876.727,
+    "dimensions_mm": [
+      20.0,
+      88.9,
+      5.8
+    ]
+  },
+  "test-rail-one-color": {
+    "nonmanifold_edges": 0,
+    "connected_components": 1,
+    "volume_mm3": 3232.634,
+    "dimensions_mm": [
+      20.0,
+      48.4,
+      5.8
+    ]
+  },
+  "slider-standard": {
+    "nonmanifold_edges": 0,
+    "connected_components": 1,
+    "volume_mm3": 706.757,
+    "dimensions_mm": [
+      12.3,
+      22.5,
+      7.9
+    ]
+  },
+  "slider-light": {
+    "nonmanifold_edges": 0,
+    "connected_components": 1,
+    "volume_mm3": 704.807,
+    "dimensions_mm": [
+      12.3,
+      22.5,
+      7.9
+    ]
+  },
+  "end-cap": {
+    "nonmanifold_edges": 0,
+    "connected_components": 1,
+    "volume_mm3": 234.903,
+    "dimensions_mm": [
+      20.0,
+      5.2,
+      3.6
+    ]
+  },
+  "clip-card-left-0.50mm": {
+    "nonmanifold_edges": 0,
+    "connected_components": 1,
+    "volume_mm3": 329.325,
+    "dimensions_mm": [
+      30.0,
+      8.0,
+      5.0
+    ]
+  },
+  "clip-sleeve-left-0.85mm": {
+    "nonmanifold_edges": 0,
+    "connected_components": 1,
+    "volume_mm3": 329.325,
+    "dimensions_mm": [
+      30.0,
+      8.0,
+      5.0
+    ]
+  },
+  "clip-card-right-0.50mm": {
+    "nonmanifold_edges": 0,
+    "connected_components": 1,
+    "volume_mm3": 329.325,
+    "dimensions_mm": [
+      30.0,
+      8.0,
+      5.0
+    ]
+  },
+  "clip-sleeve-right-0.85mm": {
+    "nonmanifold_edges": 0,
+    "connected_components": 1,
+    "volume_mm3": 329.325,
+    "dimensions_mm": [
+      30.0,
+      8.0,
+      5.0
+    ]
+  },
+  "rest_checks": {
+    "poses": 156,
+    "max_intersection_mm3": 0
+  },
+  "unflexed_crest_intersections_mm3": [
+    0.607,
+    1.323,
+    2.109,
+    0.607,
+    1.323,
+    2.109
+  ],
+  "minimum_nominal_pawl_engagement_mm": 0.4,
+  "bearing_total_lateral_clearance_mm": 0.6,
+  "deflected_travel": {
+    "poses": 252,
+    "max_intersection_mm3": 0
+  },
+  "ready_cap_intersection_mm3": 0,
+  "cap_press_interference_mm3": 3.317
+}

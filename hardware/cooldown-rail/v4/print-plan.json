@@ -1,0 +1,11 @@
+{
+  "00-small-number-test": {
+    "colors": 2
+  },
+  "01-track-only": {
+    "colors": 2
+  },
+  "02-slider-cap-clips": {
+    "colors": 1
+  }
+}
