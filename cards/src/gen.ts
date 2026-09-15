@@ -33,7 +33,7 @@ export type Manifest = Record<string, ManifestEntry>;
 export function loadManifest(): Manifest {
   return existsSync(MANIFEST) ? JSON.parse(readFileSync(MANIFEST, "utf8")) : {};
 }
-function saveManifest(m: Manifest) {
+export function saveManifest(m: Manifest) {
   mkdirSync(ART_DIR, { recursive: true });
   writeFileSync(MANIFEST, JSON.stringify(m, null, 2) + "\n");
 }
