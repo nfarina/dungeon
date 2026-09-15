@@ -10,6 +10,7 @@ bun run gen --all           # generate art for every card that has none (or is s
 bun run gen --deck gear     # one deck
 bun run gen --id goblin --force
 bun run check               # catalog vs simulator, by name
+bun run clean-art           # delete art no current card uses (--dry-run to just list it)
 ```
 
 ## How it fits together

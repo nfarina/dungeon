@@ -6,7 +6,8 @@
   "scripts": {
     "cards": "bun --watch run src/server.ts",
     "gen": "bun run src/gen.ts",
-    "check": "bun run src/check.ts"
+    "check": "bun run src/check.ts",
+    "clean-art": "bun run src/cleanup.ts"
   },
   "devDependencies": {
     "@types/bun": "^1.4.0"
