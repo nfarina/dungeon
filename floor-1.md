@@ -1,6 +1,6 @@
 # Floor 1: "The Tutorial Floor"
 
-A HeroQuest-shaped dungeon crawl for three regular people (Lucas, Ethan, Vicki) and one AI announcer (Nick). Physical board: HeroQuest First Light, Side A, using the Quest 1 room layout. Target: one hour, table to boss.
+A HeroQuest-shaped dungeon crawl for three regular people and one AI announcer. Physical board: HeroQuest First Light, Side A, using the Quest 1 room layout. Target: one hour, table to boss.
 
 > **Announcer voice, for reference.** Cheerful, corporate, slightly menacing, deeply unbothered by your suffering. "Welcome, Crawlers! Floor 1 is a *learning* floor. Most of you will survive it. Statistically."
 
@@ -18,7 +18,7 @@ Keep everything from HeroQuest that isn't listed here (movement 2d6, combat dice
 | Search for traps | Kept, but a found trap gets a **trap token** placed on the board. A Torch does this passively. |
 | Hero dies at 0 Body | Hero is **Downed** for one round, then dead for the floor. Dead heroes become **Viewers** and play the Fan deck. See 1.4 and section 8. |
 | No clock | A **floor cap**, and an **Emergency Floor Reset** when the boss door opens. See 1.7. |
-| Gold spent between quests | Gold spent at the **Stairwell Shop** between floors (Nick generates the shop with the next floor). |
+| Gold spent between quests | Gold spent at the **Stairwell Shop** between floors (announcer generates the shop with the next floor). |
 
 ### 1.1 Stats
 
@@ -275,7 +275,7 @@ Spark starts the floor in the Armory rack and the Fire Axe starts in the Trap Ch
 
 **Learning a Spellbook** costs your action and needs Mind 4 or more. **Casting** needs Mind 4 or more too, every time. Take the glasses off and the book is just a book until you put them back on, so passing the glasses around the table to learn everything gets you three people who can't cast. Once learned, it's yours: put it in front of you, it doesn't use a slot, and it stays with you across floors. A learned book can't be traded. Scrolls can.
 
-**Future hook:** every learned spell card gets five tick boxes. Fill them by casting and the spell levels up on the next floor (Nick generates the level 2 card). Not on Floor 1, but print the boxes now.
+**Future hook:** every learned spell card gets five tick boxes. Fill them by casting and the spell levels up on the next floor (announcer generates the level 2 card). Not on Floor 1, but print the boxes now.
 
 ---
 
@@ -384,16 +384,3 @@ Counts for the card pipeline. Poker size, nine per letter sheet.
 | Floor clock: a split-flap counter (00–99). Cooldown dice: d12 spindowns, one colour per player. Gold: Pockets cards. | |
 
 Card template types: Player, Monster, Item (slot, effect, flavor, art), Spell (cooldown box, tick boxes, Mind requirement), Consumable, Companion, Fan (the Item layout with its own color and back), Envelope label. Eight HTML templates, one data file.
-
----
-
-## 11. Decisions for Nick
-
-Settled: the boss is a troll named Greg (the dragon was too much for Floor 1), classes are picked after Floor 2, the Daycare stays, the goose is Sir Reginald until the boys rename him, and players pick from nine generated crawlers rather than playing themselves. Roleplaying games are for roleplaying.
-
-Still open:
-
-- **The death window.** One full round Downed before death is the main difficulty dial. If the re-run shows too many deaths, try two rounds before softening any monster.
-- **Fan deck power.** Aimed at "annoying and occasionally decisive." Poke and Heckle are the cards to cut if it overshoots.
-- **Floor 2 revival cost.** Decided at generation time. Candidates: lose your gold, lose one equipped item of Greg's choosing, start Floor 2 at half Health, or a sponsorship you didn't ask for.
-- **What the sim can't see.** Nobody in the simulator searches, uses the Whistle, or plays a Viewer card. Deck-draw counts from it are real; item-usage counts are lower bounds.
