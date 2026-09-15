@@ -6,7 +6,8 @@
   "scripts": {
     "sim": "bun run src/run.ts",
     "map": "bun --watch run src/tools/mapserve.ts",
-    "drawmap": "bun run src/tools/drawmap.ts"
+    "drawmap": "bun run src/tools/drawmap.ts",
+    "printguide": "bun run src/tools/printguide.ts"
   },
   "devDependencies": {
     "@types/bun": "^1.4.0"
