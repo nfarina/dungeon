@@ -35,6 +35,8 @@ There is no loot box deck: every card belongs to a real deck and `envelope` on a
 
 Envelope labels print single-sided, 10 per sheet, on plain paper or Avery 5163.
 
+**The Stairwell Shop menu** (`/menu`, or the workshop's *Print shop menu* button) is one letter page of names and prices, single-sided. Stock and prices are the `SHOP` table in `catalog.ts`; a card is on the shelf when its id is in that table, whatever deck it belongs to, and the two shop-only cards live in the `shop` deck. Print the cards themselves from their own decks and stack them behind the menu.
+
 **Floor tiles** (`?deck=tile`) and **standees** (`?deck=standee`) share a guillotine layout: rows of equal height, so every horizontal cut runs the full page width and each strip is then cut at the white ticks. Both print duplex. Tiles carry their name on the back; standees show the figure mirrored on the back with a 0.3 in tab at the bottom for the plastic clip stands. Print standees on cardstock.
 
 Floor tiles take their footprint and count from the map editor's file (`sim/src/content/floor1.map.json`) via each tile's `mapKey`: a feature kind, a generic piece's label, a trap kind, "secret door" or "falling block". Resize a piece in the map editor and the tile follows on the next reload; its art goes stale if the shape changed. `bun run check` flags map pieces without a tile and tiles missing from the map.

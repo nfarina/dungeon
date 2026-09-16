@@ -60,6 +60,7 @@ a { color:var(--amber); }
   <div class="tools">
     <button id="printDeck">Print this deck</button>
     <button id="printSel" disabled>Print selected</button>
+    <button id="printMenu">Print shop menu</button>
     <button id="genMissing">Generate missing in deck</button>
     <button id="genStale">Regenerate stale in deck</button>
     <button id="styleBtn">Art style</button>
@@ -182,6 +183,7 @@ const saveCounts = () => { try { localStorage.setItem("cards.counts", JSON.strin
 const countsParam = ids => { const kv = ids.filter(id => counts[id] !== undefined).map(id => `${id}:${counts[id]}`); return kv.length ? `&counts=${kv.join(",")}` : ""; };
 $("#printDeck").onclick = () => window.open(`/print?deck=${deck}&model=${encodeURIComponent(model())}${backOffset()}${countsParam(data.cards.filter(c => c.deck === deck).map(c => c.id))}`, "_blank");
 $("#printSel").onclick = () => window.open(`/print?ids=${[...sel].join(",")}&model=${encodeURIComponent(model())}${backOffset()}${countsParam([...sel])}`, "_blank");
+$("#printMenu").onclick = () => window.open("/menu", "_blank");
 $("#styleBtn").onclick = () => { showStyle = true; current = null; render(); };
 $("#model").onchange = load;
 

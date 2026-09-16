@@ -307,6 +307,33 @@ Box contents that duplicate a card already in a deck: pull that card out of the 
 
 **The Save-the-Date:** a printed card. "Congratulations on surviving Floor 1. Class selection is available at the bottom of Floor 2. This offer is non-transferable and the company is not responsible for what you choose." Classes get picked after Floor 2, like the book, so Floor 2 is still "you, but with stuff."
 
+### 7.1 The Stairwell Shop
+
+Between floors, before Floor 2 is designed. The party spent Floor 1 collecting gold with nowhere to spend it; this is where it goes, and what they buy is the input to Floor 2's design. Print the menu from the card workshop (**Print shop menu**) and stack the printed cards behind it. One copy of each, no restocks, no refunds. Prices are steep on purpose: 22 gold buys about one real card per player.
+
+The shelves are store departments, not builds. Each player has one obvious buy on it (Ball Bearings for the slingshot, a spellbook for the caster, the jacket for the axe), but the menu shouldn't look like it was written for them.
+
+| Shelf | Card | Gold | Note |
+|---|---|---|---|
+| Reading Material | Spellbook: Shove | 9 | Floor 1 Big Gear, never found |
+| Reading Material | Spellbook: Patch Up | 9 | Floor 1 Big Gear, never found |
+| Reading Material | Scroll: Firebolt | 4 | Back from the Nerd box |
+| Reading Material | Scroll: Smoke Bomb | 4 | |
+| Reading Material | Scroll: Stone Skin | 3 | |
+| Hardware | Bag of Ball Bearings | 7 | Shop only. Trinket: your Slingshot rolls 2 dice |
+| Hardware | Trap Kit | 4 | |
+| Apparel | Stolen Sneakers | 5 | Move +2 |
+| Apparel | Goblin-Chewed Leather Jacket | 5 | Body, Defend +1 |
+| Impulse Buys | Lucky Rabbit's Foot | 6 | One reroll per floor |
+| Impulse Buys | Mystery Box (×2) | 3 | Shop only. Hand it to the announcer for one face-down Pockets draw |
+| Snacks & First Aid | Juice Box, Bandage | 2 each | Priced above what the floor dropped |
+
+**Trade-in:** the shopkeeper buys any card for 1 gold. Refuses the Save-the-Date, the Soggy Note and "You did that." with visible contempt. Expect the Whistle and the Goblin Ear Necklace to go.
+
+**Not on the shelf:** the Orc Chainmail Bib (Defend +2 on the Fire Axe carrier is a Floor 2 find, not a purchase) and anything that upgrades Sir Reginald, which is Floor 2 content once we know what it should do. Retired for good: Goblin Shortbow, Orc Monocle, Trash Can Lid, Torch, Frying Pan, Broken Table Leg.
+
+**Shopkeeper:** a bopca, as in the books, who just inherited Greg's floor budget and is not happy about the trade-ins.
+
 ---
 
 ## 8. Viewers and the Fan deck

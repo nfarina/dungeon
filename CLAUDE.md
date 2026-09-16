@@ -9,7 +9,10 @@ being tuned between plays.
 
 - `floor-1.md` — the design doc and DM guide for Floor 1. Rules, room-by-room layout, loot,
   loot boxes, Fan deck, sim numbers. The source of truth for *rules*. `bun run printguide`
-  (in `sim/`) renders it to `floor-1.print.html`.
+  (in `sim/`) renders it to `floor-1.print.html`; `bun run printguide floor-2` does the same
+  for `floor-2.md`, the Floor 2 draft (inherits Floor 1 rules, adds the Cleanup Crew).
+- `floor-1-inventory.md` — what each player carried out of Floor 1; the shop purchases are
+  noted in `floor-2.md`'s opening paragraph.
 - `sim/` — Bun + TypeScript simulator of Floor 1 (`src/engine.ts` rules + fixed hero policy,
   `src/run.ts` batch/report CLI, `src/tools/`). `README.md` lists the commands; `BEHAVIOUR.md`
   explains what the hero "brain" does and does not do, read it before trusting a number.

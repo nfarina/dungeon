@@ -12,6 +12,7 @@ export type Deck =
   | "player"     // Crawler cards: pick a human, name yourself
   | "companion"  // Companion cards (the goose)
   | "junk"       // Keepsakes with no effect: notes, trophies, invitations
+  | "shop"       // Cards that only exist on the Stairwell Shop's shelf between floors
   | "envelope"   // The envelope labels themselves (label size, not card size)
   | "tile"       // Floor tiles: furniture and traps, integer inches, top-down art
   | "standee";   // Stand-up figures for the plastic stands: the nine crawlers and the boss
@@ -63,11 +64,16 @@ export type Card = {
   backOf?: string;
   /** Name of the matching entry in the sim, when it differs. */
   simName?: string;
+  /** On the Stairwell Shop's shelf between floors: price in gold and which shelf the menu lists it under. Set from SHOP below. */
+  shop?: { price: number; shelf: Shelf; qty?: number };
 };
+
+export type Shelf = "Reading Material" | "Hardware" | "Apparel" | "Impulse Buys" | "Snacks & First Aid";
+export const SHELVES: Shelf[] = ["Reading Material", "Hardware", "Apparel", "Impulse Buys", "Snacks & First Aid"];
 
 export const DECK_NAMES: Record<Deck, string> = {
   kit: "Starting Kit", pockets: "Pockets", gear: "Gear", biggear: "Big Gear", fan: "Fan Deck",
-  monster: "Monster", player: "Crawler", companion: "Companion", junk: "Junk", envelope: "Loot Box Label", tile: "Floor Tile", standee: "Standee",
+  monster: "Monster", player: "Crawler", companion: "Companion", junk: "Junk", shop: "Stairwell Shop", envelope: "Loot Box Label", tile: "Floor Tile", standee: "Standee",
 };
 
 const HUMAN: Stats = { att: 2, def: 2, hp: 6, mind: 3, move: "2d6" };
@@ -234,6 +240,36 @@ const extras: Card[] = [
     rules: "Congratulations on surviving Floor 1. Class selection is available at the bottom of Floor 2. This offer is non-transferable and the company is not responsible for what you choose.",
     art: "a fancy gold-embossed invitation card with a wax seal shaped like a dungeon stairwell" },
 ];
+
+// The Stairwell Shop, between Floors 1 and 2. Most of the shelf is cards already printed for Floor 1 that never
+// got found (SHOP below prices them); these two exist only in the shop. One copy of each, no restocks.
+const shop: Card[] = [
+  { id: "ball-bearings", name: "Bag of Ball Bearings", deck: "shop", type: "item", slot: "Trinket",
+    rules: "Your Slingshot rolls 2 attack dice instead of 1.", flavor: "Rounder than pebbles. Meaner, too.",
+    art: "a small drawstring canvas bag tipped over, shiny steel ball bearings spilling out beside a wooden slingshot" },
+  { id: "mystery-box", name: "Mystery Box", deck: "shop", type: "text", qty: 2,
+    rules: "Hand this to the announcer for one face-down draw from the Pockets deck. No refunds. No peeking.",
+    flavor: "The shopkeeper won't say. The shopkeeper doesn't know.",
+    art: "a small cardboard box wrapped in brown paper and tied with string, a big painted question mark on the side, faintly glowing at the seams" },
+];
+
+/** What is on the shelf and for how much. Prices are steep on purpose: 22 gold buys about one real card per player. */
+const SHOP: Record<string, { price: number; shelf: Shelf; qty?: number }> = {
+  // Shelves are store departments, not builds: nothing on the menu should read as "the tank shelf".
+  "shove": { price: 9, shelf: "Reading Material" },
+  "patch-up": { price: 9, shelf: "Reading Material" },
+  "scroll-firebolt": { price: 4, shelf: "Reading Material" },
+  "scroll-smoke-bomb": { price: 4, shelf: "Reading Material" },
+  "scroll-stone-skin": { price: 3, shelf: "Reading Material" },
+  "ball-bearings": { price: 7, shelf: "Hardware" },
+  "trap-kit": { price: 4, shelf: "Hardware" },
+  "sneakers": { price: 5, shelf: "Apparel" },
+  "leather-jacket": { price: 5, shelf: "Apparel" },
+  "rabbits-foot": { price: 6, shelf: "Impulse Buys" },
+  "mystery-box": { price: 3, shelf: "Impulse Buys", qty: 2 },
+  "juice-box": { price: 2, shelf: "Snacks & First Aid" },
+  "bandage": { price: 2, shelf: "Snacks & First Aid" },
+};
 
 const fan: Card[] = [
   { id: "boo", name: "Boo!", deck: "fan", type: "fan",
@@ -409,9 +445,16 @@ const tileBacks: Card[] = [
   used("sign", "the same welcome sign knocked flat on its face on the floor, the bell dented and lying on its side"),
 ];
 
-export const CARDS: Card[] = [...kits, ...pockets, ...gear, ...biggear, ...extras, ...fan, ...monsters, ...players, ...envelopes, ...tiles, ...tileBacks, ...standees];
+export const CARDS: Card[] = [...kits, ...pockets, ...gear, ...biggear, ...extras, ...shop, ...fan, ...monsters, ...players, ...envelopes, ...tiles, ...tileBacks, ...standees]
+  .map(c => SHOP[c.id] ? { ...c, shop: SHOP[c.id] } : c);
+for (const id of Object.keys(SHOP)) if (!CARDS.some(c => c.id === id)) throw new Error(`SHOP prices "${id}" but no such card`);
 
-export const DECK_ORDER: Deck[] = ["player", "kit", "pockets", "gear", "biggear", "companion", "junk", "fan", "monster", "envelope", "tile", "standee"];
+/** The shelf, in menu order. */
+export function shopStock(all: Card[] = CARDS): Card[] {
+  return SHELVES.flatMap(s => all.filter(c => c.shop?.shelf === s).sort((a, b) => b.shop!.price - a.shop!.price));
+}
+
+export const DECK_ORDER: Deck[] = ["player", "kit", "pockets", "gear", "biggear", "companion", "junk", "shop", "fan", "monster", "envelope", "tile", "standee"];
 
 const byId = new Map(CARDS.map(c => [c.id, c]));
 export const card = (id: string) => byId.get(id);

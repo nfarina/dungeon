@@ -7,10 +7,10 @@ const esc = (s: string) => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;
 /** Accent colour per deck. Backs use it as a thin stroke only, to save toner. */
 export const DECK_COLOR: Record<Deck, string> = {
   kit: "#5b7a3a", pockets: "#8a6d2f", gear: "#3d5a80", biggear: "#7a3b5e", fan: "#6b4fa0",
-  monster: "#8b2e2e", player: "#2f6f6b", companion: "#b08d2c", junk: "#7a6a5a", envelope: "#555", tile: "#4a4036", standee: "#556b2f",
+  monster: "#8b2e2e", player: "#2f6f6b", companion: "#b08d2c", junk: "#7a6a5a", shop: "#8a5a2b", envelope: "#555", tile: "#4a4036", standee: "#556b2f",
 };
 const DECK_GLYPH: Record<Deck, string> = {
-  kit: "🎒", pockets: "👖", gear: "🛠", biggear: "⚒", fan: "📣", monster: "💀", player: "🙂", companion: "🪿", junk: "🗑", envelope: "✉", tile: "🧱", standee: "🧍",
+  kit: "🎒", pockets: "👖", gear: "🛠", biggear: "⚒", fan: "📣", monster: "💀", player: "🙂", companion: "🪿", junk: "🗑", shop: "🛒", envelope: "✉", tile: "🧱", standee: "🧍",
 };
 
 export const CARD_CSS = `
@@ -175,7 +175,7 @@ export function renderBack(c: Card, artUrl: string | null = null): string {
   if (c.type === "player") return renderReference(c);
   const deck = DECK_COLOR[c.deck];
   const word = DECK_NAMES[c.deck].toUpperCase();
-  const sub = c.deck === "player" ? "pick one · name yourself" : c.deck === "monster" ? "for the announcer" : c.deck === "fan" ? "viewers only" : c.deck === "companion" ? "moves with you" : c.deck === "junk" ? "no effect. keep it." : "floor 1";
+  const sub = c.deck === "player" ? "pick one · name yourself" : c.deck === "monster" ? "for the announcer" : c.deck === "fan" ? "viewers only" : c.deck === "companion" ? "moves with you" : c.deck === "junk" ? "no effect. keep it." : c.deck === "shop" ? "between floors" : "floor 1";
   return `<div class="card back" style="--deck:${deck}"><div class="glyph">${DECK_GLYPH[c.deck]}</div><div class="word ${word.length > 8 ? "small" : ""}">${esc(word)}</div><div class="sub">${esc(sub)}</div></div>`;
 }
 
@@ -361,5 +361,47 @@ html, body { margin:0; background:#888; }
 <div class="spacer"></div>
 <script>try{localStorage.setItem("cards.backOffset",JSON.stringify({bx:${opts.backDx},by:${opts.backDy}}))}catch{}</script>
 ${pages.join("\n")}
+</body></html>`;
+}
+
+/** The Stairwell Shop menu: one letter page, single-sided. Names and prices only; the printed cards sit behind it. */
+export function renderMenu(stock: Card[], opts: { title: string; floor: number }): string {
+  const shelves = [...new Set(stock.map(c => c.shop!.shelf))];
+  const what = (c: Card) => c.type === "spell" ? `Spellbook · Mind ${c.mind}+` : c.type === "scroll" ? "Scroll · one use" : c.type === "consumable" ? "One use" : c.slot ?? "";
+  const rows = shelves.map(sh => `<section class="shelf"><h2>${esc(sh)}</h2>
+    ${stock.filter(c => c.shop!.shelf === sh).map(c => `<div class="row"><span class="nm">${esc(c.name)}${(c.shop!.qty ?? 1) > 1 ? ` <small>×${c.shop!.qty}</small>` : ""}</span><span class="what">${esc(what(c))}</span><span class="dots"></span><span class="price">${c.shop!.price}<small>g</small></span></div>`).join("")}
+  </section>`).join("");
+  return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(opts.title)}</title>
+<meta name="color-scheme" content="light only">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700;9..144,900&display=swap" rel="stylesheet">
+<style>
+@page { size: letter; margin: 0; }
+html, body { margin:0; background:#888; }
+.page { position:relative; width:8.5in; height:11in; background:#fbf6ea; margin:0 auto; overflow:hidden; box-sizing:border-box; padding:.7in .8in; color:#2b2119; font-family: Fraunces, Georgia, serif; }
+.page::before { content:""; position:absolute; inset:.35in; border:3px double #8a5a2b; pointer-events:none; }
+h1 { margin:0; font-size:44pt; font-weight:900; letter-spacing:-.01em; text-align:center; line-height:1; }
+.tag { text-align:center; font-size:11.5pt; font-style:italic; margin:.12in 0 .3in; color:#5a4636; }
+.shelf { margin:0 0 .2in; }
+h2 { margin:0 0 .06in; font-size:12pt; text-transform:uppercase; letter-spacing:.2em; font-weight:700; color:#8a5a2b; border-bottom:1px solid #c9b48f; padding-bottom:.03in; }
+.row { display:flex; align-items:baseline; gap:.1in; font-size:14pt; line-height:1.55; }
+.nm { font-weight:700; white-space:nowrap; } .nm small { font-weight:400; font-size:10pt; color:#5a4636; }
+.what { font-size:9.5pt; color:#6b5847; white-space:nowrap; }
+.dots { flex:1; border-bottom:2px dotted #b9a27c; transform:translateY(-.06in); margin:0 .05in; }
+.price { font-weight:900; font-size:16pt; min-width:.5in; text-align:right; } .price small { font-size:9pt; font-weight:400; margin-left:1px; }
+.fine { position:absolute; left:.8in; right:.8in; bottom:.6in; font-size:9.5pt; line-height:1.45; color:#5a4636; border-top:1px solid #c9b48f; padding-top:.1in; }
+.fine b { color:#2b2119; }
+.bar { position:fixed; top:0; left:0; right:0; background:#222; color:#eee; font:13px system-ui; padding:8px 14px; display:flex; gap:16px; align-items:center; z-index:9; }
+.spacer { height:40px; }
+@media print { .bar, .spacer { display:none; } body { background:#fff; } .page { margin:0; } }
+</style></head><body>
+<div class="bar"><b>${esc(opts.title)}</b><span>${stock.length} lines · 1 sheet, single-sided</span><span>Print at 100% scale.</span><span style="margin-left:auto">⌘P</span></div>
+<div class="spacer"></div>
+<section class="page">
+  <h1>${esc(opts.title)}</h1>
+  <div class="tag">Between Floor ${opts.floor} and Floor ${opts.floor + 1} · one of each · no restocks · no refunds</div>
+  ${rows}
+  <div class="fine"><b>Trade-in:</b> the shopkeeper buys any card for <b>1 gold</b>. Not keepsakes, invitations or anything that smells like a toilet.<br>
+  <b>Gold is shared</b> if you say so. What you don't buy is gone when the stairs close.</div>
+</section>
 </body></html>`;
 }

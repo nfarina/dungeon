@@ -2,9 +2,9 @@
 //   bun run cards      ->  http://localhost:5174
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { DECK_NAMES, DECK_ORDER, ROOT, cards, saveOverride, type Card, type Deck } from "./catalog";
+import { DECK_NAMES, DECK_ORDER, ROOT, cards, saveOverride, shopStock, type Card, type Deck } from "./catalog";
 import { ART_DIR, DEFAULT_MODEL, IMAGE_SIZE, MODELS, artFor, fullPrompt, generate, readStyle, styleRef, writeStyle } from "./gen";
-import { CARD_CSS, renderBack, renderFront, renderPrint, renderTileSheet } from "./templates";
+import { CARD_CSS, renderBack, renderFront, renderPrint, renderTileSheet, renderMenu } from "./templates";
 
 const PORT = Number(process.env.PORT ?? 5174);
 const EDITOR = join(import.meta.dir, "editor.html");
@@ -102,6 +102,7 @@ Bun.serve({
       list = list.filter(c => c.type !== "tile" && c.type !== "standee");
       return html(renderPrint(list.map(c => ({ card: c, art: artUrl(c, model) })), { flip, perPage, title, flipUrl: alt.pathname + alt.search, backDx, backDy, nudge }));
     }
+    if (p === "/menu") return html(renderMenu(shopStock(cards()), { title: "The Stairwell Shop", floor: 1 }));
     if (p.startsWith("/preview/")) {
       const all = cards(); const c = all.find(x => x.id === p.slice(9));
       if (!c) return new Response("no such card", { status: 404 });
