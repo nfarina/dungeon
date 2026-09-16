@@ -90,10 +90,12 @@ Bun.serve({
       const counts: Record<string, number> = {};
       for (const kv of url.searchParams.get("counts")?.split(",") ?? []) { const [id, n] = kv.split(":"); if (id && n !== undefined && !isNaN(+n)) counts[id] = Math.max(0, +n | 0); }
       const all = cards();
+      const floor = url.searchParams.get("floor");
       let list = all;
       if (ids?.length) list = ids.map(id => list.find(c => c.id === id)!).filter(Boolean);
       else if (deck) list = list.filter(c => c.deck === deck);
-      const title = ids?.length ? `${list.length} selected cards` : deck ? `${DECK_NAMES[deck]} deck` : "Every card";
+      if (!ids?.length && floor && floor !== "all") list = list.filter(c => String(c.floor ?? 1) === floor);
+      const title = (ids?.length ? `${list.length} selected cards` : deck ? `${DECK_NAMES[deck]} deck` : "Every card") + (floor && floor !== "all" && !ids?.length ? ` · Floor ${floor}` : "");
       const alt = new URL(url); alt.searchParams.set("flip", flip === "long" ? "short" : "long");
       const backDx = Number(url.searchParams.get("bx") ?? 0) || 0, backDy = Number(url.searchParams.get("by") ?? 0) || 0;
       const nudge = (dx: number, dy: number) => { const u = new URL(url); u.searchParams.set("bx", String(+(backDx + dx).toFixed(1))); u.searchParams.set("by", String(+(backDy + dy).toFixed(1))); return u.pathname + u.search; };

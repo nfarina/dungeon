@@ -12,7 +12,11 @@ bun run src/run.ts grid     1200    # Greg's health x fuse length
 bun run src/run.ts tuned    1500    # the candidate rulesets, head to head
 bun run src/tools/content.ts 2000   # what cards/rooms/achievements actually get used
 bun run src/tools/verify.ts         # dice engine vs the estimates in floor-1.md 4.1
-bun run src/tools/drawmap.ts        # ASCII picture of the board
+bun run src/tools/drawmap.ts [2]    # ASCII picture of the board (2 = Floor 2)
+bun run src/floor2.ts report 2000   # Floor 2 (floor-2.md): corpses, grubs, the password, the boss's snacks
+bun run src/floor2.ts trace 7       # one Floor 2 game, narrated
+bun run src/floor2.ts brains 1200   # cleaner vs runner party, no grubs, no cap
+bun run src/floor2.ts sweep 1200    # grub schedule, cap, fed move, floor cap, All Hands, Snack
 bun run map                         # the map editor at http://localhost:5173
 ```
 

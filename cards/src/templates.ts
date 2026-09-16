@@ -133,7 +133,7 @@ export function renderFront(c: Card, artUrl: string | null): string {
   if (c.type === "tile") return renderTile(c, artUrl);
   if (c.type === "standee") return renderStandee(c, artUrl, false);
   const deck = DECK_COLOR[c.deck];
-  const foot = `<div class="foot"><span>${esc(DECK_NAMES[c.deck])}</span><span>Floor 1</span></div>`;
+  const foot = `<div class="foot"><span>${esc(DECK_NAMES[c.deck])}</span><span>Floor ${c.floor ?? 1}</span></div>`;
   const cls = `card ${c.type} ${c.deck === "fan" ? "fan" : ""}`;
   const style = `--deck:${deck}`;
 

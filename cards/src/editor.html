@@ -56,6 +56,7 @@ a { color:var(--amber); }
 <body>
 <aside>
   <h1>Card Workshop</h1>
+  <div id="floors" style="display:flex;gap:4px;margin:0 0 8px"></div>
   <div id="decks"></div>
   <div class="tools">
     <button id="printDeck">Print this deck</button>
@@ -80,6 +81,8 @@ a { color:var(--amber); }
 <script>
 let data = { decks: [], cards: [], models: [], model: "" };
 let deck = localStorage.getItem("cards.deck") || "player";
+let floor = localStorage.getItem("cards.floor") || "all";
+const onFloor = c => floor === "all" || String(c.floor ?? 1) === floor;
 let sel = new Set(), current = null, showStyle = false;
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
@@ -93,11 +96,19 @@ async function load() {
   $("#imageSize").textContent = data.imageSize ? `@ ${data.imageSize}${data.imageSize === "512px" ? " (drafts)" : ""}` : "";
   render();
 }
-function visible() { return data.cards.filter(c => c.deck === deck); }
+function visible() { return data.cards.filter(c => c.deck === deck && onFloor(c)); }
 function render() {
+  const floorsEl = $("#floors"); floorsEl.innerHTML = "";
+  for (const [id, label] of [["all", "All"], ["1", "Floor 1"], ["2", "Floor 2"]]) {
+    const b = document.createElement("button"); b.textContent = label; b.style.flex = "1";
+    if (id === floor) b.style.fontWeight = "700";
+    b.onclick = () => { floor = id; localStorage.setItem("cards.floor", floor); render(); };
+    floorsEl.append(b);
+  }
   const decksEl = $("#decks"); decksEl.innerHTML = "";
   for (const d of data.decks) {
-    const cs = data.cards.filter(c => c.deck === d.id);
+    const cs = data.cards.filter(c => c.deck === d.id && onFloor(c));
+    if (!cs.length) continue;
     const missing = cs.filter(c => c.art && !c.artUrl).length, stale = cs.filter(c => c.stale).length, copies = cs.reduce((n, c) => n + (c.qty ?? 1), 0);
     const el = document.createElement("div"); el.className = "deck" + (d.id === deck ? " on" : "");
     el.innerHTML = `<span>${esc(d.name)}</span><span class="n">${missing ? `<b>${missing}</b>/` : ""}${copies}${stale ? ` <span style="color:var(--amber)">~${stale}</span>` : ""}</span>`;
@@ -105,7 +116,7 @@ function render() {
     decksEl.append(el);
   }
   const cs = visible();
-  $("#title").textContent = `${data.decks.find(d => d.id === deck)?.name ?? deck} · ${cs.reduce((n, c) => n + (c.qty ?? 1), 0)} cards`;
+  $("#title").textContent = `${data.decks.find(d => d.id === deck)?.name ?? deck}${floor === "all" ? "" : ` · Floor ${floor}`} · ${cs.reduce((n, c) => n + (c.qty ?? 1), 0)} cards`;
   const g = $("#grid"); g.innerHTML = "";
   for (const c of cs) {
     const t = document.createElement("div"); t.className = "thumb" + (current === c.id ? " on" : "");
@@ -181,7 +192,7 @@ const backOffset = () => { try { const o = JSON.parse(localStorage.getItem("card
 let counts = {}; try { counts = JSON.parse(localStorage.getItem("cards.counts") || "{}"); } catch {}
 const saveCounts = () => { try { localStorage.setItem("cards.counts", JSON.stringify(counts)); } catch {} };
 const countsParam = ids => { const kv = ids.filter(id => counts[id] !== undefined).map(id => `${id}:${counts[id]}`); return kv.length ? `&counts=${kv.join(",")}` : ""; };
-$("#printDeck").onclick = () => window.open(`/print?deck=${deck}&model=${encodeURIComponent(model())}${backOffset()}${countsParam(data.cards.filter(c => c.deck === deck).map(c => c.id))}`, "_blank");
+$("#printDeck").onclick = () => window.open(`/print?deck=${deck}&floor=${floor}&model=${encodeURIComponent(model())}${backOffset()}${countsParam(visible().map(c => c.id))}`, "_blank");
 $("#printSel").onclick = () => window.open(`/print?ids=${[...sel].join(",")}&model=${encodeURIComponent(model())}${backOffset()}${countsParam([...sel])}`, "_blank");
 $("#printMenu").onclick = () => window.open("/menu", "_blank");
 $("#styleBtn").onclick = () => { showStyle = true; current = null; render(); };

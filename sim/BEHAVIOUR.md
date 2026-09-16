@@ -153,3 +153,14 @@ What they are *not* robust to is the map. Route length is the dominant variable
 by a distance: adding four squares of detour with stone moved the median clear
 from 22 rounds to 26, which is worth far more than any amount of skill. Trust the
 shape of the distribution, and re-run whenever the route changes.
+
+
+---
+
+## Floor 2 additions (floor-2.md)
+
+The rules half adds corpses, the stairwell queue, grubs that walk a fixed 4 toward the nearest corpse and flip into the fed form of what they ate, fed janitors that walk a fixed 6 toward the nearest hero by open route (they pursue across the whole floor; Floor 1 monsters still only close the last few squares), the password door, All Hands, the boss's free Snack and Understaffed, the goose's Downed state and the Pet Biscuit.
+
+The brain half, "cleaner" (`cleanPolicy`): on a turn with nothing to fight, no awake room monster nearby and no fed janitor within eight squares, it walks to the nearest corpse worth the action and cleans it: the goose eats a small one (a medium one with the biscuit), bleach goes on a medium or large one, and Spark burns a medium or large one in line of sight when the book is ready. It never bleaches a small corpse. It squashes an adjacent grub only when that grub is one move from a medium or large corpse. It never Shoves a corpse. Patch Up is cast on anyone at 2 Health or less, and on quiet turns on anyone at 3 or less. Restructuring is read at Mind 5 on the boss or anything with 2 Health. "Runner" does none of the cleaning.
+
+Heroes fight fed janitors only when adjacent; they never chase one. Grubs are never a target except as above. The Shift Lead is prioritised over other monsters in its room, and the Shift Office is on every route until the password is in hand.

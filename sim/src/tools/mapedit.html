@@ -313,7 +313,7 @@ const TRAPS = { pit:{g:"◍",n:"Pit"}, spear:{g:"✕",n:"Spear"} };
 const BLOCKER_PRESETS = ["Desk", "Tiny Chairs", "Welcome Sign"];
 const furnTool = () => { const [kind, ...rest] = (tool.furniture || "").split(":"); return { kind, label: rest.join(":") || undefined }; };
 const DOORS = { normal:"Door", locked:"Locked", secret:"Secret", block:"Falling block" };
-const MONSTERS = ["goblin","orc","skeleton","zombie","abomination","boss"];
+const MONSTERS = ["goblin","orc","skeleton","zombie","abomination","boss","rat","kobold","bear","shiftlead","custodian","grub"];
 
 /* What the DM sees when tapping a square. Mirrors the printed cards and floor-1.md; keep them in step. */
 const DM_MONSTERS = {
@@ -325,6 +325,15 @@ const DM_MONSTERS = {
   boss:        { n:"The Floor Manager (Greg)", att:3, def:3, hp:4, mind:4, move:"6", loot:"Boss Box, plus one Big Gear to whoever carries the least",
     rules:"Performance Review (cooldown 2): 2 attack dice at any hero in line of sight, aimed at whoever carries the most equipment. Delegation: while either Orc lives, defends with 4 dice instead of 3.",
     flavor:"A troll named Greg." },
+  /* Floor 2 (floor-2.md section 4). Names are placeholders until the art exists. */
+  rat:         { n:"Cave Rat", att:2, def:1, hp:1, mind:1, move:"10", loot:"1–3 nothing · 4–6 Pockets", rules:"Leaves a small corpse.", flavor:"Unionized. Has a lanyard. Does not have a name tag." },
+  kobold:      { n:"Kobold Miner", att:3, def:2, hp:1, mind:2, move:"8", loot:"1–2 nothing · 3–4 Pockets · 5–6 Gear", rules:"Leaves a medium corpse.", flavor:"Contractor. Paid by the corpse. Hasn't been paid." },
+  bear:        { n:"Cave Bear", att:3, def:3, hp:2, mind:2, move:"6", loot:"1–3 Gear · 4–6 Big Gear", rules:"Leaves a large corpse.", flavor:"Not staff. Nobody has told the bear this." },
+  shiftlead:   { n:"The Shift Lead", att:3, def:3, hp:2, mind:3, move:"8", loot:"Password of the Day, plus one Gear", rules:"Leaves a medium corpse. The password opens the Sump door.", flavor:"Has the password. Has a clipboard. Has had enough." },
+  grub:        { n:"Grub", att:0, def:0, hp:1, mind:0, move:"4, no roll", loot:"nothing", rules:"Ignores heroes. Walks toward the nearest corpse and eats it, then flips: small → Bloated Grub (2/2/1), medium → Custodian (3/3/2), large → Facilities Manager (4/3/3), all Move 6 fixed, hunting the nearest hero. Janitors leave no corpse.", flavor:"Facilities. Please do not interact with the staff." },
+  custodian:   { n:"The Senior Custodian", att:4, def:3, hp:5, mind:4, move:"6", loot:"Boss Box, plus one Big Gear",
+    rules:"Snack: if a corpse is in the room, eats it and heals 2, and still attacks. Corpses in here are lunch. Mop (cooldown 2): 2 dice at every adjacent hero when two or more are adjacent. Understaffed: while any fed janitor is alive, defends with 4 dice.",
+    flavor:"A grub that ate something with a very large skeleton, a long time ago." },
 };
 const DM_TRAPS = {
   pit:   "Step on it: 1 damage and movement ends. Climbing out costs an action (free with a Rope, which also crosses a revealed pit). Monsters take it too, and most have 1 Health. Disarm with a Multitool or Trap Kit, or walk around it once revealed.",
@@ -332,7 +341,7 @@ const DM_TRAPS = {
 };
 const DM_DOORS = {
   normal: "Opens as you walk through.",
-  locked: "Locked. Opens with a Skeleton Key, a Fire Axe, or Knock.",
+  locked: "Locked. Floor 1: opens with a Skeleton Key, a Fire Axe, or Knock. Floor 2 (the Sump): opens only for the Password of the Day, read aloud.",
   secret: "Secret door. Players don't know it's there until someone searches or walks past it with a Torch.",
   block:  "Falling block. 2 damage to whoever opens it unless they roll a white shield on 1 die. The block then fills the doorway: come in the other way or spend an action clearing it. A Football Helmet eats the damage.",
 };
@@ -348,7 +357,7 @@ const DM_FEATURES = {
   cage:     "Open it as an action. Sir Reginald the goose joins whoever opened it, and does not like them. Hand over the Companion envelope.",
   blocker:  "Blocks movement. Nothing to search.",
 };
-const MONSTER_GLYPH = { goblin:"g", orc:"O", skeleton:"S", zombie:"Z", abomination:"A", boss:"★" };
+const MONSTER_GLYPH = { goblin:"g", orc:"O", skeleton:"S", zombie:"Z", abomination:"A", boss:"★", rat:"r", kobold:"K", bear:"B", shiftlead:"L", custodian:"★", grub:"~" };
 
 const LAYERS = [
   {id:"board",     name:"Possible rooms", hint:"What's printed on the cardboard: corridors and every room the board has. Trace it once, then lock it — every floor on this board side reuses it."},

@@ -53,9 +53,11 @@ What a grub becomes is set by what it ate. Standees. Cards flip: Grub on one fac
 
 | Ate | Becomes | Att | Def | HP | Move |
 |---|---|---|---|---|---|
-| Small corpse | **Bloated Grub** | 2 | 2 | 2 | 6, no roll |
-| Medium corpse | **Custodian** | 3 | 3 | 3 | 6, no roll |
-| Large corpse | **Facilities Manager** | 4 | 3 | 4 | 6, no roll |
+| Small corpse | **Bloated Grub** | 2 | 2 | 1 | 6, no roll |
+| Medium corpse | **Custodian** | 3 | 3 | 2 | 6, no roll |
+| Large corpse | **Facilities Manager** | 4 | 3 | 3 | 6, no roll |
+
+(The simulator had these at one more Health each first. That version killed someone in half of all games and wiped the party in one game of nine. A fed janitor should be a chase, not a boss.)
 
 A fed janitor **follows the party**: each monster turn it moves 6 toward the nearest hero by open route and attacks if adjacent. Fixed movement is the point. A party that keeps moving stays ahead of one; a party that stops to fight, loot or argue gets caught. It uses monster rules 4.3.2 for target choice. No loot. Killing one earns an achievement (section 7) and nothing else.
 
@@ -75,10 +77,28 @@ The boss room door has no lock. It has a speaker. It opens for the **Password of
 
 ### 1.6 The clock
 
-- **Floor cap: 26 rounds, TBD by the simulator.** Announced and counted down every round, same as Floor 1. The Cleanup Crew is the pressure that grows; the cap is the wall at the end.
+- **Floor cap: 26 rounds.** Announced and counted down every round, same as Floor 1. The Cleanup Crew is the pressure that grows; the cap is the wall at the end. The simulator says 22 to 30 all land within two points of each other, so the cap is about pacing, not difficulty.
 - **All Hands.** The moment the boss door opens, every grub still in the queue leaves the stairs at once and the schedule doubles: a grub every round. With corpses around, they head for corpses. With none, they head for the boss room. Announcer: "Attention, Crawlers. Facilities has declared an All Hands. This is a standard cleanliness measure and not a reflection on your hygiene. Please enjoy the remainder of your visit."
 - **The collapse** is the Floor 1 ramp: 1, 1, 2, 2, 3 damage at the end of each round past zero.
 - **You can leave without killing the boss.** Same rule, same forfeit, say it out loud before the fight.
+
+**Where the simulator stands** (3,000 runs of the first layout, the real party, rules as written above, a "cleaner" party that bleaches medium and large corpses on quiet turns and lets the goose eat the small ones):
+
+| Measure | Result |
+|---|---|
+| Party wins (boss dead, everyone down the stairs) | 84% |
+| Escaped with the boss alive | 5% |
+| Floor came down on somebody | 5% |
+| Full wipe | 6.6% |
+| Games where someone dies | 37% (Ethan most often, then Vicki) |
+| Rounds to finish, median | 24 |
+| Password found, average round | 9 |
+| Sump door opens, average round | 18 |
+| Corpses made / cleaned / left at the end | 12 / 6 / 1 |
+| Fed janitors per game | 3.7, in 96% of games |
+| Boss snacks per game | 1.9 |
+
+The same party that never cleans wins just as often but loses someone in half of all games and wipes twice as much. Cleaning is how you keep people alive, not how you win, which is the right shape. Without the Cleanup Crew at all the floor is a 99% walk, so the grubs are the whole difficulty. The grub schedule, the grub cap and the floor cap all move the win rate by two points or less; fed janitor Health moves it by ten. That is the dial to touch if the table wants it easier or harder.
 
 ---
 
@@ -99,13 +119,13 @@ The three upgrades seeded on the floor, and who they are obviously for without s
 
 ## 3. Floor layout
 
-**TBD in the map editor.** Side B into a new map file (`sim/src/content/floor2.map.json`), same layers as Floor 1. What the layout must do, in order of importance:
+A first layout is in `sim/src/content/floor2.map.json` (drawn by the sim, not yet reviewed at the table): entrance top-right, Reception then the Supply Closet forced by stone, the Shift Office top-middle, the Sump on the left with the stairs against its west wall. Fourteen of the nineteen rooms are in play; the five between the columns are stone. What the layout has to do, in order of importance:
 
 1. **The big chamber is the boss room.** The skeleton on its floor is what the boss ate. Its door is the password door.
 2. **Required by walls: the first two rooms.** Same trick as Floor 1: the entrance corridor dead-ends into them. That guarantees corpses early, and the first grub has somewhere to walk.
 3. **The Shift Lead's room is required by content, not by walls.** Put it off the main route, two or three rooms deep, so the party has to find it and then carry the password back across the floor with a medium corpse behind them.
 4. **The scroll before the robe.** Scroll: Restructuring in furniture near the Shift Lead. The Wizard's Bathrobe in furniture in one of the last rooms before the boss. Ethan should own an unreadable scroll for at least three rooms.
-5. **Four bleach, spread out.** One in the first required room, so the mechanic gets taught on the first corpse. The rest deeper in.
+5. **Five bleach, two on the required path.** Reception's front desk and the Supply Closet's shelving, so the mechanic gets taught on the first corpse and there is a second bottle before the Shift Lead. The other three sit in optional rooms (Boiler Room, Records, Cafeteria). With only one on the path the party found 1.6 bottles a game and left twice as many bodies.
 6. **Far more rooms than they can open.** Twenty rooms and a 26-round cap means most stay shut. That is fine. The announcer should say so.
 7. **Monsters at least two squares from their door**, like Floor 1. That rule was worth thirteen points of win rate.
 
@@ -136,7 +156,7 @@ The party is stronger than it was: a Fire Axe at 4 dice, a caster with Spark and
 
 A grub that ate something with a very large skeleton, a long time ago. Too big for the door, which is why the door needs a password. Standee, the size of Greg's.
 
-- **Snack** (its action, when a corpse is in the boss room): eats it and heals 2. Every minion the party kills in this room becomes a meal unless somebody cleans it. Clean the corpses or Shove them out the door; either one is a turn not spent hitting the boss.
+- **Snack** (free, at the start of its turn, when a corpse is in the boss room): eats it, heals 2, and still attacks. Every minion the party kills in this room becomes a meal unless somebody cleans it. Clean the corpses or Shove them out the door; either one is a turn not spent hitting the boss. (If Snack cost the boss its action it would be a gift to the party: the simulator says four points of win rate.)
 - **Mop** (Cooldown 2): 2 attack dice at every hero adjacent to it. Used whenever it is off cooldown and two or more heroes are adjacent.
 - **Understaffed:** while any fed janitor is on the floor, the boss defends with 4 dice instead of 3.
 - On death: the killer opens the **Boss Box** and the announcer starts the class selection (section 11). No corpse. Obviously.
@@ -162,43 +182,85 @@ Floor 1's three, same tokens. One addition: **a pit eats corpses.** A corpse Sho
 
 ## 6. Loot
 
-The Floor 1 decks, reshuffled, with the cards the shop sold or retired pulled out, and these added:
+Three shuffled decks again. What is physically in each one on the night, so the announcer can build them from the Floor 1 boxes plus the Floor 2 print run.
 
-| Card | Deck | Slot | Effect |
-|---|---|---|---|
-| **Industrial Bleach** ×4 | Pockets, but placed in furniture, not shuffled | | Obliterate a corpse on your square or adjacent. One use. Or drink it: lose 1 Health. Why would you. |
-| **Wizard's Bathrobe** | Big Gear, placed in furniture | Body | Mind +1. Terrycloth. Stacks with the Glasses, which is the whole point of it being a robe. |
-| **Scroll: Restructuring** | Big Gear, placed in furniture | | **Mind 5 to read.** 4 attack dice at a monster in line of sight, and 1 damage to every monster adjacent to it. One use. |
-| **Password of the Day** | Junk, carried by the Shift Lead | | "Today's password is: [the announcer picks something embarrassing]. Do not write it down." Opens the boss door when read aloud. |
-| **Pet Biscuit** | Companion upgrade, in the Good Boy envelope | slides under Sir Reginald | Reginald gets his own standee and square. Health 3, 2 attack dice, Move 6 with his person's turn. When a monster attacks his person, it attacks the goose instead, no roll. He can eat a medium corpse. |
-| **Orc Chainmail Bib** | Big Gear, placed in furniture | Body | As Floor 1. |
-| **Goblin Shortbow** | Big Gear, in the Nice Shot envelope | Both hands | As Floor 1. |
+### 6.1 Pockets deck (16 cards)
 
-Retired for good: Goblin Shortbow from the deck (it lives in an envelope now), Orc Monocle, Trash Can Lid, Torch, Frying Pan, Broken Table Leg. Sold at the shop, so out of the decks: Spellbook: Shove, Spellbook: Patch Up, Scroll: Stone Skin.
+Floor 1's Pockets deck with the cards the party is holding taken out (Bandage, Whistle, Scroll: Sleep, one Energy Drink), plus four reprints.
 
-The **Torch** stays retired, so the Wizard's Bathrobe is not competing with a Head item and the secret-door rule this floor is search only.
+| Card | Qty | Note |
+|---|---|---|
+| **Juice Box** | 4 | Floor 1 cards |
+| **Energy Drink** | 2 | one Floor 1 card, one reprint |
+| **Gold (1)**, **Gold (2)**, **Gold (3)** | 2, 3, 1 | Floor 1 cards plus two reprinted Gold (2) |
+| **Firecracker** | 1 | Floor 1 card |
+| **Rope** | 1 | Floor 1 card |
+| **Scroll: Heal** | 1 | Floor 1 card |
+| **Bandage** | 1 | reprint |
+
+Not shuffled: **Industrial Bleach** ×5, set out in furniture (section 3). "Obliterate a corpse on your square or adjacent to you. One use. Or drink it: lose 1 Health. Why would you."
+
+### 6.2 Gear deck (14 cards)
+
+Six Floor 1 cards that never got found (the shop's unsold stock goes back in), plus eight new ones. Basic kit, mostly +1s, because this floor is a scramble for the password and not a shopping trip.
+
+| Card | Slot | Effect |
+|---|---|---|
+| **Goblin-Chewed Leather Jacket** | Body | Defend +1. Floor 1 card. |
+| **Stolen Sneakers** | Feet | Move +2. Floor 1 card. |
+| **Lucky Rabbit's Foot** | Trinket | Once per floor, reroll one die. Floor 1 card. |
+| **Trap Kit** | Trinket | Disarm an adjacent revealed trap. Three uses. Floor 1 card. |
+| **Scroll: Firebolt** | | 3 attack dice at a monster in line of sight. Floor 1 card. |
+| **Scroll: Smoke Bomb** | | No monster can attack anyone this round. Floor 1 card. |
+| **Hard Hat** | Head | Defend +1. |
+| **Steel-Toed Boots** | Feet | Defend +1. |
+| **Wet Floor Sign** | Off hand | Defend +1. |
+| **Hi-Vis Vest** | Body | Defend +1. |
+| **Push Broom** | Main hand | Attack +1. |
+| **Mop** | Main hand | Attack +1. Once, obliterate an adjacent corpse as your action, no bleach. Then it's just a mop. |
+| **Contractor Badge** | Trinket | Kobolds won't attack you if there's any other hero they can reach. |
+| **Scroll: Lights Out** | | Every monster in your room skips its next activation. One use. |
+
+### 6.3 Big Gear deck (5 in the deck, 10 printed)
+
+Every Floor 1 Big Gear card is in someone's hands or was sold, so this deck is new. Five shuffled, five set out or in envelopes.
+
+| Card | Slot | Effect |
+|---|---|---|
+| **Cattle Prod** | Main hand | Attack +1. A monster you damage with it skips its next activation. |
+| **Janitor's Keyring** | Trinket | Opens a locked chest or door as your action. Three uses. Does not know the password. |
+| **Spellbook: Mop-Up** | Learned | Mind 4+. Obliterate a corpse in line of sight. Cooldown 2. Frees Spark to be a weapon again. |
+| **Spellbook: Static** | Learned | Mind 4+. 1 damage to every monster adjacent to you, no defence roll. Cooldown 3. |
+| **Steel Lunchbox** | Trinket | Once per floor, heal 3. |
+| **Wizard's Bathrobe** | Body | Mind +1. On the Laundry shelf. |
+| **Scroll: Restructuring** | | Mind 5 to read. 4 attack dice at a monster in line of sight, and 1 damage to every monster adjacent to it. On the Shift Lead's desk. |
+| **Orc Chainmail Bib** | Body | Defend +2, Move -2, no Sneakers. In the Evidence locker. |
+| **Goblin Shortbow** | Both hands | 2 dice at range, can't shoot adjacent, replaces your Attack. In the Nice Shot envelope. |
+| **Leaf Blower** | Both hands | Action: Shove. Push a monster or a corpse in line of sight up to 3 squares away. Into a pit, it goes in. A monster into a wall or another monster takes 1. In the Trap Chef envelope. Shove for people who can't read. |
+
+**Carried, not drawn:** the Password of the Day (Junk, on the Shift Lead) and the Pet Biscuit (Companion upgrade, in the Good Boy envelope). Sir Reginald gets a standee of his own once the biscuit is under him.
+
+**Retired for good:** Orc Monocle, Trash Can Lid, Torch, Frying Pan, Broken Table Leg. Torch stays retired so the Bathrobe isn't competing with a Head item and secret doors are search-only this floor.
 
 ---
 
 ## 7. Loot Boxes
 
-Same envelopes, new labels. The Floor 1 boxes that were never earned come back with the same contents.
+Seven envelopes. Every trigger is something the announcer will see happen, so nothing needs tracking across the evening.
 
 | Box | Tier | Trigger | Contents |
 |---|---|---|---|
-| **First Blood** | Bronze | First monster killed on the floor | 3 gold, 1 Juice Box |
-| **Nice Shot** | Gold | Kill a monster that isn't adjacent to you | Goblin Shortbow |
+| **Nice Shot** | Gold | Kill a monster from range with a weapon. Spells don't count. | Goblin Shortbow |
 | **Good Boy** | Companion | Sir Reginald eats a corpse | Pet Biscuit |
 | **Clean Freak** | Silver | Obliterate three corpses | 4 gold, 1 Industrial Bleach |
 | **Health Inspector** | Gold | Kill a fed janitor | 5 gold |
-| **Hoarder** | Bronze | Carry three unequipped items in your backpack at once | "Congratulations." A card. |
-| **Bookworm** | Silver | Cast four different spells on the floor | Bookmark, if it is not already on the table; otherwise 3 gold |
-| **Password Accepted** | Bronze | Open the boss door | 2 gold and a lanyard. Trinket, no effect. |
-| **Cartographer** | Silver | Open the doors to eight rooms | 5 gold |
-| **Trap Chef** | Gold | A monster dies from a trap | Fire Axe is taken; **TBD**, something for the one who does not have the axe |
-| **Boss Box** | Platinum | Kill the Senior Custodian | 8 gold, the class selection, and **TBD** one card per class chosen |
+| **Why Would You Drink That** | Bronze | Drink the bleach | 3 gold, 1 Juice Box. It costs 1 Health to open. Someone will. |
+| **Trap Chef** | Gold | A monster dies from a trap | Leaf Blower |
+| **Boss Box** | Platinum | Kill the Senior Custodian | 8 gold and the class selection (section 11) |
 
-Trap Chef and Boss Box contents wait on the class design (section 11).
+Cut from the first draft: First Blood and Cartographer (Floor 1 did those), Password Accepted (opening the door is its own reward), Hoarder and Bookworm (nobody wants to count cards mid-fight).
+
+**Pet Biscuit:** slide it under Sir Reginald. He gets his own standee and square: Health 3, 2 attack dice, moves 6 with his person's turn. Attacks on his person hit the goose instead, no roll. He can eat a medium corpse.
 
 ---
 
@@ -225,17 +287,20 @@ Ninety-five minutes. The queue does the cutting: a party that dawdles meets the 
 
 ## 10. What has to be generated
 
+All in the card workshop under the **Floor 2** filter, so the print run is just the new things.
+
 | Asset | Count |
 |---|---|
-| Monster cards: Cave Rat, Kobold Miner, Cave Bear, Shift Lead, Grub, Senior Custodian | 6 |
-| Fed janitor cards: Bloated Grub, Custodian, Facilities Manager (printed as the flip side of the Grub card's three copies, or three separate cards) | 3 |
-| Standees: rat, kobold, bear, Shift Lead, three fed forms, boss | 8 designs |
-| Grub tiles | 6 |
-| Corpse tiles: small, medium, large | 3 designs, counts from the map |
-| New item cards: Bleach ×4, Bathrobe, Restructuring, Password, Pet Biscuit, lanyard, "Congratulations." | 10 |
-| Envelope labels | 11 |
-| Furniture tiles for whatever Side B gets, with used backs | from the map |
-| Announcer speeches: intro, first grub, All Hands, boss, class selection | 5 |
+| Monster cards: Cave Rat, Kobold Miner, Cave Bear, Shift Lead, Grub, Bloated Grub, Custodian, Facilities Manager, Senior Custodian | 9 |
+| Standees: rat, kobold, bear, Shift Lead, three fed forms, boss, and Sir Reginald for the biscuit | 9 designs |
+| Pockets: Bleach ×5, reprints ×4 | 9 |
+| Gear: eight new cards | 8 |
+| Big Gear: ten cards | 10 |
+| Password of the Day, Pet Biscuit | 2 |
+| Envelope labels | 7 |
+| Furniture tiles, sized from the map, with used backs | 15 fronts, 13 backs |
+| Corpse tiles: small ×6, medium ×6, large ×3. Grub tiles ×6 | 21 |
+| Announcer speeches: intro, first grub, All Hands, collapse, stairs (in the map file, read from the iPad) | 5 |
 
 ---
 
@@ -260,4 +325,6 @@ Behind a `floor2` config so Floor 1 numbers stay intact.
 - Two hero policies, not one: a **cleaner** (bleach the nearest medium or large corpse when no grub is within eight squares and nobody is in combat) and a **runner** (never clean, keep moving). Tune the schedule and the bleach count until both land near 80% with different failure stories.
 - Report: win rate, deaths, corpses cleaned, janitors fed by size, rounds the party spent within reach of a fed janitor, and how often the boss got a Snack.
 
-**Open questions for the sim:** whether a grub every even round is too many or too few; whether six is the right cap; whether fed move 6 lets a running party ignore them entirely; whether the boss room's two Kobolds make Snack a fight-defining rule or a footnote.
+**Answered by the first runs:** a grub every round, every other round or every third round is within seven points, so the even-round schedule stays for pacing. Six is fine as the cap; four and eight are within four points. A running party does not escape fed janitors at move 6 (it loses more people, not fewer), and move 7 costs three more points. Snack matters only if it is free; as the boss's action it helped the party. The two Kobolds in the Sump produce about two snacks a game.
+
+**Still open:** the layout has not been played, the placeholder Big Gear cards are stand-ins, and the sim's cleaner never Shoves a corpse into the pit or out of the boss room, so those tricks are unmeasured upside for the real table.

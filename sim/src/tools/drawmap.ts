@@ -1,7 +1,9 @@
 import { Board, SOLID, CORRIDOR } from "../board";
 import { FLOOR1 } from "../content/floor1-map";
+import { FLOOR2 } from "../content/floor2";
+const FLOOR = process.argv[2] === "2" ? FLOOR2 : FLOOR1;
 
-const b = new Board(FLOOR1);
+const b = new Board(FLOOR);
 // Render at 2x so wall EDGES and doors are visible between cells.
 const W = b.w * 2 + 1, H = b.h * 2 + 1;
 const g: string[][] = Array.from({ length: H }, () => Array(W).fill(" "));
@@ -10,12 +12,12 @@ const cellChar = (x: number, y: number) => {
   const r = b.regionAt(x, y);
   if (r === SOLID) return "█";
   if (b.blocked[b.idx(x, y)]) return "F";
-  if (FLOOR1.entrance.x === x && FLOOR1.entrance.y === y) return "@";
-  for (const rm of FLOOR1.rooms)
+  if (FLOOR.entrance.x === x && FLOOR.entrance.y === y) return "@";
+  for (const rm of FLOOR.rooms)
     if (rm.interact && rm.interact.at.x === x && rm.interact.at.y === y && rm.interact.what.kind === "stairs") return "X";
-  for (const rm of FLOOR1.rooms)
+  for (const rm of FLOOR.rooms)
     if (rm.trap && rm.trap.at.x === x && rm.trap.at.y === y) return rm.trap.kind === "pit" ? "o" : "^";
-  for (const t of FLOOR1.corridorTraps) if (t.at.x === x && t.at.y === y) return t.kind === "pit" ? "o" : "^";
+  for (const t of FLOOR.corridorTraps) if (t.at.x === x && t.at.y === y) return t.kind === "pit" ? "o" : "^";
   if (r === CORRIDOR) return "·";
   return String(r);
 };

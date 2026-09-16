@@ -66,6 +66,10 @@ export type Card = {
   simName?: string;
   /** On the Stairwell Shop's shelf between floors: price in gold and which shelf the menu lists it under. Set from SHOP below. */
   shop?: { price: number; shelf: Shelf; qty?: number };
+  /** Which floor introduced the card. Default 1. The workshop filters on it so a new floor prints on its own. */
+  floor?: 1 | 2;
+  /** Not shuffled into its deck: set out in a piece of furniture or carried by a monster (says which). */
+  placed?: string;
 };
 
 export type Shelf = "Reading Material" | "Hardware" | "Apparel" | "Impulse Buys" | "Snacks & First Aid";
@@ -445,7 +449,209 @@ const tileBacks: Card[] = [
   used("sign", "the same welcome sign knocked flat on its face on the floor, the bell dented and lying on its side"),
 ];
 
-export const CARDS: Card[] = [...kits, ...pockets, ...gear, ...biggear, ...extras, ...shop, ...fan, ...monsters, ...players, ...envelopes, ...tiles, ...tileBacks, ...standees]
+// ---------------------------------------------------------------------------
+// Floor 2 (floor-2.md). Everything here is `floor: 2` so it prints on its own.
+// ---------------------------------------------------------------------------
+const f2 = <T extends Card>(c: T): T => ({ ...c, floor: 2 });
+
+const f2pockets: Card[] = ([
+  { id: "bleach", name: "Industrial Bleach", deck: "pockets", type: "consumable", qty: 5, placed: "furniture",
+    rules: "Obliterate a corpse on your square or adjacent to you. One use. Or drink it: lose 1 Health. Why would you.",
+    flavor: "DO NOT DRINK. Seriously.",
+    art: "a big white plastic jug of industrial bleach with a red skull warning label and a splash cap, slightly dented" },
+  // Reprints that go back into the Floor 2 Pockets deck (same art as the Floor 1 cards).
+  { id: "gold-2-f2", name: "Gold (2)", deck: "pockets", type: "consumable", qty: 2, rules: "2 gold. Spend at the Stairwell Shop.", flavor: "Slightly sticky.",
+    art: "a small handful of gold coins spilling out of a torn pocket" },
+  { id: "bandage-f2", name: "Bandage", deck: "pockets", type: "consumable",
+    rules: "Heal 1, or get an adjacent Downed player up without spending your action. One use.", flavor: "Mostly clean.",
+    art: "a roll of white gauze bandage, partly unrolled, with a small red cross on the wrapper" },
+  { id: "energy-drink-f2", name: "Energy Drink", deck: "pockets", type: "consumable",
+    rules: "+1 attack die on your next attack this turn. One use.", flavor: "DO NOT GIVE TO CHILDREN.",
+    art: "a tall neon green energy drink can with a lightning bolt logo, condensation dripping, faintly glowing" },
+] as Card[]).map(f2);
+
+const f2gear: Card[] = ([
+  { id: "hard-hat", name: "Hard Hat", deck: "gear", type: "item", slot: "Head", rules: "Defend +1.", flavor: "Required on site.",
+    art: "a scuffed yellow construction hard hat with a faded company sticker on the front" },
+  { id: "steel-boots", name: "Steel-Toed Boots", deck: "gear", type: "item", slot: "Feet", rules: "Defend +1.", flavor: "Kick things.",
+    art: "a pair of heavy brown leather work boots with steel toe caps showing through the worn leather" },
+  { id: "wet-floor-sign", name: "Wet Floor Sign", deck: "gear", type: "item", slot: "Off hand", rules: "Defend +1.", flavor: "Caution: you.",
+    art: "a yellow folding wet floor caution sign with a slipping stick figure, held up like a shield" },
+  { id: "hi-vis-vest", name: "Hi-Vis Vest", deck: "gear", type: "item", slot: "Body", rules: "Defend +1.", flavor: "Nobody will run you over. They will still hit you.",
+    art: "a bright orange high-visibility safety vest with silver reflective stripes, hanging on a hook" },
+  { id: "push-broom", name: "Push Broom", deck: "gear", type: "item", slot: "Main hand", rules: "Attack +1.", flavor: "Wide. Satisfying.",
+    art: "a wide wooden push broom with stiff black bristles and a long handle, held ready like a polearm" },
+  { id: "mop", name: "Mop", deck: "gear", type: "item", slot: "Main hand",
+    rules: "Attack +1. Once: obliterate an adjacent corpse as your action, no bleach. Then it's just a mop. Tick the box. ☐",
+    flavor: "Property of Facilities.",
+    art: "a grey string mop on a wooden handle, the mop head dripping something faintly green" },
+  { id: "contractor-badge", name: "Contractor Badge", deck: "gear", type: "item", slot: "Trinket",
+    rules: "Kobolds won't attack you if there's any other hero they can reach.", flavor: "Union rules.",
+    art: "a laminated contractor ID badge on a lanyard with a blurry photo of a kobold and a barcode" },
+  { id: "scroll-lights-out", name: "Scroll: Lights Out", deck: "gear", type: "scroll",
+    rules: "Every monster in your room skips its next activation.", flavor: "Anyone can read it. Once.",
+    art: "a rolled parchment scroll with a wax seal, an image of a light switch flipped down glowing on it" },
+] as Card[]).map(f2);
+
+const f2biggear: Card[] = ([
+  { id: "cattle-prod", name: "Cattle Prod", deck: "biggear", type: "item", slot: "Main hand",
+    rules: "Attack +1. A monster you damage with it skips its next activation.", flavor: "Bzzt.",
+    art: "a long yellow-and-black electric cattle prod with crackling blue sparks at the tip" },
+  { id: "keyring", name: "Janitor's Keyring", deck: "biggear", type: "item", slot: "Trinket",
+    rules: "Opens a locked chest or door as your action. Three uses. Tick the boxes. ☐ ☐ ☐ Does not know the password.",
+    flavor: "Forty keys. Three that work.",
+    art: "a huge steel ring crowded with dozens of mismatched keys, hanging from a belt clip" },
+  { id: "mop-up", name: "Spellbook: Mop-Up", deck: "biggear", type: "spell", mind: 4, cooldown: 2,
+    rules: "Obliterate a corpse in line of sight.",
+    art: "a small leather spellbook, open, with a glowing blue mop and bucket floating above the page" },
+  { id: "static", name: "Spellbook: Static", deck: "biggear", type: "spell", mind: 4, cooldown: 3,
+    rules: "1 damage to every monster adjacent to you. No defence roll.",
+    art: "a small leather spellbook, open, with a crackling ring of static electricity radiating out from the page" },
+  { id: "lunchbox", name: "Steel Lunchbox", deck: "biggear", type: "item", slot: "Trinket",
+    rules: "Once per floor, heal 3. Tick the box. ☐", flavor: "There is always something in it.",
+    art: "a battered steel workman's lunchbox with a domed lid, slightly open, a warm glow inside" },
+  // Placed or in an envelope, not shuffled.
+  { id: "bathrobe", name: "Wizard's Bathrobe", deck: "biggear", type: "item", slot: "Body", placed: "the Laundry shelf",
+    rules: "Mind +1.", flavor: "Terrycloth. Stacks with the Glasses, which is the whole point.",
+    art: "a fluffy purple terrycloth bathrobe covered in tiny gold stars and moons, on a wooden hanger" },
+  { id: "scroll-restructuring", name: "Scroll: Restructuring", deck: "biggear", type: "scroll", mind: 5, placed: "the Shift Lead's desk",
+    rules: "Mind 5 to read. 4 attack dice at a monster in line of sight, and 1 damage to every monster adjacent to it. One use.",
+    flavor: "Effective immediately.",
+    art: "an ornate parchment scroll with a red corporate seal, a glowing orange org chart on it with several boxes crossed out" },
+  { id: "chainmail-bib-f2", name: "Orc Chainmail Bib", deck: "biggear", type: "item", slot: "Body", placed: "the Evidence locker",
+    rules: "Defend +2. Subtract 2 from your movement roll. Can't wear Sneakers with it.", flavor: "They don't fit under.",
+    art: "a heavy chainmail bib apron with a leather neck strap, dented and stained" },
+  { id: "shortbow-f2", name: "Goblin Shortbow", deck: "biggear", type: "item", slot: "Both hands", envelope: "Nice Shot",
+    rules: "Attack 2 dice at any monster in line of sight. Can't be used on an adjacent monster. Replaces your Attack instead of adding to it.",
+    flavor: "Goblin-sized. Still works.",
+    art: "a small crude wooden shortbow with a frayed string and three mismatched arrows" },
+  { id: "leaf-blower", name: "Leaf Blower", deck: "biggear", type: "item", slot: "Both hands", envelope: "Trap Chef",
+    rules: "Action: Shove. Push a monster or a corpse in line of sight up to 3 squares directly away from you. Into a pit: it goes in. A monster into a wall or another monster: 1 damage.",
+    flavor: "Not a weapon. Not not a weapon.",
+    art: "a loud orange gas-powered leaf blower with a long black nozzle, leaves and dust blasting out of it" },
+] as Card[]).map(f2);
+
+const f2extras: Card[] = ([
+  { id: "password", name: "Password of the Day", deck: "junk", type: "text", placed: "the Shift Lead",
+    rules: "Today's password is whatever the announcer says it is. Read it aloud at the Sump door. Do not write it down.",
+    flavor: "Signed, the Shift Lead. Underlined twice.",
+    art: "a yellow sticky note with a scribbled word crossed out and rewritten, stuck to a clipboard" },
+  { id: "pet-biscuit", name: "Pet Biscuit", deck: "companion", type: "item", slot: "Companion upgrade", envelope: "Good Boy",
+    rules: "Slide under Sir Reginald. He gets his own standee and square: Health 3, 2 attack dice, moves 6 with his person's turn. Attacks on his person hit the goose instead, no roll. He can eat a medium corpse.",
+    flavor: "Who's a good boy. He is. He knows.",
+    art: "a large bone-shaped dog biscuit with a tiny crown stamped into it, resting on a red velvet cushion" },
+  { id: "reginald-standee", name: "Sir Reginald", deck: "standee", type: "standee", tile: { w: 0.75, h: 1 + STANDEE_TAB, kind: "standee" }, rules: "", ref: "sir-reginald",
+    art: "full-body figure of a furious white goose with an orange beak, wings half spread, wearing a tiny crooked knight's helmet, standing facing the viewer, whole body visible" },
+] as Card[]).map(f2);
+
+const f2monsters: Card[] = ([
+  { id: "rat", name: "Cave Rat", deck: "monster", type: "monster", stats: { att: 2, def: 1, hp: 1, mind: 1, move: "10" },
+    loot: ["1–3  Nothing", "4–6  Draw Pockets"], rules: "Leaves a small corpse.", flavor: "Unionized. Has a lanyard. Does not have a name tag.",
+    art: "a large scruffy brown cave rat standing on its hind legs wearing a lanyard, yellow teeth bared" },
+  { id: "kobold", name: "Kobold Miner", deck: "monster", type: "monster", stats: { att: 3, def: 2, hp: 1, mind: 2, move: "8" },
+    loot: ["1–2  Nothing", "3–4  Draw Pockets", "5–6  Draw Gear"], rules: "Leaves a medium corpse.", flavor: "Contractor. Paid by the corpse. Hasn't been paid.",
+    art: "a wiry red-scaled kobold in a miner's helmet with a headlamp, holding a pickaxe, dusty overalls" },
+  { id: "bear", name: "Cave Bear", deck: "monster", type: "monster", stats: { att: 3, def: 3, hp: 2, mind: 2, move: "6" },
+    loot: ["1–3  Draw Gear", "4–6  Draw Big Gear"], rules: "Leaves a large corpse.", flavor: "Not staff. Nobody has told the bear this.",
+    art: "a huge shaggy dark brown cave bear rearing up on its hind legs, roaring, a torn hi-vis vest snagged on one claw" },
+  { id: "shift-lead", name: "The Shift Lead", deck: "monster", type: "monster", stats: { att: 3, def: 3, hp: 2, mind: 3, move: "8" },
+    loot: ["Password of the Day + Draw Gear"], rules: "Leaves a medium corpse. The password opens the Sump door.", flavor: "Has the password. Has a clipboard. Has had enough.",
+    art: "a tall kobold in a short-sleeved dress shirt and a hard hat, holding a clipboard and a coffee mug, exhausted and furious" },
+  { id: "grub", name: "Grub", deck: "monster", type: "monster", stats: { att: 0, def: 0, hp: 1, mind: 0, move: "4, no roll" },
+    loot: ["Nothing. Ever."],
+    special: [
+      "Ignores heroes. Moves 4 toward the nearest corpse and eats it on arrival.",
+      "Then flip it: small corpse → Bloated Grub, medium → Custodian, large → Facilities Manager.",
+      "Janitors leave no corpse.",
+    ],
+    rules: "", flavor: "Facilities. Please do not interact with the staff.",
+    art: "a fat pale blind grub the size of a dog, segmented and glistening, wearing a tiny janitor's cap, mouth open" },
+  { id: "bloated-grub", name: "Bloated Grub", deck: "monster", type: "monster", stats: { att: 2, def: 2, hp: 1, mind: 0, move: "6, no roll" },
+    loot: ["Nothing"], rules: "Hunts the nearest hero by open route. No corpse.", flavor: "Ate a rat. Feels great.",
+    art: "a swollen pale grub with a rat's tail hanging out of its mouth, wearing a tiny janitor's cap, moving with purpose" },
+  { id: "custodian", name: "Custodian", deck: "monster", type: "monster", stats: { att: 3, def: 3, hp: 2, mind: 0, move: "6, no roll" },
+    loot: ["Nothing"], rules: "Hunts the nearest hero by open route. No corpse.", flavor: "Ate a kobold. Has a pickaxe now. Sort of.",
+    art: "a large upright grub with a kobold's helmet fused to its head and a pickaxe held in a new pair of stubby arms, janitor's cap on top" },
+  { id: "facilities-manager", name: "Facilities Manager", deck: "monster", type: "monster", stats: { att: 4, def: 3, hp: 3, mind: 0, move: "6, no roll" },
+    loot: ["Nothing"], rules: "Hunts the nearest hero by open route. No corpse.", flavor: "Ate a bear. Got promoted.",
+    art: "an enormous bloated grub with bear fur sprouting in patches and bear claws on stubby arms, a janitor's cap and a clip-on tie, looming" },
+  { id: "senior-custodian", name: "The Senior Custodian", deck: "monster", type: "monster", stats: { att: 4, def: 3, hp: 5, mind: 4, move: "6" },
+    loot: ["Boss Box + Draw Big Gear"],
+    special: [
+      "Snack: if a corpse is in the room, eats it at the start of its turn, heals 2, and still attacks.",
+      "Mop (Cooldown 2): 2 attack dice at every adjacent hero, when two or more are adjacent.",
+      "Understaffed: while any fed janitor is alive, defends with 4 dice instead of 3.",
+    ],
+    rules: "", flavor: "A grub that ate something with a very large skeleton, a long time ago.",
+    art: "a colossal ancient grub filling a cavern, pale and wrinkled, wearing a ragged janitor's cap and a name badge, a giant mop in one stubby arm, bones scattered around it" },
+] as Card[]).map(f2);
+
+const f2standees: Card[] = ([
+  standee("rat", "Cave Rat", 0.75, 1, "full-body figure of a large scruffy brown cave rat standing on its hind legs wearing a lanyard, facing the viewer, whole body visible", "rat"),
+  standee("kobold", "Kobold Miner", 0.75, 1.5, "full-body figure of a wiry red-scaled kobold in a miner's helmet with a headlamp, holding a pickaxe, dusty overalls, facing the viewer, whole body visible", "kobold"),
+  standee("bear", "Cave Bear", 1.25, 1.75, "full-body figure of a huge shaggy dark brown cave bear rearing up on its hind legs, facing the viewer, whole body visible", "bear"),
+  standee("shift-lead", "The Shift Lead", 0.75, 1.5, "full-body figure of a tall kobold in a short-sleeved dress shirt and a hard hat, holding a clipboard and a coffee mug, facing the viewer, whole body visible", "shift-lead"),
+  standee("bloated-grub", "Bloated Grub", 0.75, 1, "full-body figure of a swollen pale grub with a rat's tail hanging out of its mouth, wearing a tiny janitor's cap, facing the viewer", "bloated-grub"),
+  standee("custodian", "Custodian", 1, 1.5, "full-body figure of a large upright grub with a kobold's helmet fused to its head and a pickaxe in stubby arms, janitor's cap, facing the viewer, whole body visible", "custodian"),
+  standee("facilities-manager", "Facilities Manager", 1.25, 1.75, "full-body figure of an enormous bloated grub with patches of bear fur and bear claws, a janitor's cap and a clip-on tie, facing the viewer, whole body visible", "facilities-manager"),
+  standee("senior-custodian", "The Senior Custodian", 1.5, 2.25, "full-body figure of a colossal ancient pale wrinkled grub wearing a ragged janitor's cap and a name badge, holding a giant mop, facing the viewer, whole body visible", "senior-custodian"),
+] as Card[]).map(f2);
+
+const f2envelopes: Card[] = ([
+  env("nice-shot", "Nice Shot", "Gold", "Kill a monster from range with a weapon. Spells don't count.", "Goblin Shortbow"),
+  env("good-boy", "Good Boy", "Companion", "Sir Reginald eats a corpse", "Pet Biscuit"),
+  env("clean-freak", "Clean Freak", "Silver", "Obliterate three corpses", "4 gold, 1 Industrial Bleach", "Industrial Bleach, from the spares"),
+  env("health-inspector", "Health Inspector", "Gold", "Kill a fed janitor", "5 gold"),
+  env("drink", "Why Would You Drink That", "Bronze", "Drink the bleach", "3 gold, 1 Juice Box", "Juice Box, from Pockets"),
+  env("trap-chef-f2", "Trap Chef", "Gold", "A monster dies from a trap", "Leaf Blower"),
+  env("boss-f2", "Boss Box", "Platinum", "Kill the Senior Custodian", "8 gold, class selection"),
+] as Card[]).map(f2);
+
+const f2tile = (id: string, name: string, w: number, h: number, kind: "furniture" | "trap", art: string, mapKey: string, qty = 1): Card =>
+  f2({ ...tile(id, name, w, h, kind, art, mapKey), qty });
+const f2tiles: Card[] = [
+  f2tile("stairs-f2", "Stairs Down", 1, 2, "furniture", "a wide stone staircase descending into darkness, worn steps, a faint glow from below", "stairs"),
+  f2tile("front-desk", "Front Desk", 2, 1, "furniture", "a chipped laminate reception desk seen from directly above, with a bell, a sign-in sheet and a dead potted plant", "front desk"),
+  f2tile("shelving", "Shelving", 2, 1, "furniture", "a steel utility shelving unit seen from directly above, stacked with cleaning supplies, jugs and rags", "shelving"),
+  f2tile("shift-desk", "Shift Lead's Desk", 2, 1, "furniture", "a battered metal office desk seen from directly above, covered in clipboards, a rotary phone and a sticky note", "shift lead's desk"),
+  f2tile("bench", "Bench", 1, 2, "furniture", "a wooden locker room bench seen from directly above, a towel and a single boot left on it", "bench"),
+  f2tile("feed-trough", "Feed Trough", 2, 1, "furniture", "a long wooden feed trough seen from directly above, half full of suspicious kibble", "feed trough"),
+  f2tile("tool-rack", "Tool Rack", 1, 2, "furniture", "a pegboard tool rack seen from directly above, lying flat, hung with wrenches, a hammer and a coil of rope", "tool rack"),
+  f2tile("pipe-rack", "Pipe Rack", 2, 1, "furniture", "a rack of rusted iron pipes and valves seen from directly above, steam leaking from one joint", "pipe rack"),
+  f2tile("filing-cabinet", "Filing Cabinet", 1, 2, "furniture", "a tall grey steel filing cabinet seen from directly above, one drawer slightly open with papers sticking out", "filing cabinet"),
+  f2tile("laundry-shelf", "Laundry Shelf", 2, 1, "furniture", "a wooden laundry shelf seen from directly above, stacked with folded towels and one fluffy purple bathrobe", "laundry shelf"),
+  f2tile("lunch-table", "Lunch Table", 2, 2, "furniture", "a square cafeteria table seen from directly above, with trays, a spilled drink and a half-eaten sandwich", "lunch table"),
+  f2tile("ash-shelf", "Ash Shelf", 2, 1, "furniture", "a soot-stained stone shelf seen from directly above, with urns, a shovel and a pile of grey ash", "ash shelf"),
+  f2tile("evidence-locker", "Evidence Locker", 2, 1, "furniture", "a steel evidence locker seen from directly above, padlocked, with numbered tags and a chain", "evidence locker"),
+  f2tile("bunk", "Bunk", 1, 2, "furniture", "a rickety wooden bunk bed seen from directly above, a thin mattress and a chewed blanket", "bunk"),
+  f2tile("sump-pump", "Sump Pump", 2, 2, "furniture", "a huge rusted industrial sump pump seen from directly above, with pipes, a wheel valve and a puddle of dark water", "sump pump"),
+  f2tile("corpse-small", "Small Corpse", 1, 1, "trap", "a dead cave rat lying on a stone floor square seen from directly above, X eyes, lanyard beside it", "corpse", 6),
+  f2tile("corpse-medium", "Medium Corpse", 1, 1, "trap", "a dead kobold miner lying on a stone floor square seen from directly above, X eyes, helmet rolled off, pickaxe dropped", "corpse", 6),
+  f2tile("corpse-large", "Large Corpse", 1, 1, "trap", "a dead cave bear slumped on a stone floor square seen from directly above, X eyes, one paw over the edge of the square", "corpse", 3),
+  f2tile("grub-tile", "Grub", 1, 1, "trap", "a fat pale blind grub curled on a stone floor square seen from directly above, wearing a tiny janitor's cap", "grub", 6),
+];
+const f2used = (id: string, art: string): Card => {
+  const front = f2tiles.find(t => t.id === `tile-${id}`)!;
+  return f2({ id: `${front.id}-used`, name: `${front.name}, used`, deck: "tile", type: "tile", tile: { ...front.tile! }, rules: "", art, ref: front.id, backOf: front.id });
+};
+const f2tileBacks: Card[] = [
+  f2used("front-desk", "the same reception desk ransacked, drawers pulled out, the bell knocked over, papers everywhere"),
+  f2used("shelving", "the same shelving unit stripped bare, one shelf collapsed, a single empty jug on its side"),
+  f2used("shift-desk", "the same desk with every clipboard flung off, the phone off the hook, a sticky note torn away"),
+  f2used("bench", "the same bench tipped on its side, the towel on the floor"),
+  f2used("feed-trough", "the same trough overturned and empty, kibble scattered across the floor"),
+  f2used("tool-rack", "the same pegboard with every tool gone, only outlines and empty pegs"),
+  f2used("pipe-rack", "the same pipe rack with a valve wrenched off, steam gushing, a pipe lying loose"),
+  f2used("filing-cabinet", "the same filing cabinet with every drawer yanked out and papers heaped around it"),
+  f2used("laundry-shelf", "the same laundry shelf with the towels toppled and the bathrobe gone"),
+  f2used("lunch-table", "the same cafeteria table with the trays swept off and every chair knocked over"),
+  f2used("ash-shelf", "the same shelf with the urns tipped and ash spilled everywhere"),
+  f2used("evidence-locker", "the same locker forced open, the chain cut, empty inside"),
+  f2used("bunk", "the same bunk with the mattress dragged off and the blanket in a heap"),
+];
+
+export const CARDS: Card[] = [...kits, ...pockets, ...gear, ...biggear, ...extras, ...shop, ...fan, ...monsters, ...players, ...envelopes, ...tiles, ...tileBacks, ...standees,
+  ...f2pockets, ...f2gear, ...f2biggear, ...f2extras, ...f2monsters, ...f2envelopes, ...f2tiles, ...f2tileBacks, ...f2standees]
   .map(c => SHOP[c.id] ? { ...c, shop: SHOP[c.id] } : c);
 for (const id of Object.keys(SHOP)) if (!CARDS.some(c => c.id === id)) throw new Error(`SHOP prices "${id}" but no such card`);
 
@@ -476,14 +682,20 @@ export function saveOverride(id: string, patch: { art?: string }) {
   writeFileSync(OVERRIDES, JSON.stringify(o, null, 2) + "\n");
 }
 /** The catalog with any edited prompts applied. */
-/** The map editor's file. Tiles read their footprint and count from it, so a resize there shows up here. */
-export const MAP_FILE = join(ROOT, "..", "sim", "src", "content", "floor1.map.json");
+/** The map editor's files, one per floor. Tiles read their footprint and count from them, so a resize there shows up here. */
+export const MAP_FILES: Record<number, string> = {
+  1: join(ROOT, "..", "sim", "src", "content", "floor1.map.json"),
+  2: join(ROOT, "..", "sim", "src", "content", "floor2.map.json"),
+};
+export const MAP_FILE = MAP_FILES[1];
 export type Footprint = { w: number; h: number; n: number };
 
-/** Every piece on the map, keyed the way `Card.mapKey` is, as one entry per distinct size with a count. */
-export function mapFootprints(): Record<string, Footprint[]> {
-  if (!existsSync(MAP_FILE)) return {};
-  const fl = JSON.parse(readFileSync(MAP_FILE, "utf8")).floor ?? {};
+/** Every piece on a floor's map, keyed the way `Card.mapKey` is, as one entry per distinct size with a count.
+ *  A labelled piece is keyed by its label (Floor 2 names every piece); an unlabelled one by its kind (Floor 1). */
+export function mapFootprints(floor = 1): Record<string, Footprint[]> {
+  const file = MAP_FILES[floor];
+  if (!file || !existsSync(file)) return {};
+  const fl = JSON.parse(readFileSync(file, "utf8")).floor ?? {};
   const out: Record<string, Footprint[]> = {};
   const add = (key: string, w = 1, h = 1) => {
     const list = out[key.trim().toLowerCase()] ??= [];
@@ -492,7 +704,7 @@ export function mapFootprints(): Record<string, Footprint[]> {
   };
   for (const f of fl.features ?? []) {
     if (f.kind === "blocker") { if (f.label) add(f.label, f.w, f.h); }
-    else add(f.kind, f.w, f.h);
+    else add(f.label ?? f.kind, f.w, f.h);
   }
   for (const t of fl.traps ?? []) add(t.kind);
   for (const d of fl.doors ?? []) { if (d.kind === "secret") add("secret door"); if (d.trap === "block") add("falling block"); }
@@ -500,19 +712,20 @@ export function mapFootprints(): Record<string, Footprint[]> {
 }
 
 /** Unlabeled generic furniture on the map: it can't be matched to a tile, so it's worth flagging. */
-export function unlabeledBlockers(): { x: number; y: number; w: number; h: number }[] {
-  if (!existsSync(MAP_FILE)) return [];
-  const fl = JSON.parse(readFileSync(MAP_FILE, "utf8")).floor ?? {};
+export function unlabeledBlockers(floor = 1): { x: number; y: number; w: number; h: number }[] {
+  const file = MAP_FILES[floor];
+  if (!file || !existsSync(file)) return [];
+  const fl = JSON.parse(readFileSync(file, "utf8")).floor ?? {};
   return (fl.features ?? []).filter((f: any) => f.kind === "blocker" && !f.label).map((f: any) => ({ x: f.x, y: f.y, w: f.w ?? 1, h: f.h ?? 1 }));
 }
 
 export function cards(): Card[] {
   const o = loadOverrides();
-  const fp = mapFootprints();
+  const fps = { 1: mapFootprints(1), 2: mapFootprints(2) };
   const fronts = CARDS.flatMap(c => {
     const base = o[c.id]?.art ? { ...c, art: o[c.id].art! } : c;
     if (c.type !== "tile" || !c.mapKey) return [base];
-    const sizes = fp[c.mapKey];
+    const sizes = fps[c.floor ?? 1][c.mapKey];
     if (!sizes?.length) return [base];
     // one card per distinct size on the map; the first keeps the plain id so existing art and overrides still apply
     return sizes.map((s, i) => ({ ...base, id: i ? `${c.id}-${s.w}x${s.h}` : c.id, qty: s.n, tile: { ...c.tile!, w: s.w, h: s.h } }));

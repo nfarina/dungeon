@@ -41,6 +41,12 @@ being tuned between plays.
 - Batches of a few thousand games take 1-3 minutes; run them in the background.
 - Typecheck with `bunx tsc --noEmit -p .` inside `sim/` or `cards/` (no `tsc` on PATH).
 - Trap Chef is unmeasurable in the sim: monsters never step on traps on their own.
+- Floor 2 runs through the same engine behind `floor: 2` (`FLOOR2_CONFIG` in `engine.ts`): map
+  `floor2.map.json`, monsters/items in `content/monsters.ts` and `content/items.ts` (`FLOOR2_*`),
+  the carry-over party and fixed furniture loot in `content/floor2.ts`. Runner is `src/floor2.ts`
+  (it has its own report; `run.ts` stays Floor 1 only). `trace: true` narrates a game.
+- Floor 1's regression check after any engine change: `bun run src/run.ts report 3000` should
+  still say about 81% win, 37% someone dies.
 
 ## Keeping the three sources aligned
 
