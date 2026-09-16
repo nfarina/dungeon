@@ -1,0 +1,39 @@
+{
+  "board": {
+    "name": "HeroQuest First Light — Side B",
+    "w": 26,
+    "h": 19,
+    "grid": [
+      ".......AAAA..........BBBB.",
+      ".CCCCC.AAAA.DDDD.EEE.BBBB.",
+      ".CCCCC.AAAA.DDDD.EEE.BBBB.",
+      ".CCCCC.AAAA.DDDD.EEE......",
+      ".CCCCC......DDDD.EEE.FFFFF",
+      "GGGGGGG.HHH.DDDD.....FFFFF",
+      "GGGGGGG.HHH......III.FFFFF",
+      "GGGGGGG.HHH.JJJJ.III......",
+      "GGGGGGG.....JJJJ.III.KKKK.",
+      "GGGGGGG.....JJJJ.....KKKK.",
+      "GGGGGGG.....JJJJ.LLL.KKKK.",
+      "GGGGGGG.MMM.JJJJ.LLL......",
+      "GGGGGGG.MMM......LLL.NNNNN",
+      "GGGGGGG.MMM.OOOO.....NNNNN",
+      ".PPPPP......OOOO.QQQ.NNNNN",
+      ".PPPPP.RRRR.OOOO.QQQ......",
+      ".PPPPP.RRRR.OOOO.QQQ.SSSS.",
+      ".PPPPP.RRRR.OOOO.QQQ.SSSS.",
+      ".......RRRR..........SSSS."
+    ]
+  },
+  "floor": {
+    "name": "Floor 2 — Facilities",
+    "guide": "floor-2",
+    "note": "Board traced from the Side B board image: 26x19, 19 possible rooms, G is the big chamber with the skeleton. No rooms, doors or furniture placed yet.",
+    "rooms": [],
+    "doors": [],
+    "features": [],
+    "traps": [],
+    "monsters": [],
+    "speeches": []
+  }
+}
