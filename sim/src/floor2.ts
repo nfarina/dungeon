@@ -1,18 +1,8 @@
 // Floor 2 balance runner. `bun run src/floor2.ts report 2000`, `... sweep 1500`, `... brains 1500`.
 // Kept apart from run.ts (Floor 1) because the questions are different: corpses, grubs, the password.
-import { FLOOR2_CONFIG, simulate, type Config, type Result } from "./engine";
-import { FLOOR2 } from "./content/floor2";
+import { simulate, type Config, type Result } from "./engine";
+import { sampleFloor2 as sample } from "./presets";
 import { RNG } from "./rng";
-
-const OPTIONAL = FLOOR2.rooms.filter(r => !r.required && r.interact?.what.kind !== "stairs").map(r => r.id);
-
-/** One evening: a random appetite for side rooms. Kits don't apply; the party is the real one. */
-function sample(rng: RNG, base: Partial<Config>, i: number): Partial<Config> {
-  const greed = rng.next();
-  const nOpt = greed < 0.15 ? 1 : greed < 0.5 ? 2 : greed < 0.85 ? 3 : 4;
-  const optionalRooms = rng.shuffle([...OPTIONAL]).slice(0, nOpt);
-  return { ...FLOOR2_CONFIG, seed: 1000 + i * 7919, optionalRooms, ...base };
-}
 
 export let LAST: Result[] = [];
 

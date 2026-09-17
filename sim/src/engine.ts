@@ -77,6 +77,11 @@ export type Config = {
   bossSnack: boolean;
   /** Record the story of the game in `events` (and print it). */
   trace: boolean;
+  /** Keep a snapshot of the board after every hero turn and every DM phase, with a play-by-play, in `frames`.
+   *  Draws no dice, so a recorded game plays out exactly like an unrecorded one. For the map editor's Sim view. */
+  record: boolean;
+  /** Play on this floor instead of the built-in map for `floor` (the editor sends its unsaved map). */
+  floorDef: FloorDef | null;
   /** Floor 2 tuning: added to every fed janitor's Defend / Health (negative to soften them). */
   fedDef: number;
   fedHp: number;
@@ -125,6 +130,8 @@ export const DEFAULT_CONFIG: Config = {
   allHands: true,
   bossSnack: true,
   trace: false,
+  record: false,
+  floorDef: null,
   fedDef: 0,
   fedHp: 0,
   snackFree: false,
@@ -221,6 +228,47 @@ export type Result = {
   deadNames: string[];
 };
 
+/** One step of a recorded game: the board as it stands after a hero's turn or the DM's phase. */
+export type Frame = {
+  round: number;
+  /** "start" before round 1, "hero" after one hero's turn, "dm" after monsters, grubs and the end of the round. */
+  phase: "start" | "hero" | "dm";
+  who: string | null;
+  /** What happened during this step, in order. */
+  lines: string[];
+  heroes: {
+    name: string; x: number; y: number; hp: number; maxHp: number;
+    downed: boolean; dead: boolean; exited: boolean; inPit: boolean;
+    goose: number; gooseMax: number; gold: number;
+    atk: number; def: number; mind: number;
+    equip: string[]; pack: string[]; learned: string[];
+  }[];
+  monsters: {
+    key: string; id: string; name: string; x: number; y: number; hp: number; maxHp: number;
+    alive: boolean; active: boolean; asleep: number; janitor: "grub" | "fed" | null; boss: boolean; password: boolean;
+  }[];
+  corpses: Corpse[];
+  /** Doors by their two squares, so the page can match them to the map file without sharing indices. */
+  openDoors: [Pt, Pt][];
+  foundSecrets: [Pt, Pt][];
+  revealedTraps: Pt[];
+  spentTraps: Pt[];
+  /** Rooms whose furniture has been used. */
+  usedFurniture: number[];
+  /** Where each figure walked this step: hero name or monster key, then the squares in order. */
+  trails: { key: string; hero: boolean; path: Pt[] }[];
+  /** Room the party is heading for, when the brain has decided this round. */
+  goalRoom: number | null;
+  urgent: boolean;
+  queue: number;
+  collapseBegins: number | null;
+  deadline: number | null;
+  collapsing: boolean;
+  achievements: string[];
+  /** Set on the last frame. */
+  outcome: Result["outcome"] | null;
+};
+
 const SLOTS: Slot[] = ["main", "off", "body", "head", "feet"];
 
 export class Game {
@@ -237,7 +285,18 @@ export class Game {
     janitorsFed: { small: 0, medium: 0, large: 0 }, janitorsKilled: 0, grubsKilled: 0, bossSnacks: 0, chasedRounds: 0,
     passwordRound: null, allHandsRound: null, cleanedBy: { bleach: 0, spark: 0, goose: 0, pit: 0 } };
   events: string[] = [];
-  log(msg: string) { if (!this.cfg.trace) return; const line = `r${String(this.round).padStart(2)}  ${msg}`; this.events.push(line); console.log(line); }
+  log(msg: string) {
+    if (this.cfg.record) this.said.push(msg);
+    if (!this.cfg.trace) return;
+    const line = `r${String(this.round).padStart(2)}  ${msg}`; this.events.push(line); console.log(line);
+  }
+  /** Play-by-play for recorded games only. Call as `this.cfg.record && this.say(...)` so batches never build the string. */
+  say(msg: string) { this.said.push(msg); }
+  frames: Frame[] = [];
+  private said: string[] = [];
+  private trails: Frame["trails"] = [];
+  private trail(key: string, hero: boolean, path: Pt[]) { if (this.cfg.record && path.length > 1) this.trails.push({ key, hero, path: path.map(p => ({ ...p })) }); }
+  private monKey(m: Monster) { return `m${this.monsters.indexOf(m)}`; }
   rng: RNG;
   cfg: Config;
   heroes: Hero[] = [];
@@ -272,7 +331,7 @@ export class Game {
 
   constructor(cfg: Partial<Config> = {}) {
     this.cfg = { ...DEFAULT_CONFIG, ...cfg };
-    this.floor = this.cfg.floor === 2 ? FLOOR2 : FLOOR1;
+    this.floor = this.cfg.floorDef ?? (this.cfg.floor === 2 ? FLOOR2 : FLOOR1);
     this.board = new Board(this.floor);
     const stairsRoom = this.floor.rooms.find(r => r.interact?.what.kind === "stairs");
     if (!stairsRoom) throw new Error("the floor has no stairs");
@@ -409,6 +468,7 @@ export class Game {
   // --- inventory -----------------------------------------------------------
 
   give(h: Hero, item: Item) {
+    this.round > 0 && this.cfg.record && this.say(`  ${h.name} gets ${item.name}`);
     if (item.gold) { h.gold += item.gold; this.stats.gold += item.gold; return; }
     if (item.slot === "pack" || item.inert) { h.pack.push(item); return; }
     if (item.slot === "learned") { h.pack.push(item); return; }   // must be learned first
@@ -485,6 +545,7 @@ export class Game {
   award(name: string, contents: Item[]) {
     if (this.achievements.has(name)) return;
     this.achievements.add(name);
+    this.cfg.record && this.say(`Achievement: ${name}`);
     const h = this.living()[0] ?? this.heroes[0];
     for (const c of contents) this.give(h, clone(c));
   }
@@ -518,13 +579,18 @@ export class Game {
   // --- main loop -----------------------------------------------------------
 
   run(): Result {
+    this.snap("start", null);
     while (this.round < this.cfg.maxRounds) {
       this.round++;
       this.goalFieldCache.clear();
       this.fanShield = 0; this.fanReroll = 0;
       this.tradePhase();
       this.fanDeckPhase();
-      for (const h of this.heroes) this.heroTurn(h);
+      for (const h of this.heroes) {
+        const acts = !h.exited && !h.dead;
+        this.heroTurn(h);
+        if (acts) this.snap("hero", h.name);
+      }
       if (this.cfg.floor === 2) this.releaseQueue();
       this.monsterPhase();
       if (this.cfg.floor === 2) this.grubPhase();
@@ -543,6 +609,7 @@ export class Game {
           // The ceiling comes down harder every round you stay.
           const k = this.round - this.collapseFrom;
           const dmg = this.cfg.collapseEscalation === "steep" ? k + 1 : 1 + Math.floor(k / 2);
+          this.cfg.record && this.say(`The ceiling comes down: ${dmg} damage to everyone still standing on the floor`);
           for (const h of this.heroes) if (!h.exited && !h.downed) this.damage(h, dmg);
         }
       }
@@ -551,8 +618,48 @@ export class Game {
         this.heroesLost = this.living().length;
         return this.result("collapsed");
       }
+      this.snap("dm", null);
     }
     return this.result("stalled");
+  }
+
+  private snap(phase: Frame["phase"], who: string | null, outcome: Result["outcome"] | null = null) {
+    if (!this.cfg.record) return;
+    const pair = (d: { a: Pt; b: Pt }): [Pt, Pt] => [{ ...d.a }, { ...d.b }];
+    const pt = (k: string) => { const [x, y] = k.split(",").map(Number); return { x, y }; };
+    this.frames.push({
+      round: this.round, phase, who, lines: this.said, trails: this.trails,
+      heroes: this.heroes.map(h => ({
+        name: h.name, x: h.pos.x, y: h.pos.y, hp: h.hp, maxHp: h.maxHp,
+        downed: h.downed, dead: h.dead, exited: h.exited, inPit: h.inPit,
+        goose: h.goose, gooseMax: h.gooseMax, gold: h.gold,
+        atk: this.atk(h), def: this.def(h), mind: this.mind(h),
+        equip: [...SLOTS.map(s => h.equip[s]), ...h.trinkets].filter(Boolean).map(i => i!.name),
+        pack: [...h.pack, ...h.pending].map(i => i.name),
+        learned: h.learned.map(l => l.item.name + (l.cd ? ` (${l.cd})` : "")),
+      })),
+      monsters: this.monsters.map((m, i) => ({
+        key: `m${i}`, id: m.def.id, name: m.def.name, x: m.pos.x, y: m.pos.y, hp: m.hp,
+        maxHp: m.def.boss && this.cfg.floor === 1 ? this.cfg.bossHp : m.def.hp,
+        alive: m.alive, active: m.active, asleep: m.asleep, janitor: m.def.janitor ?? null,
+        boss: !!m.def.boss, password: !!m.def.password,
+      })),
+      corpses: this.corpses.map(c => ({ pos: { ...c.pos }, size: c.size })),
+      openDoors: this.board.doors.filter((_, i) => this.openDoors[i]).map(pair),
+      foundSecrets: this.board.doors.filter((_, i) => this.foundSecrets[i]).map(pair),
+      revealedTraps: [...this.revealedTraps].map(pt),
+      spentTraps: [...this.spentTraps].map(pt),
+      usedFurniture: [...this.usedInteract],
+      goalRoom: this.roomTargetCache?.round === this.round ? this.roomTargetCache.id : null,
+      urgent: this.urgent,
+      queue: this.queue,
+      collapseBegins: this.collapseBegins(),
+      deadline: this.hardDeadline(),
+      collapsing: this.collapseFrom !== null,
+      achievements: [...this.achievements],
+      outcome,
+    });
+    this.said = []; this.trails = [];
   }
 
   private result(kind: "done" | "collapsed" | "stalled" | "wiped"): Result {
@@ -560,6 +667,7 @@ export class Game {
     const outcome: Result["outcome"] =
       kind === "wiped" ? "wiped" : kind === "collapsed" ? "collapsed"
       : kind === "stalled" ? "stalled" : boss ? "win" : "escaped-no-boss";
+    this.snap("dm", null, outcome);
     const exitRound = kind === "done" ? this.round : null;
     return {
       outcome, rounds: this.round, bossKilled: boss, bossKilledRound: this.bossKilledRound,
@@ -620,7 +728,7 @@ export class Game {
       // of you, unusable, and your body rides the stairs down with the party.
       if (h.downed && !h.dead && this.round - h.downedRound >= 1) {
         // Sponsored Cape: once per floor, the sponsor would rather you didn't.
-        if (!h.capeUsed && this.items(h).some(i => i.capeOnce)) { h.capeUsed = true; h.downed = false; h.hp = 1; continue; }
+        if (!h.capeUsed && this.items(h).some(i => i.capeOnce)) { h.capeUsed = true; h.downed = false; h.hp = 1; this.cfg.record && this.say(`The sponsor's Cape saves ${h.name}`); continue; }
         h.downed = false; h.dead = true; h.deaths++; this.stats.deaths++;
         this.log(`${h.name} DIES`);
       }
@@ -630,7 +738,7 @@ export class Game {
     if (this.cfg.floor === 2) {
       const every = this.allHandsOn ? 1 : this.cfg.grubEvery;
       const alive = this.monsters.filter(m => m.alive && m.def.janitor).length;
-      if (this.round >= this.cfg.grubFrom && (this.round - this.cfg.grubFrom) % every === 0 && this.queue + alive < this.cfg.grubCap) this.queue++;
+      if (this.round >= this.cfg.grubFrom && (this.round - this.cfg.grubFrom) % every === 0 && this.queue + alive < this.cfg.grubCap) { this.queue++; this.cfg.record && this.say(`A grub joins the stairwell queue (${this.queue} waiting)`); }
       if (this.monsters.some(m => m.alive && m.def.janitor === "fed" && this.living().some(h => dist1(h.pos, m.pos) <= 3))) this.f2.chasedRounds++;
     }
   }
@@ -670,6 +778,7 @@ export class Game {
       if (!best || bd >= 0x3fffffff) continue;
       const path = pathTo(this.board, f, best.pos);
       m.pos = { ...path[Math.min(path.length - 1, this.cfg.grubMove)] };
+      this.cfg.record && this.trail(this.monKey(m), false, path.slice(0, Math.min(path.length - 1, this.cfg.grubMove) + 1));
       const c = this.corpseAt(m.pos);
       if (c) this.feed(m, c);
     }
@@ -762,6 +871,7 @@ export class Game {
     if (!who) return false;
     pu.cd = pu.item.spell!.cooldown;
     who.hp = Math.min(who.maxHp, who.hp + 2);
+    this.cfg.record && this.say(`${h.name} casts Patch Up on ${who === h ? "themself" : who.name} (${who.hp}/${who.maxHp})`);
     return true;
   }
 
@@ -783,6 +893,7 @@ export class Game {
         if (!to) continue;
         h.pack = h.pack.filter(x => x !== b);
         to.pack.push(b);
+        this.cfg.record && this.say(`${h.name} hands ${b.name} to ${to.name}`);
       }
     }
   }
@@ -815,7 +926,7 @@ export class Game {
     if (h.exited || h.dead) return;
     for (const l of h.learned) if (l.cd > 0) l.cd--;
     h.stoneSkin = false;
-    if (h.downed) return;
+    if (h.downed) { this.cfg.record && this.say(`${h.name} is Downed and can't act; dies at the end of round ${h.downedRound + 1} unless picked up`); return; }
 
     // Out of combat, gear picked up during a fight gets equipped for free.
     if (h.pending.length && !this.inCombat(h)) { for (const it of h.pending) this.equipOrStash(h, it); h.pending = []; }
@@ -825,7 +936,7 @@ export class Game {
 
     if (h.inPit) {
       if (this.has(h, i => !!i.rope)) h.inPit = false;
-      else { h.inPit = false; return; }        // climbing out costs the action
+      else { h.inPit = false; this.cfg.record && this.say(`${h.name} climbs out of the pit (that's the turn)`); return; }        // climbing out costs the action
     }
 
     const dl = this.hardDeadline();
@@ -842,7 +953,7 @@ export class Game {
       || lastOneStanding;
 
     // Floor 2: a Downed goose gets picked up on a quiet turn (his person's action).
-    if (h.gooseDown >= 0 && !this.inCombat(h)) { h.gooseDown = -99; h.goose = 1; return; }
+    if (h.gooseDown >= 0 && !this.inCombat(h)) { h.gooseDown = -99; h.goose = 1; this.cfg.record && this.say(`${h.name} picks up Sir Reginald`); return; }
     // Pet Biscuit: slide it under the goose the moment it is in hand.
     if (!h.biscuit && h.goose > 0 && h.pack.some(i => i.biscuit)) { h.biscuit = true; h.gooseMax = 3; h.goose = 3; h.pack = h.pack.filter(i => !i.biscuit); }
 
@@ -865,13 +976,14 @@ export class Game {
     if (this.cfg.floor === 2 && (!this.cfg.castNeedsMind || this.mind(h) >= 4)) {
       const st = h.learned.find(l => l.item.spell?.id === "static" && l.cd === 0);
       const adj = this.monsters.filter(m => m.alive && m.def.janitor !== "grub" && adjacent(m.pos, h.pos));
-      if (st && adj.length >= 2) { st.cd = st.item.spell!.cooldown; for (const m of adj) this.hurtMonster(m, 1, h); return; }
+      if (st && adj.length >= 2) { st.cd = st.item.spell!.cooldown; this.cfg.record && this.say(`${h.name} casts Static: 1 damage to each of ${adj.length} adjacent monsters`); for (const m of adj) this.hurtMonster(m, 1, h); return; }
     }
     // Patch Up beats a swing when somebody is about to drop.
     if ((h.hp <= 2 || this.standing().some(o => o !== h && adjacent(o.pos, h.pos) && o.hp <= 2)) && this.tryPatchUp(h)) return;
 
     // Already in melee? Swing.
     if (target && adjacent(h.pos, target.pos) && !this.hasRanged(h)) {
+      this.cfg.record && this.say(`${h.name} stays in the fight`);
       this.heroAttack(h, target); return;
     }
     if (target && this.hasRanged(h) && !adjacent(h.pos, target.pos) && los(this.board, h.pos, target.pos, this.openDoors)) {
@@ -889,7 +1001,7 @@ export class Game {
       const f = this.walkField(h);
       const dest = this.stepToward(h, f, goal, this.moveBudget(h));
       if (dest) this.walk(h, f, dest);
-      else this.stuck++;
+      else { this.stuck++; this.cfg.record && this.say(`${h.name} can't find a way forward and stays put`); }
     }
 
     // Act after moving.
@@ -908,11 +1020,12 @@ export class Game {
     if (this.cfg.floor === 2 && this.cfg.cleanPolicy === "cleaner") {
       const g = this.monsters.find(m => m.alive && m.def.janitor === "grub" && adjacent(m.pos, h.pos)
         && this.corpses.some(c => c.size !== "small" && dist1(c.pos, m.pos) <= this.cfg.grubMove));
-      if (g) { this.heroAttack(h, g); return; }
+      if (g) { this.cfg.record && this.say(`${h.name} squashes a grub before it reaches a corpse`); this.heroAttack(h, g); return; }
     }
   }
 
-  private moveBudget(h: Hero) { return this.moveDice(h); }
+  private moveBudget(h: Hero) { return this.lastRoll = this.moveDice(h); }
+  private lastRoll = 0;
 
   private walkField(h: Hero): Field {
     return field(this.board, h.pos, this.heroPolicy(h));
@@ -1089,7 +1202,8 @@ export class Game {
 
   private walk(h: Hero, f: Field, dest: Pt) {
     const path = pathTo(this.board, f, dest);
-    for (let i = 1; i < path.length; i++) {
+    let i = 1;
+    for (; i < path.length; i++) {
       const from = path[i - 1], to = path[i];
       const di = this.board.doorIndex(from, to);
       if (di >= 0 && !this.openDoors[di]) this.openDoor(h, di, from, to);
@@ -1097,12 +1211,22 @@ export class Game {
       if (this.enterCell(h)) break;      // pit stops movement
       if (h.downed) break;
     }
+    if (this.cfg.record && path.length > 1) {
+      const walked = path.slice(0, Math.min(i + 1, path.length));
+      this.trail(h.name, true, walked);
+      const where = this.board.roomIdAt(h.pos);
+      this.say(`${h.name} moves ${walked.length - 1} (rolled ${this.lastRoll}) to ${where === null ? "the corridor" : this.board.rooms.get(where)!.name}`);
+    }
     if (this.has(h, i => !!i.torch)) this.torchReveal(h);
   }
 
   private openDoor(h: Hero, di: number, from: Pt, to: Pt) {
     const d = this.board.doors[di];
     this.openDoors[di] = 1;
+    if (this.cfg.record) {
+      const r = this.board.roomIdAt(to) ?? this.board.roomIdAt(from);
+      this.say(`${h.name} opens ${d.kind === "locked" ? "the locked door" : d.kind === "secret" ? "a secret door" : "a door"}${r === null ? "" : ` (${this.board.rooms.get(r)!.name})`}${d.trap === "block" ? ": FALLING BLOCK" : ""}`);
+    }
     this.doorVersion++; this.goalFieldCache.clear();
     if (d.trap === "block") {
       this.stats.traps++;
@@ -1125,6 +1249,7 @@ export class Game {
     }
     if (d.kind === "locked" && !this.has(h, i => !!i.unlocks)) {
       // Knocking: the two Orcs each get a free swing at the knocker.
+      this.cfg.record && this.say(`${h.name} knocks: the guards get a free swing`);
       for (const m of this.monsters.filter(m => m.alive && m.room === this.bossRoom && !m.def.boss)) {
         m.active = true;
         this.monsterAttack(m, h);
@@ -1165,6 +1290,7 @@ export class Game {
     this.spentTraps.add(k);
     this.revealedTraps.add(k);
     this.stats.traps++;
+    this.cfg.record && this.say(`${h.name} steps on a ${trap.kind} trap`);
     this.award("Found It With Your Face", [{ name: "Football Helmet", slot: "head", trapImmuneOnce: true }]);
     if (this.absorbTrap(h)) return trap.kind === "pit";
     if (trap.kind === "pit") {
@@ -1188,6 +1314,7 @@ export class Game {
       if (!c) break;
       h.pack = h.pack.filter(x => x !== c);
       h.hp = Math.min(h.maxHp, h.hp + (c.use === "heal4" ? 4 : c.use === "heal3" ? 3 : 1));
+      this.cfg.record && this.say(`${h.name} uses ${c.name} (${h.hp}/${h.maxHp})`);
     }
   }
 
@@ -1195,6 +1322,7 @@ export class Game {
     const bandage = h.pack.find(i => i.use === "heal1");
     if (bandage) h.pack = h.pack.filter(x => x !== bandage);
     down.downed = false; down.hp = this.cfg.reviveHp;
+    this.cfg.record && this.say(`${h.name} picks up ${down.name} (${down.hp} Health)`);
   }
 
   /** A true ranged weapon (the Shortbow): shoot instead of closing to melee. */
@@ -1213,6 +1341,7 @@ export class Game {
     const spark = (!this.cfg.castNeedsMind || this.mind(h) >= 4) ? h.learned.find(l => l.item.spell?.id === "spark" && l.cd === 0) : undefined;
     if (spark && (!adjacent(h.pos, target.pos) || 2 > this.atk(h))) {
       spark.cd = spark.item.spell!.cooldown;
+      this.cfg.record && this.say(`${h.name} casts Spark at ${target.def.name}`);
       this.resolveAttack(h, target, 2);
       return true;
     }
@@ -1223,6 +1352,7 @@ export class Game {
       const crowd = this.monsters.filter(m => m.alive && m.asleep === 0 && rid !== null && this.board.roomIdAt(m.pos) === rid);
       if (crowd.length >= 2 || (crowd.length && target.def.boss)) {
         h.pack = h.pack.filter(x => x !== lo);
+        this.cfg.record && this.say(`${h.name} reads Lights Out: ${crowd.length} monster(s) skip their next turn`);
         for (const m of crowd) m.asleep = Math.max(m.asleep, 1);
         return true;
       }
@@ -1230,6 +1360,7 @@ export class Game {
     const rs = h.pack.find(i => i.use === "restructuring");
     if (rs && this.mind(h) >= (rs.needMind ?? 5) && (target.def.boss || target.hp >= 2)) {
       h.pack = h.pack.filter(x => x !== rs);
+      this.cfg.record && this.say(`${h.name} reads Restructuring at ${target.def.name}`);
       this.resolveAttack(h, target, 4);
       for (const o of this.monsters.filter(o => o.alive && o !== target && adjacent(o.pos, target.pos))) this.hurtMonster(o, 1, h);
       return true;
@@ -1237,6 +1368,7 @@ export class Game {
     const fb = h.pack.find(i => i.use === "firebolt");
     if (fb && (target.def.boss || target.hp > 1)) {
       h.pack = h.pack.filter(x => x !== fb);
+      this.cfg.record && this.say(`${h.name} reads Firebolt at ${target.def.name}`);
       this.resolveAttack(h, target, 3);
       return true;
     }
@@ -1245,6 +1377,7 @@ export class Game {
       && this.heroes.some(x => x.hp <= 3)) {
       h.pack = h.pack.filter(x => x !== sleep);
       target.asleep = 2;
+      this.cfg.record && this.say(`${h.name} reads Sleep on ${target.def.name}`);
       return true;
     }
     return false;
@@ -1262,7 +1395,7 @@ export class Game {
     // Energy Drink: spend it when it might matter.
     if (!h.energy && this.rng.next() < this.cfg.competence * 0.5) {
       const e = h.pack.find(i => i.use === "energy");
-      if (e && (m.def.boss || m.def.def >= 3)) { h.pack = h.pack.filter(x => x !== e); dice += 1; }
+      if (e && (m.def.boss || m.def.def >= 3)) { h.pack = h.pack.filter(x => x !== e); dice += 1; this.cfg.record && this.say(`${h.name} drinks an Energy Drink`); }
     }
     h.energy = 0;
     this.resolveAttack(h, m, dice);
@@ -1286,6 +1419,7 @@ export class Game {
     if (m.def.boss && this.cfg.floor === 2 && this.monsters.some(o => o.alive && o.def.janitor === "fed")) defDice += 1; // Understaffed
     const shields = rollShields(this.rng, defDice, true);
     const dmg = Math.max(0, skulls - shields);
+    this.cfg.record && this.say(`${h.name} attacks ${m.def.name}${this.lastShotRanged ? " from range" : ""}: ${dice} dice, ${skulls} skull${skulls === 1 ? "" : "s"} vs ${shields} of ${defDice} shields` + (dmg > 0 ? `, ${dmg} damage${m.hp - dmg <= 0 ? ", KILLED" : ` (${m.hp - dmg} left)`}` : ", no damage"));
     if (dmg > 0) this.hurtMonster(m, dmg, h);
   }
 
@@ -1325,6 +1459,7 @@ export class Game {
     if (this.cfg.lootRich && roll === 5 && (m.def.id === "orc" || m.def.id === "zombie")) kind = "gear";
     if (this.cfg.lootRich && roll === 6 && m.def.id === "skeleton") kind = "gear";
     if (this.cfg.lootRich && roll >= 4 && m.def.id === "skeleton") kind = roll === 6 ? "gear" : "pockets";
+    this.cfg.record && this.say(`  loot roll ${roll}: ${kind === "none" ? "nothing" : kind === "big" ? "Big Gear" : kind === "gear" ? "Gear" : "Pockets"}`);
     if (kind !== "none") {
       const item = this.draw(kind === "big" ? "big" : kind === "gear" ? "gear" : "pockets");
       if (item) this.give(killer, item);
@@ -1345,7 +1480,8 @@ export class Game {
     const w = r.interact.what;
     if (w.kind === "stairs") return false;
     if (this.urgent) return false;
-    if (w.kind === "cage") { this.usedInteract.add(rid); h.goose = 2; return true; }
+    this.cfg.record && this.say(`${h.name} uses the ${w.kind} in ${r.name}`);
+    if (w.kind === "cage") { this.usedInteract.add(rid); h.goose = 2; this.cfg.record && this.say(`  Sir Reginald joins ${h.name}`); return true; }
     const fixed = this.cfg.floor === 2 ? FIXED_LOOT[r.name] : undefined;
     const handout = () => { if (!fixed) return false; const it = namedItem(fixed); if (it.use === "bleach") this.f2.bleachFound++; this.give(h, it); return true; };
     if (w.kind === "chest") {
@@ -1356,6 +1492,7 @@ export class Game {
         // Failed pick: it screams, and a goblin comes running.
         const g = this.monsters.find(m => m.alive && m.def.id === "goblin" && !m.active);
         if (g) g.active = true;
+        this.cfg.record && this.say(`  the lock pick fails and the chest screams`);
         return true;
       }
       this.usedInteract.add(rid);
@@ -1379,6 +1516,7 @@ export class Game {
     if (!bk) return false;
     h.pack = h.pack.filter(x => x !== bk);
     h.learned.push({ item: bk, cd: 0 });
+    this.cfg.record && this.say(`${h.name} learns ${bk.name}`);
     this.award("Nerd", [{ name: "Scroll: Firebolt", slot: "pack", use: "firebolt" },
       { name: "Bookmark", slot: "trinket", resetCd: true }]);
     return true;
@@ -1396,7 +1534,7 @@ export class Game {
         const doorOpen = this.board.doors.some((d, i) =>
           (this.board.roomIdAt(d.a) === m.room || this.board.roomIdAt(d.b) === m.room) && !!this.openDoors[i]);
         const seen = this.standing().some(h => los(this.board, m.pos, h.pos, this.openDoors));
-        if (doorOpen && seen) m.active = true;
+        if (doorOpen && seen) { m.active = true; this.cfg.record && this.say(`${m.def.name} wakes up`); }
         else continue;
       }
       const targets = this.standing();
@@ -1408,13 +1546,14 @@ export class Game {
         if (lunch) { this.removeCorpse(lunch, "snack"); m.hp = Math.min(m.def.hp, m.hp + this.cfg.snackHeal); this.f2.bossSnacks++; this.log(`  boss heals to ${m.hp}`); if (!this.cfg.snackFree) continue; }
         // Mop: 2 dice at every adjacent hero when two or more are in reach.
         const adj = targets.filter(h => adjacent(m.pos, h.pos));
-        if (m.cd === 0 && adj.length >= 2) { m.cd = 2; for (const h of adj) this.monsterAttack(m, h, 2); continue; }
+        if (m.cd === 0 && adj.length >= 2) { m.cd = 2; this.cfg.record && this.say(`${m.def.name}: Mop`); for (const h of adj) this.monsterAttack(m, h, 2); continue; }
       }
       if (m.def.boss && m.cd === 0 && this.cfg.floor === 1) {
         const vis = targets.filter(h => los(this.board, m.pos, h.pos, this.openDoors));
         if (vis.length) {
           const t = vis.reduce((a, b) => (this.gearCount(b) > this.gearCount(a) ? b : a));
           m.cd = 2;
+          this.cfg.record && this.say(`${m.def.name}: Performance Review at ${t.name}`);
           this.monsterAttack(m, t, 2);   // Performance Review
           continue;
         }
@@ -1438,12 +1577,14 @@ export class Game {
       }
       if (best && victim) {
         const path = pathTo(this.board, f, best);
-        for (let i = 1; i < path.length; i++) {
+        let i = 1;
+        for (; i < path.length; i++) {
           const c = path[i];
           if (this.cfg.monstersAvoidAllTraps && this.isLiveTrap(c.x, c.y)) break;   // never, given the policy above
           m.pos = { ...c };
-          if (!this.cfg.monstersAvoidAllTraps && this.revealedTraps.has(`${c.x},${c.y}`) && !this.spentTraps.has(`${c.x},${c.y}`)) break;
+          if (!this.cfg.monstersAvoidAllTraps && this.revealedTraps.has(`${c.x},${c.y}`) && !this.spentTraps.has(`${c.x},${c.y}`)) { i++; break; }
         }
+        this.cfg.record && this.trail(this.monKey(m), false, path.slice(0, i));
         if (this.monsterStepTraps(m)) continue;
         if (adjacent(m.pos, victim.pos)) this.monsterAttack(m, victim);
       } else {
@@ -1461,6 +1602,7 @@ export class Game {
           if (spot) {
             const path = pathTo(this.board, f, spot);
             m.pos = { ...path[Math.min(path.length - 1, mv)] };
+            this.cfg.record && this.trail(this.monKey(m), false, path.slice(0, Math.min(path.length - 1, mv) + 1));
             if (adjacent(m.pos, bh.pos)) this.monsterAttack(m, bh);
           }
         }
@@ -1514,19 +1656,21 @@ export class Game {
 
   private monsterAttack(m: Monster, h: Hero, diceOverride?: number) {
     // A Viewer takes one attack off the table (Banana Peel, Slow Clap, Boo!).
-    if (this.fanShield > 0) { this.fanShield--; return; }
+    if (this.fanShield > 0) { this.fanShield--; this.cfg.record && this.say(`${m.def.name} swings at ${h.name}; a Viewer's card stops it`); return; }
     // Goose: soaks a hit on a skull (every hit, with the Pet Biscuit). Floor 2: at 0 he is Downed, not dead.
     if (h.goose > 0 && (h.biscuit || rollSkulls(this.rng, 1) > 0)) {
       h.goose--;
       if (h.goose === 0 && this.cfg.floor === 2) h.gooseDown = this.round;
+      this.cfg.record && this.say(`${m.def.name} swings at ${h.name}; Sir Reginald takes it (${h.goose} left)`);
       return;
     }
     const nope = this.living().filter(x => !this.cfg.castNeedsMind || this.mind(x) >= 4).flatMap(x => x.learned).find(l => l.item.spell?.id === "nope" && l.cd === 0);
-    if (nope && h.hp <= 2) { nope.cd = 3; return; }
+    if (nope && h.hp <= 2) { nope.cd = 3; this.cfg.record && this.say(`${m.def.name} swings at ${h.name}: NOPE`); return; }
     const skulls = rollSkulls(this.rng, diceOverride ?? m.def.atk);
     const shields = rollShields(this.rng, this.def(h), false);
     const dmg = Math.max(0, skulls - shields);
     if (m.def.janitor || m.def.boss) this.log(`  ${m.def.name} hits ${h.name} for ${dmg} (${h.hp - dmg} left)`);
+    else this.cfg.record && this.say(`${m.def.name} attacks ${h.name}: ${skulls} skull${skulls === 1 ? "" : "s"} vs ${shields} shield${shields === 1 ? "" : "s"}, ${dmg ? `${dmg} damage (${h.hp - dmg} left)` : "no damage"}`);
     if (dmg > 0) this.damage(h, dmg);
   }
 
@@ -1538,6 +1682,7 @@ export class Game {
       if (sc && this.rng.next() < this.cfg.competence * 0.4) {
         h.pack = h.pack.filter(x => x !== sc);
         h.hp = sc.use === "heal4" ? 4 : 3;
+        this.cfg.record && this.say(`${h.name} would go down, but uses ${sc.name} just in time`);
         return;
       }
       h.hp = 0; h.downed = true; h.downedRound = this.round; h.inPit = false;

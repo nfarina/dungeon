@@ -1,8 +1,8 @@
 import { simulate, type Config, type Result } from "./engine";
 import { RNG } from "./rng";
+import { RECOMMENDED, sampleFloor1 as sampleConfig } from "./presets";
 
-const ALL_OPTIONAL = [3, 4, 6, 7, 8];
-const KIT_NAMES = ["Slingshot", "HockeyStick", "Multitool", "SnackBag", "Glasses"];
+export { RECOMMENDED };
 
 export type Batch = {
   n: number;
@@ -30,15 +30,6 @@ export type Batch = {
   calmRate: number;                // out with >=5 rounds before the collapse began
   feltItRate: number;              // out during, or within 1 round of, the collapse
 };
-
-/** One party sampled the way a real evening samples: random kits, random appetite for side rooms. */
-function sampleConfig(rng: RNG, base: Partial<Config>, i: number): Partial<Config> {
-  const kits = rng.shuffle([...KIT_NAMES]).slice(0, 3);
-  const greed = rng.next();
-  const nOpt = greed < 0.15 ? 0 : greed < 0.5 ? 1 : greed < 0.85 ? 2 : 3;
-  const optionalRooms = rng.shuffle([...ALL_OPTIONAL]).slice(0, nOpt);
-  return { seed: 1000 + i * 7919, kits, optionalRooms, ...base };
-}
 
 export let LAST: Result[] = [];
 
@@ -270,13 +261,6 @@ if (cmd === "softfuse") {
   console.log(`feltit = got out during the collapse or with <=1 round before it started`);
   console.log(`calm   = got out with >=5 rounds before the first tremor (never felt it)`);
 }
-
-export const RECOMMENDED: Partial<Config> = {
-  lootRich: true, richRack: true, guaranteedSpellbook: true,
-  collapseStart: "both", collapseRound: 22, collapseAfterDoor: 5,
-  collapseMode: "soft", collapseGrace: 4, collapseEscalation: "gentle",
-  bossHp: 4,
-};
 
 if (cmd === "report") {
   const cfg = process.argv[4] === "aswritten" ? {} : RECOMMENDED;

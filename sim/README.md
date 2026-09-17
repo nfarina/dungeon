@@ -17,6 +17,7 @@ bun run src/floor2.ts report 2000   # Floor 2 (floor-2.md): corpses, grubs, the 
 bun run src/floor2.ts trace 7       # one Floor 2 game, narrated
 bun run src/floor2.ts brains 1200   # cleaner vs runner party, no grubs, no cap
 bun run src/floor2.ts sweep 1200    # grub schedule, cap, fed move, floor cap, All Hands, Snack
+bun run src/replay.ts 7 2            # one recorded game (seed 7, Floor 2), step by step
 bun run map                         # the map editor at http://localhost:5173
 ```
 
@@ -54,6 +55,14 @@ is Greg hitting the emergency reset when the Office opens. That state lives in
 the browser, separate from the map, so marking rooms cleared never edits the
 floor. The **Players** preset hides traps, monsters and secret doors, for when
 you turn the screen round.
+
+**Sim** plays one game on the map as it stands in the editor (unsaved edits
+included), using the same party sampling and ruleset as the batch reports, and
+lets you step through it: ← → one hero turn or DM phase at a time, ↑ ↓ a round,
+Space autoplays, N rolls a new game. A seed replays the same game, so change a
+monster placement and hit "Replay seed" to see what it does to that evening
+(it diverges from the first die the change touches). The engine records it
+behind `record: true` (`Frame` in `engine.ts`); recording draws no dice.
 
 ## The map format
 

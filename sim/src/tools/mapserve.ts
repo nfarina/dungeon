@@ -4,6 +4,7 @@
 // in the browser lands in the same file the simulator (and Claude) reads.
 import { readdir } from "node:fs/promises";
 import { formatMapJson, type MapFile } from "../mapfile";
+import { replay } from "../replay";
 
 const ROOT = new URL("../..", import.meta.url).pathname;   // sim/
 const CONTENT = `${ROOT}src/content`;
@@ -57,6 +58,17 @@ const server = Bun.serve({
         await Bun.write(file, formatMapJson(body));
         return json({ ok: true, saved: `src/content/${name}.map.json`, at: new Date().toISOString() });
       }
+    }
+    // One recorded game on the map the page sends (unsaved edits included), for the Sim view.
+    if (p === "/api/sim" && req.method === "POST") {
+      let body: { map: MapFile; seed?: number };
+      try { body = await req.json() as typeof body; }
+      catch { return json({ error: "invalid JSON" }, 400); }
+      if (!body?.map?.board?.grid || !body.map.floor) return json({ error: "send { map, seed }" }, 400);
+      const floor = body.map.floor.guide === "floor-2" ? 2 : 1;
+      const seed = Number.isFinite(body.seed) ? Math.floor(body.seed!) : Math.floor(Math.random() * 1e6);
+      try { return json(replay(body.map, floor, seed)); }
+      catch (e) { return json({ error: `the sim could not run this map: ${(e as Error).message}` }, 400); }
     }
     // The floor guidebook: markdown kept next to the sim folder, rendered by the page's Guide view.
     const d = p.match(/^\/api\/doc\/([^/]+)$/);

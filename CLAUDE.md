@@ -45,6 +45,10 @@ being tuned between plays.
   `floor2.map.json`, monsters/items in `content/monsters.ts` and `content/items.ts` (`FLOOR2_*`),
   the carry-over party and fixed furniture loot in `content/floor2.ts`. Runner is `src/floor2.ts`
   (it has its own report; `run.ts` stays Floor 1 only). `trace: true` narrates a game.
+- The editor's Sim tab (`POST /api/sim` in `mapserve.ts` → `src/replay.ts`) replays one game with
+  `record: true`. Play-by-play lines go through `this.cfg.record && this.say(...)` so batches never
+  build the strings; any new engine narration must not draw from `this.rng`. `RECOMMENDED` and the
+  party samplers live in `src/presets.ts` (safe to import; `run.ts` re-exports `RECOMMENDED`).
 - Floor 1's regression check after any engine change: `bun run src/run.ts report 3000` should
   still say about 81% win, 37% someone dies.
 

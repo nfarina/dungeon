@@ -193,6 +193,46 @@ svg{display:block; touch-action:none; max-width:100%; user-select:none}
 .roster .n{color:var(--muted); width:14px; flex:none}
 .roster .m{margin-left:auto; color:var(--muted); font-size:11px; white-space:nowrap}
 
+/* Sim view: the log scrolls on its own so the controls stay put */
+aside.right.simside{display:flex; flex-direction:column; overflow:hidden}
+aside.right.simside #simLog{flex:1; min-height:0; overflow-y:auto}
+aside.right.simside #simCtl{flex:none}
+.simbar{display:flex; align-items:center; gap:6px; flex-wrap:wrap}
+.simbar button{padding:5px 10px}
+.simbar input[type=number]{width:84px; padding:5px 6px; background:var(--paper); border:1px solid var(--line-2); border-radius:3px}
+.simbar select{padding:5px 4px; background:var(--paper); border:1px solid var(--line-2); border-radius:3px}
+#simScrub{width:100%; margin:8px 0 2px; accent-color:var(--amber)}
+.simnow{font-family:"Barlow Condensed",sans-serif; font-size:22px; font-weight:700; line-height:1.1; margin:8px 0 2px}
+.simfacts{display:flex; gap:5px; flex-wrap:wrap; margin-top:6px}
+.simfacts span{font-size:11px; border:1px solid var(--line-2); border-radius:10px; padding:1px 8px; background:var(--paper); white-space:nowrap}
+.simfacts span.hot{border-color:var(--danger); color:var(--danger)}
+.simlog{font-size:11.5px; line-height:1.45}
+.simlog h3{font:600 10.5px "IBM Plex Mono",monospace; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin:10px 0 3px; cursor:pointer}
+.simlog h3:hover{color:var(--ink)}
+.simlog .fr{padding:2px 6px 4px; border-radius:4px; opacity:.55}
+.simlog .fr.cur{opacity:1; background:var(--amber-soft); box-shadow:inset 2px 0 0 var(--amber)}
+.simlog .fr.cur h3{color:var(--ink)}
+.simlog p{margin:0; padding-left:10px; text-indent:-10px}
+.simlog p.sub{padding-left:22px; color:var(--muted)}
+.simlog p.bad{color:var(--danger); font-weight:600}
+.simlog p.good{color:var(--ok); font-weight:600}
+.simlog p.none{color:var(--muted); font-style:italic}
+.hero{border:1px solid var(--line-2); border-radius:5px; padding:6px 8px; margin-bottom:7px; background:var(--paper)}
+.hero.turn{border-color:var(--amber); box-shadow:0 0 0 1px var(--amber)}
+.hero.gone{opacity:.55}
+.hero .top{display:flex; align-items:center; gap:6px}
+.hero .dot{width:12px; height:12px; border-radius:50%; flex:none}
+.hero .nm{font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:17px}
+.hero .tag{margin-left:auto; font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--danger)}
+.hero .tag.ok{color:var(--ok)}
+.hpbar{height:7px; background:var(--sunk); border-radius:4px; overflow:hidden; margin:5px 0 3px}
+.hpbar i{display:block; height:100%; background:var(--ok)}
+.hpbar i.low{background:var(--danger)}
+.hero .st{font-size:10.5px; color:var(--muted)}
+.hero ul{list-style:none; margin:3px 0 0; padding:0; font-size:11px; line-height:1.35}
+.hero li.k{color:var(--muted)}
+.simtok{font-family:"Barlow Condensed",sans-serif; font-weight:700; text-anchor:middle; dominant-baseline:central; pointer-events:none}
+
 dialog{
   border:1px solid var(--line-2); border-radius:6px; background:var(--surface); color:var(--ink);
   max-width:min(680px,92vw); width:100%; padding:0;
@@ -225,6 +265,7 @@ dialog textarea{width:100%; min-height:260px; font-size:11.5px; background:var(-
       <button id="mDM">DM</button>
       <button id="mIntro">Intro</button>
       <button id="mGuide">Guide</button>
+      <button id="mSim">Sim</button>
     </div>
     <span class="sp"></span>
     <span id="status">&nbsp;</span>
@@ -252,6 +293,7 @@ dialog textarea{width:100%; min-height:260px; font-size:11.5px; background:var(-
           <li><i class="k-poss"></i>Possible room, not in play</li>
         </ul>
       </div>
+      <div class="pane simonly" id="simParty"></div>
       <div class="pane" id="presetPane">
         <h2>Show</h2>
         <div class="tools">
@@ -272,6 +314,8 @@ dialog textarea{width:100%; min-height:260px; font-size:11.5px; background:var(-
       <div class="pane" id="speechPane"></div>
       <div class="pane" id="rosterPane"></div>
       <div class="pane" id="issuePane"></div>
+      <div class="pane simonly" id="simCtl"></div>
+      <div class="pane simonly" id="simLog"></div>
     </aside>
   </div>
   <section id="docView" class="doc" hidden></section>
@@ -585,7 +629,12 @@ function render() {
   if (!map) return;
   const avail = Math.min($("main").clientWidth - 34, 1100);
   CS = Math.max(15, Math.min(38, Math.floor(avail / (B().w || 26))));
-  drawMap(); drawLayers(); drawTools(); drawSel(); drawClock(); drawSpeeches(); drawRoster(); drawIssues();
+  const simMode = mode === "sim";
+  $("aside.right").classList.toggle("simside", simMode);
+  for (const pane of document.querySelectorAll("aside .pane")) pane.hidden = pane.classList.contains("simonly") ? !simMode : simMode;
+  if (simMode) { drawMap(); drawSim(); }
+  else { drawMap(); drawLayers(); drawTools(); drawSel(); drawClock(); drawSpeeches(); drawRoster(); drawIssues(); }
+  $("#mSim").classList.toggle("on", simMode);
   $("#mEdit").classList.toggle("on", mode === "edit");
   $("#mDM").classList.toggle("on", mode === "dm");
   $("#mIntro").classList.toggle("on", mode === "intro");
@@ -668,13 +717,15 @@ function drawMap() {
       if (di < 0 || !vis.doors) { seg(...a); continue; }
       const d = F().doors[di];
       if (d.kind === "secret" && mode === "dm" && !vis.traps) { seg(...a); continue; }
+      const simOpen = mode === "sim" && simDoor(d, "openDoors");
       const horiz = a[1] === a[3];
       const mid = horiz ? [(a[0]+a[2])/2, a[1]] : [a[0], (a[1]+a[3])/2];
       const g = CS * .34;
       if (horiz) { seg(a[0],a[1],mid[0]-g,a[1]); seg(mid[0]+g,a[1],a[2],a[3]); }
       else       { seg(a[0],a[1],a[0],mid[1]-g); seg(a[0],mid[1]+g,a[2],a[3]); }
+      if (simOpen) continue;   // an open door is just a gap in the wall
       const col = d.kind === "secret" ? "var(--muted)" : d.kind === "locked" ? "var(--danger)" : "var(--amber)";
-      const dash = d.kind === "secret" ? ' stroke-dasharray="3 3"' : "";
+      const dash = d.kind === "secret" && !(mode === "sim" && simDoor(d, "foundSecrets")) ? ' stroke-dasharray="3 3"' : "";
       const bar = horiz ? `<line x1="${mid[0]-g}" y1="${a[1]}" x2="${mid[0]+g}" y2="${a[1]}"`
                         : `<line x1="${a[0]}" y1="${mid[1]-g}" x2="${a[0]}" y2="${mid[1]+g}"`;
       p.push(`${bar} stroke="${col}" stroke-width="5" stroke-linecap="round"${dash}/>`);
@@ -685,17 +736,22 @@ function drawMap() {
   if (vis.furniture) for (const f of F().features) {
     const FF = FEATURES[f.kind]; if (!FF) continue;
     const fw = f.w || 1, fh = f.h || 1, W = fw*CS, H = fh*CS;
+    const used = mode === "sim" && simFurnitureUsed(f);
+    if (used) p.push(`<g opacity=".35">`);
     if (FF.blocks || fw > 1 || fh > 1)
       p.push(`<rect x="${f.x*CS+2}" y="${f.y*CS+2}" width="${W-4}" height="${H-4}" fill="${FF.blocks ? "var(--sunk)" : "none"}" stroke="var(--line-2)" rx="2"/>`);
     p.push(`<text class="glyph" x="${f.x*CS+W/2}" y="${f.y*CS+H/2+1}" style="font-size:${CS*.62}px">${FF.g}</text>`);
     if (f.label && CS >= 20)
       p.push(`<text class="rid" x="${f.x*CS+W/2}" y="${f.y*CS+H-3}" text-anchor="middle" style="font-size:${Math.min(CS*.4,9)}px">${esc(f.label)}</text>`);
+    if (used) p.push(`</g><text class="glyph" x="${f.x*CS+W-CS*.22}" y="${f.y*CS+CS*.24}" fill="var(--ok)" style="font-size:${CS*.4}px;font-weight:700">✓</text>`);
   }
   if (vis.traps) for (const t of F().traps) {
-    p.push(`<circle cx="${t.x*CS+CS/2}" cy="${t.y*CS+CS/2}" r="${CS*.3}" fill="none" stroke="var(--danger)" stroke-width="2"/>`);
-    p.push(`<text class="glyph" x="${t.x*CS+CS/2}" y="${t.y*CS+CS/2+1}" fill="var(--danger)" style="font-size:${CS*.42}px">${TRAPS[t.kind].g}</text>`);
+    // Sim: dashed until the party knows about it, faded once it has gone off
+    const spent = mode === "sim" && simTrap(t, "spentTraps"), hidden = mode === "sim" && !spent && !simTrap(t, "revealedTraps");
+    p.push(`<g opacity="${spent ? .3 : 1}"><circle cx="${t.x*CS+CS/2}" cy="${t.y*CS+CS/2}" r="${CS*.3}" fill="none" stroke="var(--danger)" stroke-width="2"${hidden ? ' stroke-dasharray="3 2"' : ""}/>`);
+    p.push(`<text class="glyph" x="${t.x*CS+CS/2}" y="${t.y*CS+CS/2+1}" fill="var(--danger)" style="font-size:${CS*.42}px">${TRAPS[t.kind].g}</text></g>`);
   }
-  if (vis.monsters) for (const mo of F().monsters || []) {
+  if (vis.monsters && mode !== "sim") for (const mo of F().monsters || []) {
     p.push(`<circle cx="${mo.x*CS+CS/2}" cy="${mo.y*CS+CS/2}" r="${CS*.36}" fill="var(--danger)" opacity=".85"/>`);
     p.push(`<text class="glyph" x="${mo.x*CS+CS/2}" y="${mo.y*CS+CS/2+1}" fill="#fff" style="font-size:${CS*.5}px;font-weight:700">${MONSTER_GLYPH[mo.id] || "?"}</text>`);
   }
@@ -710,13 +766,15 @@ function drawMap() {
     if (r) {
       if (CS >= 20) {
         p.push(`<text class="rlabel" x="${X}" y="${Y}" text-anchor="middle" dominant-baseline="central" style="font-size:${Math.min(CS*.62,14)}px">${esc(r.name)}</text>`);
-        if (vis.monsters && r.monsters.length && !placedIn(c).length)
+        if (vis.monsters && mode !== "sim" && r.monsters.length && !placedIn(c).length)
           p.push(`<text class="rid" x="${X}" y="${Y+CS*.62}" text-anchor="middle" style="font-size:${Math.min(CS*.44,10)}px">${esc(r.monsters.join(" "))}</text>`);
       } else p.push(`<text class="rlabel" x="${X}" y="${Y}" text-anchor="middle" dominant-baseline="central" style="font-size:${CS*.6}px">${r.id}</text>`);
     } else if (vis.board && active === "inplay" || vis.board && active === "board") {
       p.push(`<text class="rid" x="${X}" y="${Y}" text-anchor="middle" dominant-baseline="central" style="font-size:${Math.min(CS*.6,15)}px" fill="var(--muted)">${c}</text>`);
     }
   }
+
+  if (mode === "sim") p.push(simLayer());
 
   const box = dragBox();
   if (box) {
@@ -1290,7 +1348,7 @@ function bindMap() {
 
   svg.addEventListener("pointerdown", ev => {
     const c = cellAt(ev);
-    if (!inB(c.x, c.y)) return;
+    if (!inB(c.x, c.y) || mode === "sim") return;
     ev.preventDefault(); svg.setPointerCapture(ev.pointerId);
     const rectTool = (isArea(active) && paintMode === "rect") || (active === "furniture" && tool.furniture !== "erase");
     if (mode === "edit" && !lock[active] && rectTool) {
@@ -1410,11 +1468,267 @@ function apply(c, dragging = false) {
   dirty = true; render();
 }
 
+/* ---------- Sim view: one recorded game, step by step ---------- */
+let sim = { data:null, i:0, loading:false, error:null, timer:null, speed:+(localStorage.getItem("dungeon.simSpeed") || 700), stale:false };
+const HERO_COLORS = ["#2f6fdb", "#1a9a5a", "#a24bd0", "#c77712"];
+const SIM_GLYPH = { ...MONSTER_GLYPH, fedSmall:"b", fedMedium:"C", fedLarge:"F", custodian:"★" };
+const simFrame = () => sim.data?.frames[sim.i] || null;
+const samePt = (a, b) => a.x === b.x && a.y === b.y;
+function simDoor(d, list) {
+  const f = simFrame(); if (!f) return false;
+  const [a, b] = doorCells(d);
+  return f[list].some(([p, q]) => (samePt(p, a) && samePt(q, b)) || (samePt(p, b) && samePt(q, a)));
+}
+const simTrap = (t, list) => !!simFrame()?.[list].some(p => p.x === t.x && p.y === t.y);
+function simFurnitureUsed(f) {
+  const fr = simFrame(); if (!fr || !FEATURES[f.kind]?.blocks) return false;
+  return featCells(f).some(c => { const r = roomAt(c.x, c.y); return r && fr.usedFurniture.includes(r.id); });
+}
+const heroColor = name => HERO_COLORS[Math.max(0, sim.data?.party.names.indexOf(name) ?? 0) % HERO_COLORS.length];
+
+async function simRun(seed) {
+  if (!hasServer) { sim.error = "The Sim needs the map server (bun run map)."; render(); return; }
+  simStop();
+  sim.loading = true; sim.error = null; render();
+  try {
+    const r = await fetch("/api/sim", { method:"POST", headers:{ "content-type":"application/json" },
+      body: JSON.stringify({ map, seed: seed ?? Math.floor(Math.random() * 1e6) }) });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error || "sim failed");
+    sim.data = j; sim.i = 0; sim.stale = false;
+  } catch (e) { sim.error = e.message; }
+  sim.loading = false; render();
+}
+function simGo(i) {
+  if (!sim.data) return;
+  sim.i = Math.max(0, Math.min(sim.data.frames.length - 1, i));
+  render();
+  if (sim.i === sim.data.frames.length - 1) simStop();
+}
+/** Jump to the first frame of the next (or this/previous) round. */
+function simRound(dir) {
+  const fs = sim.data?.frames; if (!fs) return;
+  const r = fs[sim.i].round;
+  if (dir > 0) { const j = fs.findIndex(f => f.round > r); simGo(j < 0 ? Infinity : j); }
+  else {
+    const first = fs.findIndex(f => f.round === r);
+    const target = first < sim.i ? r : r - 1;
+    simGo(Math.max(0, fs.findIndex(f => f.round === target)));
+  }
+}
+function simStop() { if (sim.timer) { clearInterval(sim.timer); sim.timer = null; if (mode === "sim") render(); } }
+function simToggle() {
+  if (sim.timer) { simStop(); return; }
+  if (!sim.data) return;
+  if (sim.i >= sim.data.frames.length - 1) sim.i = 0;
+  sim.timer = setInterval(() => simGo(sim.i + 1), sim.speed);
+  render();
+}
+
+function frameTitle(f) {
+  if (f.phase === "start") return "Setup";
+  if (f.phase === "hero") return `Round ${f.round} · ${f.who}`;
+  return `Round ${f.round} · DM`;
+}
+const OUTCOME = { win:"Won: boss dead, party out", "escaped-no-boss":"Escaped without the boss", collapsed:"The floor came down", wiped:"Everyone died", stalled:"Stalled (round limit)" };
+
+/** Everything that moves, drawn over the static map. */
+function simLayer() {
+  const f = simFrame(); if (!f) return "";
+  const prev = sim.data.frames[sim.i - 1];
+  const o = [], cx = x => x * CS + CS / 2;
+
+  // the room the party is working toward
+  if (f.goalRoom != null) {
+    const r = F().rooms.find(q => q.id === f.goalRoom);
+    if (r) for (const c of cellsOf(r.at)) for (const [dir, [dx, dy]] of Object.entries(DELTA)) {
+      if (at(c.x + dx, c.y + dy) === r.at) continue;
+      const X = c.x * CS, Y = c.y * CS;
+      const a = dir === "E" ? [X+CS,Y,X+CS,Y+CS] : dir === "S" ? [X,Y+CS,X+CS,Y+CS] : dir === "W" ? [X,Y,X,Y+CS] : [X,Y,X+CS,Y];
+      o.push(`<line x1="${a[0]}" y1="${a[1]}" x2="${a[2]}" y2="${a[3]}" stroke="var(--amber)" stroke-width="2" stroke-dasharray="4 3" opacity=".8"/>`);
+    }
+  }
+  // corpses: a stain sized by the corpse
+  for (const c of f.corpses) {
+    const s = { small:.5, medium:.7, large:.9 }[c.size] * CS;
+    o.push(`<rect x="${c.pos.x*CS + (CS-s)/2}" y="${c.pos.y*CS + (CS-s)/2}" width="${s}" height="${s}" rx="${s*.25}" fill="#5b3312" stroke="#2b1606" stroke-width="1.5" opacity=".9"><title>${c.size} corpse</title></rect>`);
+    o.push(`<text class="simtok" x="${cx(c.pos.x)}" y="${cx(c.pos.y)+1}" fill="#f3dcb8" style="font-size:${CS*.36}px">${c.size[0].toUpperCase()}</text>`);
+  }
+  // this step's movement
+  for (const t of f.trails) {
+    const col = t.hero ? heroColor(t.key) : "var(--danger)";
+    const pts = t.path.map(q => `${cx(q.x)},${cx(q.y)}`).join(" ");
+    o.push(`<polyline points="${pts}" fill="none" stroke="${col}" stroke-width="${t.hero ? 3 : 2}" stroke-linejoin="round" stroke-linecap="round" opacity=".75"${t.hero ? "" : ' stroke-dasharray="5 3"'}/>`);
+    o.push(`<circle cx="${cx(t.path[0].x)}" cy="${cx(t.path[0].y)}" r="${CS*.1}" fill="${col}" opacity=".8"/>`);
+  }
+  // group figures by square so a crowd fans out instead of stacking
+  const figs = [];
+  for (const m of f.monsters) {
+    const was = prev?.monsters.find(q => q.key === m.key);
+    if (m.alive || was?.alive) figs.push({ kind:"m", x:m.x, y:m.y, m, justDied: !m.alive });
+  }
+  for (const h of f.heroes) if (!h.exited && !(h.dead && prev?.heroes.find(q => q.name === h.name)?.dead)) figs.push({ kind:"h", x:h.x, y:h.y, h });
+  const bySq = new Map();
+  for (const g of figs) { const k = g.x + "," + g.y; bySq.set(k, [...(bySq.get(k) || []), g]); }
+  for (const group of bySq.values()) group.forEach((g, i) => {
+    const n = group.length, R = n > 1 ? CS * .22 : 0, ang = (i / n) * Math.PI * 2 - Math.PI / 2;
+    const X = cx(g.x) + Math.cos(ang) * R, Y = cx(g.y) + Math.sin(ang) * R, r = CS * (n > 1 ? .24 : .36);
+    if (g.kind === "m") {
+      const m = g.m;
+      if (g.justDied) {
+        o.push(`<text class="simtok" x="${X}" y="${Y}" fill="var(--danger)" style="font-size:${r*2}px" opacity=".6">✕<title>${esc(m.name)}: killed</title></text>`);
+        return;
+      }
+      const dormant = !m.active && m.janitor !== "grub", fill = m.janitor === "grub" ? "#8f8a5a" : m.janitor === "fed" ? "#8a3a8a" : "var(--danger)";
+      o.push(`<g opacity="${dormant ? .5 : 1}"><circle cx="${X}" cy="${Y}" r="${r}" fill="${fill}" stroke="${m.boss ? "var(--amber)" : m.password ? "#e6c14a" : "none"}" stroke-width="2.5"${dormant ? ' stroke-dasharray="3 2"' : ""}><title>${esc(m.name)} · ${m.hp}/${m.maxHp} Health${dormant ? " · not awake yet" : ""}${m.asleep ? " · asleep" : ""}</title></circle>`);
+      o.push(`<text class="simtok" x="${X}" y="${Y+1}" fill="#fff" style="font-size:${r*1.25}px">${SIM_GLYPH[m.id] || "?"}</text>`);
+      if (m.asleep) o.push(`<text class="simtok" x="${X+r*.9}" y="${Y-r*.9}" fill="var(--ink)" style="font-size:${r*.8}px">z</text>`);
+      if (m.maxHp > 1) o.push(hpPips(X, Y + r + 2, m.hp, m.maxHp, r));
+      o.push(`</g>`);
+    } else {
+      const h = g.h, col = heroColor(h.name), turn = f.who === h.name;
+      if (turn) o.push(`<circle cx="${X}" cy="${Y}" r="${r+4}" fill="none" stroke="var(--amber)" stroke-width="2.5"/>`);
+      const face = h.dead ? "☠" : h.name[0];
+      o.push(`<circle cx="${X}" cy="${Y}" r="${r}" fill="${h.dead || h.downed ? "#777" : col}" stroke="#fff" stroke-width="1.5"><title>${esc(h.name)} · ${h.hp}/${h.maxHp}${h.downed ? " · DOWNED" : ""}${h.dead ? " · dead" : ""}</title></circle>`);
+      o.push(`<text class="simtok" x="${X}" y="${Y+1}" fill="#fff" style="font-size:${r*1.2}px">${face}</text>`);
+      if (!h.dead) o.push(hpPips(X, Y + r + 2, h.hp, h.maxHp, r));
+      if (h.goose > 0) o.push(`<text class="simtok" x="${X+r}" y="${Y-r}" style="font-size:${r*.9}px">🪿</text>`);
+    }
+  });
+  return o.join("");
+}
+function hpPips(X, Y, hp, max, r) {
+  const w = Math.max(r * 2, CS * .5), filled = Math.max(0, hp) / max;
+  return `<rect x="${X-w/2}" y="${Y}" width="${w}" height="3.5" rx="1.5" fill="var(--sunk)" stroke="var(--line-2)" stroke-width=".5"/>`
+       + `<rect x="${X-w/2}" y="${Y}" width="${w*filled}" height="3.5" rx="1.5" fill="${filled <= .34 ? "var(--danger)" : "var(--ok)"}"/>`;
+}
+
+/** Controls are built once and updated in place, so a slider drag or a Pause click survives autoplay redraws. */
+function simControls(ctl) {
+  if (ctl.firstChild) return;
+  const seedIn = el("input", { id:"simSeed", type:"number", placeholder:"seed", title:"Same seed, same map: same game" });
+  seedIn.addEventListener("keydown", e => { if (e.key === "Enter") simRun(+seedIn.value); });
+  const speed = el("select", { id:"simSpeed", title:"Autoplay speed" });
+  for (const [ms, label] of [[1200, "slow"], [700, "normal"], [300, "fast"], [100, "very fast"]]) speed.append(new Option(label, ms, false, ms === sim.speed));
+  speed.addEventListener("change", () => { sim.speed = +speed.value; localStorage.setItem("dungeon.simSpeed", speed.value); if (sim.timer) { simStop(); simToggle(); } });
+  const scrub = el("input", { id:"simScrub", type:"range", min:"0", max:"0", value:"0" });
+  scrub.addEventListener("input", () => { simStop(); simGo(+scrub.value); });
+  ctl.append(
+    el("h2", {}, "Simulate one game"),
+    el("div", { class:"simbar" }, [
+      el("button", { class:"on", onclick: () => simRun(), title:"New random game (N)" }, "New game"),
+      seedIn,
+      el("button", { onclick: () => simRun(+seedIn.value), title:"Replay this seed against the map as it is now" }, "Replay seed"),
+    ]),
+    el("div", { id:"simTransport" }, [
+      el("div", { class:"simbar", style:"margin-top:8px" }, [
+        el("button", { onclick: () => { simStop(); simRound(-1); }, title:"Previous round (↑ or Shift+←)" }, "⏮"),
+        el("button", { id:"simBack", onclick: () => { simStop(); simGo(sim.i - 1); }, title:"Back one step (←)" }, "◀"),
+        el("button", { id:"simPlay", onclick: simToggle, title:"Play / pause (Space)" }, "▶ Play"),
+        el("button", { id:"simFwd", onclick: () => { simStop(); simGo(sim.i + 1); }, title:"Forward one step (→)" }, "▶"),
+        el("button", { onclick: () => { simStop(); simRound(1); }, title:"Next round (↓ or Shift+→)" }, "⏭"),
+        speed,
+      ]),
+      scrub,
+    ]),
+    el("div", { id:"simNow" }),
+  );
+}
+
+function drawSim() {
+  const ctl = $("#simCtl"), log = $("#simLog"), party = $("#simParty");
+  simControls(ctl);
+  const now = $("#simNow");
+  now.innerHTML = ""; log.innerHTML = ""; party.innerHTML = "";
+  $("#simTransport").hidden = !sim.data || sim.loading;
+  if (sim.loading) { now.append(el("p", { class:"hint" }, "Rolling dice…")); return; }
+  if (sim.error) now.append(el("p", { class:"hint", style:"color:var(--danger)" }, sim.error));
+  if (!sim.data) { now.append(el("p", { class:"hint" }, "Plays one game with the floor's real ruleset on the map as it stands in the editor, saved or not.")); return; }
+
+  const d = sim.data, f = simFrame(), last = d.frames.length - 1;
+  const seedIn = $("#simSeed");
+  if (seedIn.dataset.seed !== String(d.seed)) { seedIn.value = d.seed; seedIn.dataset.seed = d.seed; }
+  const scrub = $("#simScrub");
+  scrub.max = String(last); if (+scrub.value !== sim.i) scrub.value = String(sim.i);
+  $("#simBack").disabled = sim.i === 0; $("#simFwd").disabled = sim.i === last;
+  $("#simPlay").textContent = sim.timer ? "❚❚ Pause" : "▶ Play"; $("#simPlay").classList.toggle("on", !!sim.timer);
+  now.append(el("div", { class:"simnow" }, frameTitle(f)));
+  now.append(el("p", { class:"hint", style:"margin-top:0" }, `step ${sim.i + 1} of ${last + 1} · ← → step · ↑ ↓ round · Space play · N new game`));
+
+  const facts = el("div", { class:"simfacts" });
+  const fact = (t, hot) => facts.append(el("span", { class: hot ? "hot" : "" }, t));
+  if (f.collapsing) fact(`collapsing · gone after round ${f.deadline}`, true);
+  else if (f.collapseBegins != null) fact(`collapse at round ${f.collapseBegins}`, f.collapseBegins - f.round <= 3);
+  if (f.urgent) fact("heading for the stairs", true);
+  if (f.goalRoom != null) fact("goal: " + (F().rooms.find(r => r.id === f.goalRoom)?.name ?? "room " + f.goalRoom));
+  if (d.floor === 2) {
+    fact(`corpses ${f.corpses.length}`, f.corpses.length >= 3);
+    fact(`grubs queued ${f.queue}`);
+    const grubs = f.monsters.filter(m => m.alive && m.janitor === "grub").length, fed = f.monsters.filter(m => m.alive && m.janitor === "fed").length;
+    if (grubs) fact(`grubs out ${grubs}`);
+    if (fed) fact(`fed janitors ${fed}`, true);
+  }
+  const kills = f.monsters.filter(m => !m.alive && !m.janitor).length;
+  fact(`kills ${kills}`);
+  now.append(facts);
+
+  const r = d.result;
+  now.append(el("p", { class:"hint", style:"margin-top:10px" },
+    (d.party.kits ? `Kits: ${d.party.kits.join(", ")}. ` : "") +
+    `Side rooms this party wants: ${d.party.optionalRooms.map(o => o.name).join(", ") || "none"}.`));
+  const ending = el("details", { style:"margin-top:8px; font-size:12px" }, [
+    el("summary", { style:"cursor:pointer; color:var(--muted)" }, "How it ends (spoiler)"),
+    el("p", { style:"margin:4px 0" }, `${OUTCOME[r.outcome] || r.outcome} in ${r.rounds} rounds` + (r.deadNames.length ? ` · died: ${r.deadNames.join(", ")}` : "")),
+    el("button", { onclick: () => { simStop(); simGo(Infinity); } }, "Jump to the end"),
+  ]);
+  ending.open = sim.showEnd; ending.addEventListener("toggle", () => { sim.showEnd = ending.open; });
+  now.append(ending);
+
+  // the story of this round so far, newest step highlighted
+  log.append(el("h2", {}, "What happened"));
+  const box = el("div", { class:"simlog" });
+  const first = d.frames.findIndex(q => q.round === f.round);
+  for (let k = first; k <= sim.i; k++) {
+    const q = d.frames[k];
+    const fr = el("div", { class:"fr" + (k === sim.i ? " cur" : "") });
+    fr.append(el("h3", { onclick: () => { simStop(); simGo(k); } }, frameTitle(q)));
+    if (!q.lines.length) fr.append(el("p", { class:"none" }, q.phase === "start" ? "Everyone on the entrance." : "Nothing to report."));
+    for (const line of q.lines) {
+      const cls = /^\s/.test(line) ? "sub" : /DOWNED|DIES|KILLS THE BOSS|FALLING BLOCK|ceiling|EATEN|hunts the party/.test(line) ? "bad" : /Achievement|PASSWORD|takes the stairs|picks up/.test(line) ? "good" : "";
+      fr.append(el("p", { class: cls }, line.trim()));
+    }
+    if (q.outcome) fr.append(el("p", { class:"good" }, OUTCOME[q.outcome] || q.outcome));
+    box.append(fr);
+  }
+  log.append(box);
+  requestAnimationFrame(() => box.querySelector(".cur")?.scrollIntoView({ block:"nearest" }));
+
+  party.append(el("h2", {}, "Party"));
+  for (const h of f.heroes) {
+    const tag = h.dead ? "dead" : h.exited ? "out" : h.downed ? "downed" : h.inPit ? "in a pit" : "";
+    const card = el("div", { class:"hero" + (f.who === h.name ? " turn" : "") + (h.dead || h.exited ? " gone" : "") });
+    card.append(el("div", { class:"top" }, [
+      el("span", { class:"dot", style:`background:${heroColor(h.name)}` }), el("span", { class:"nm" }, h.name),
+      tag ? el("span", { class:"tag" + (h.exited ? " ok" : "") }, tag) : "",
+    ]));
+    const pct = Math.max(0, h.hp) / h.maxHp;
+    card.append(el("div", { class:"hpbar" }, el("i", { class: pct <= .34 ? "low" : "", style:`width:${pct * 100}%` })));
+    card.append(el("div", { class:"st" }, `♥ ${h.hp}/${h.maxHp} · Att ${h.atk} · Def ${h.def} · Mind ${h.mind}` + (h.gold ? ` · ${h.gold}g` : "") + (h.gooseMax && h.goose ? ` · 🪿 ${h.goose}/${h.gooseMax}` : "")));
+    const ul = el("ul");
+    for (const it of h.equip) ul.append(el("li", {}, it));
+    for (const it of h.learned) ul.append(el("li", {}, "✦ " + it));
+    if (h.pack.length) ul.append(el("li", { class:"k" }, "pack: " + h.pack.join(", ")));
+    card.append(ul);
+    party.append(card);
+  }
+}
+
 /* ---------- chrome ---------- */
 $("#mEdit").onclick = () => { mode = "edit"; sel = null; render(); };
 $("#mDM").onclick = () => { mode = "dm"; sel = null; render(); };
 $("#mIntro").onclick = () => { mode = "intro"; sel = null; render(); };
 $("#mGuide").onclick = () => { mode = "guide"; sel = null; render(); };
+$("#mSim").onclick = () => { mode = "sim"; sel = null; drag = null; render(); if (!sim.data && !sim.loading) simRun(); };
 $("#save").onclick = save;
 
 // Side panels: each side toggles on its own, remembered per device.
@@ -1441,7 +1755,7 @@ $("#fsBtn").onclick = () => {
 };
 for (const ev of ["fullscreenchange", "webkitfullscreenchange"]) document.addEventListener(ev, () => { $("#fsBtn").classList.toggle("off", !!fsActive()); render(); });
 $("#undo").onclick = undo;
-$("#mapSel").onchange = e => loadMap(e.target.value);
+$("#mapSel").onchange = async e => { simStop(); sim.data = null; await loadMap(e.target.value); if (mode === "sim") simRun(); };
 for (const b of document.querySelectorAll("[data-preset]")) b.onclick = () => {
   const p = b.dataset.preset;
   const set = o => { for (const L of LAYERS) vis[L.id] = o[L.id] ?? true; };
@@ -1466,6 +1780,14 @@ $("#jsonApply").onclick = () => {
 };
 addEventListener("keydown", e => {
   if (e.key === "Escape" && drag) { drag = null; drawMap(); return; }
+  if (mode === "sim" && !e.metaKey && !e.ctrlKey && !e.altKey && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || "")) {
+    const k = e.key;
+    if (k === "ArrowRight" || k === "ArrowLeft") { e.preventDefault(); simStop(); e.shiftKey ? simRound(k === "ArrowRight" ? 1 : -1) : simGo(sim.i + (k === "ArrowRight" ? 1 : -1)); return; }
+    if (k === "ArrowDown" || k === "ArrowUp") { e.preventDefault(); simStop(); simRound(k === "ArrowDown" ? 1 : -1); return; }
+    if (k === "Home" || k === "End") { e.preventDefault(); simStop(); simGo(k === "Home" ? 0 : Infinity); return; }
+    if (k === " ") { e.preventDefault(); simToggle(); return; }
+    if (k === "n") { simRun(); return; }
+  }
   if (e.key === "r" && !e.metaKey && !e.ctrlKey && isArea(active) && mode === "edit"
       && !/^(INPUT|TEXTAREA)$/.test(document.activeElement?.tagName || "")) {
     paintMode = paintMode === "rect" ? "free" : "rect";
