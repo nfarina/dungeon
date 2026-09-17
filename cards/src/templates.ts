@@ -161,7 +161,7 @@ export function renderFront(c: Card, artUrl: string | null): string {
     : "";
   return `<div class="${cls}" style="${style}">${artBlock(c, artUrl)}
     <div class="meta">${chips(c)}</div>
-    <div class="rules">${esc(c.rules)}</div>
+    <div class="rules">${c.rules}</div>
     ${cooldown}
     <div class="gap"></div>
     ${c.flavor ? `<div class="flavor">${esc(c.flavor)}</div>` : ""}${foot}</div>`;
