@@ -386,8 +386,8 @@ const players: Card[] = HUMANS.map((h, i) => ({
 
 /** Stand-up figures for the plastic card stands. Sizes in inches; the height includes STANDEE_TAB at the bottom that the stand grips. */
 export const STANDEE_TAB = 0.3;
-const standee = (id: string, name: string, w: number, h: number, art: string, ref?: string): Card =>
-  ({ id: `standee-${id}`, name, deck: "standee", type: "standee", tile: { w, h: h + STANDEE_TAB, kind: "standee" }, rules: "", art, ref });
+const standee = (id: string, name: string, w: number, h: number, art: string, ref?: string, qty?: number): Card =>
+  ({ id: `standee-${id}`, name, deck: "standee", type: "standee", tile: { w, h: h + STANDEE_TAB, kind: "standee" }, rules: "", art, ref, qty });
 const standeeArt = (desc: string) => `full-body figure of ${desc}, ordinary modern everyday clothes, standing facing the viewer, whole body visible from head to shoes, no weapons`;
 const standees: Card[] = [
   ...HUMANS.map((h, i) => standee(`human-${i + 1}`, `Crawler ${i + 1}`, 0.75, 1.5, standeeArt(h.desc), `human-${i + 1}`)),
@@ -599,13 +599,13 @@ const f2monsters: Card[] = ([
 ] as Card[]).map(f2);
 
 const f2standees: Card[] = ([
-  standee("rat", "Cave Rat", 0.75, 1, "full-body figure of a large scruffy brown cave rat standing on its hind legs wearing a lanyard, facing the viewer, whole body visible", "rat"),
-  standee("kobold", "Kobold Miner", 0.75, 1.5, "full-body figure of a wiry red-scaled kobold in a miner's helmet with a headlamp, holding a pickaxe, dusty overalls, facing the viewer, whole body visible", "kobold"),
-  standee("bear", "Cave Bear", 1.25, 1.75, "full-body figure of a huge shaggy dark brown cave bear rearing up on its hind legs, facing the viewer, whole body visible", "bear"),
+  standee("rat", "Cave Rat", 0.75, 1, "full-body figure of a large scruffy brown cave rat standing on its hind legs wearing a lanyard, facing the viewer, whole body visible", "rat", 4),
+  standee("kobold", "Kobold Miner", 0.75, 1.5, "full-body figure of a wiry red-scaled kobold in a miner's helmet with a headlamp, holding a pickaxe, dusty overalls, facing the viewer, whole body visible", "kobold", 2),
+  standee("bear", "Cave Bear", 1.25, 1.75, "full-body figure of a huge shaggy dark brown cave bear rearing up on its hind legs, facing the viewer, whole body visible", "bear", 2),
   standee("shift-lead", "The Shift Lead", 0.75, 1.5, "full-body figure of a tall kobold in a short-sleeved dress shirt and a hard hat, holding a clipboard and a coffee mug, facing the viewer, whole body visible", "shift-lead"),
-  standee("bloated-grub", "Bloated Grub", 0.75, 1, "full-body figure of a swollen pale grub with a rat's tail hanging out of its mouth, wearing a tiny janitor's cap, facing the viewer", "bloated-grub"),
-  standee("custodian", "Custodian", 1, 1.5, "full-body figure of a large upright grub with a kobold's helmet fused to its head and a pickaxe in stubby arms, janitor's cap, facing the viewer, whole body visible", "custodian"),
-  standee("facilities-manager", "Facilities Manager", 1.25, 1.75, "full-body figure of an enormous bloated grub with patches of bear fur and bear claws, a janitor's cap and a clip-on tie, facing the viewer, whole body visible", "facilities-manager"),
+  standee("bloated-grub", "Bloated Grub", 0.75, 1, "full-body figure of a swollen pale grub with a rat's tail hanging out of its mouth, wearing a tiny janitor's cap, facing the viewer", "bloated-grub", 3),
+  standee("custodian", "Custodian", 1, 1.5, "full-body figure of a large upright grub with a kobold's helmet fused to its head and a pickaxe in stubby arms, janitor's cap, facing the viewer, whole body visible", "custodian", 4),
+  standee("facilities-manager", "Facilities Manager", 1.25, 1.75, "full-body figure of an enormous bloated grub with patches of bear fur and bear claws, a janitor's cap and a clip-on tie, facing the viewer, whole body visible", "facilities-manager", 2),
   standee("sump-door", "The Sump Door", 1.5, 2.25, "a massive riveted steel industrial door with a big red AUTHORIZED PERSONNEL ONLY sign, a rusty intercom speaker grille with a glowing green button beside it, a small drain at the bottom, seen straight on, whole door visible"),
   standee("senior-custodian", "The Senior Custodian", 1.5, 2.25, "full-body figure of a colossal ancient pale wrinkled grub wearing a ragged janitor's cap and a name badge, holding a giant mop, facing the viewer, whole body visible", "senior-custodian"),
 ] as Card[]).map(f2);
@@ -638,7 +638,7 @@ const f2tiles: Card[] = [
   f2tile("evidence-locker", "Evidence Locker", 2, 1, "furniture", "a steel evidence locker seen from directly above, padlocked, with numbered tags and a chain", "evidence locker"),
   f2tile("bunk", "Bunk", 1, 2, "furniture", "a rickety wooden bunk bed seen from directly above, a thin mattress and a chewed blanket", "bunk"),
   f2tile("sump-pump", "Sump Pump", 2, 2, "furniture", "a huge rusted industrial sump pump seen from directly above, with pipes, a wheel valve and a puddle of dark water", "sump pump"),
-  f2tile("corpse-small", "Small Corpse", 1, 1, "trap", "a dead cave rat lying on a stone floor square seen from directly above, X eyes, lanyard beside it", "corpse", 6),
+  f2tile("corpse-small", "Small Corpse", 1, 1, "trap", "a dead cave rat lying on a stone floor square seen from directly above, X eyes, lanyard beside it", "corpse", 8),
   f2tile("corpse-medium", "Medium Corpse", 1, 1, "trap", "a dead kobold miner lying on a stone floor square seen from directly above, X eyes, helmet rolled off, pickaxe dropped", "corpse", 6),
   f2tile("corpse-large", "Large Corpse", 1, 1, "trap", "a dead cave bear slumped on a stone floor square seen from directly above, X eyes, one paw over the edge of the square", "corpse", 3),
   f2tile("grub-tile", "Grub", 1, 1, "trap", "a fat pale blind grub curled on a stone floor square seen from directly above, wearing a tiny janitor's cap", "grub", 8),

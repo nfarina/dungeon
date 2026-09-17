@@ -355,15 +355,17 @@ All in the card workshop under the **Floor 2** filter, so the print run is just 
 | Asset | Count |
 |---|---|
 | Monster cards: Cave Rat, Kobold Miner, Cave Bear, Shift Lead, Grub, Bloated Grub, Custodian, Facilities Manager, Senior Custodian | 9 |
-| Standees: rat, kobold, bear, Shift Lead, three fed forms, boss, Sir Reginald for the biscuit, and the Sump door | 10 designs |
+| Standees, 9 designs, **20 pieces**: Cave Rat ×4, Kobold Miner ×2, Cave Bear ×2, Shift Lead, Bloated Grub ×3, Custodian ×4, Facilities Manager ×2, Senior Custodian, the Sump door | 20 |
 | Pockets: Bleach ×5, healing in furniture ×2 (Juice Box, Scroll: Heal), one reprinted Bandage | 8 |
 | Gear: eight new cards | 8 |
 | Big Gear: ten cards, plus the Skeleton Key on the tool rack | 11 |
 | Password of the Day, Pet Biscuit, Class Selection Available | 3 |
 | Envelope labels | 7 |
 | Furniture tiles, sized from the map, with used backs | 15 fronts, 13 backs |
-| Corpse tiles: small ×6, medium ×6, large ×3. Grub tiles ×8 | 23 |
+| Corpse tiles: small ×8, medium ×6, large ×3. Grub tiles ×8 | 25 |
 | Announcer speeches: intro, first grub, All Hands, collapse, stairs (in the map file, read from the iPad) | 5 |
+
+**Why those counts.** One standee per monster is not enough: the simulator's worst moment in each of 3,000 games says the table needs four Cave Rats, two Kobolds, two Bears, three Bloated Grubs, four Custodians and two Facilities Managers at once. Each of those runs short in about one game in a thousand, and one fewer of any of them runs short far more often: three rats fails one game in fifty, one Kobold fails half the time, one Facilities Manager one game in five. Corpses peak higher than you would think because they are the whole mechanic: eight small, six medium and three large cover it. If the table ever does run out, a Floor 1 figure stands in.
 
 ---
 
