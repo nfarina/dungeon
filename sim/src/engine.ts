@@ -85,6 +85,8 @@ export type Config = {
   fedMove: number;
   /** Floor 2: opening the boss door empties the queue and puts the schedule on every round. */
   allHands: boolean;
+  /** Floor 2: All Hands also puts one grub on the boss door itself, so the Crew arrives as the party goes in. */
+  allHandsAtDoor: boolean;
   /** Floor 2: the boss eats corpses in its room to heal. */
   bossSnack: boolean;
   /** Record the story of the game in `events` (and print it). */
@@ -150,6 +152,7 @@ export const DEFAULT_CONFIG: Config = {
   grubMove: 4,
   fedMove: 6,
   allHands: true,
+  allHandsAtDoor: true,
   bossSnack: true,
   trace: false,
   record: false,
@@ -166,7 +169,7 @@ export const FLOOR2_CONFIG: Partial<Config> = {
   floor: 2, party: "carryover",
   collapseStart: "round", collapseMode: "hard",
   lootRich: true, snackFree: true, explore: "blind", chestKeyOnly: true,
-  collapseRound: 44, grubEvery: 3, grubBudget: 8,
+  collapseRound: 48, grubEvery: 3, grubBudget: 8,
 };
 
 // ---------------------------------------------------------------------------
@@ -322,6 +325,8 @@ export type HeroDecision = {
 export type HeroBrain = (game: Game, h: Hero) => Promise<void>;
 
 const SLOTS: Slot[] = ["main", "off", "body", "head", "feet"];
+/** `Monster.room` for a guard standing in a corridor: no room, so no door and no room to clear. */
+const CORRIDOR_GUARD = -2;
 
 export class Game {
   floor: FloorDef;
@@ -481,6 +486,12 @@ export class Game {
   }
 
   private setupMonsters() {
+    // Corridor guards: no room, so no door to open and nothing to clear. They wake when somebody sees them.
+    for (const c of this.floor.corridorMonsters ?? []) {
+      const def = ALL_MONSTERS[c.id];
+      if (!def) throw new Error(`unknown monster "${c.id}" in a corridor`);
+      this.monsters.push({ def, pos: { ...c.at }, hp: def.hp, room: CORRIDOR_GUARD, active: false, asleep: 0, alive: true, cd: 0 });
+    }
     for (const r of this.floor.rooms) {
       const fixed = this.cfg.placedMonsters ? (r.spawns ?? []) : [];
       const cells = this.roomCells(r.id).filter(c => this.board.isFloor(c.x, c.y) && !fixed.some(f => same(f, c)));
@@ -829,8 +840,10 @@ export class Game {
     if (this.cfg.floor === 2) {
       const every = this.allHandsOn ? 1 : this.cfg.grubEvery;
       const alive = this.monsters.filter(m => m.alive && m.def.janitor).length;
+      // One grub is held back for the boss door (openDoor), so the schedule only ever brings the other seven.
+      const scheduled = this.cfg.grubBudget - (this.cfg.allHandsAtDoor && !this.allHandsOn ? 1 : 0);
       if (this.round >= this.cfg.grubFrom && (this.round - this.cfg.grubFrom) % every === 0 && this.queue + alive < this.cfg.grubCap
-        && this.grubsQueuedTotal < this.cfg.grubBudget) { this.queue++; this.grubsQueuedTotal++; this.cfg.record && this.say(`A grub joins the stairwell queue (${this.queue} waiting)`); }
+        && this.grubsQueuedTotal < scheduled) { this.queue++; this.grubsQueuedTotal++; this.cfg.record && this.say(`A grub joins the stairwell queue (${this.queue} waiting)`); }
       if (this.monsters.some(m => m.alive && m.def.janitor === "fed" && this.living().some(h => dist1(h.pos, m.pos) <= 3))) this.f2.chasedRounds++;
     }
   }
@@ -1481,6 +1494,16 @@ export class Game {
       this.log(`${h.name} opens the boss door: ALL HANDS, ${this.queue} grub(s) released`);
       for (; this.queue > 0; this.queue--)
         this.monsters.push({ def: ALL_MONSTERS.grub, pos: { ...this.floor.entrance }, hp: 1, room: -1, active: true, asleep: 0, alive: true, cd: 0 });
+      // Facilities converges on the boss room: one grub is already at the door, on the corridor side, which is
+      // where the guard's body usually lands. The stairwell is too far away for the Crew to make this moment.
+      // The last grub of the floor is this one: the schedule holds it back (see endOfRound), so the door beat
+      // always happens and the tile count is still eight.
+      if (this.cfg.allHandsAtDoor) {
+        const side = this.board.roomIdAt(from) === this.bossRoom ? to : from;
+        this.grubsQueuedTotal++;
+        this.monsters.push({ def: ALL_MONSTERS.grub, pos: { ...side }, hp: 1, room: -1, active: true, asleep: 0, alive: true, cd: 0 });
+        this.log(`  a grub is already at the door (${side.x},${side.y})`);
+      }
     }
     if (this.cfg.floor === 2 && d.kind === "locked") return;   // the password door: nothing is spent, nothing knocks
     {
@@ -1793,7 +1816,8 @@ export class Game {
       if (m.cd > 0) m.cd--;
       if (m.asleep > 0) { m.asleep--; continue; }
       if (!m.active) {
-        const doorOpen = this.board.doors.some((d, i) =>
+        // A corridor guard has no door between it and the party: being seen is enough.
+        const doorOpen = m.room === CORRIDOR_GUARD || this.board.doors.some((d, i) =>
           (this.board.roomIdAt(d.a) === m.room || this.board.roomIdAt(d.b) === m.room) && !!this.openDoors[i]);
         const seen = this.standing().some(h => los(this.board, m.pos, h.pos, this.openDoors));
         if (doorOpen && seen) { m.active = true; this.cfg.record && this.say(`${m.def.name} wakes up`); }

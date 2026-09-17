@@ -69,7 +69,7 @@ A fed janitor **follows the party**: each monster turn it moves 6 toward the nea
 
 Grubs arrive on the clock, not on the corpses. Keep the queue on a spindown die on the DM sheet; put a grub tile on the stairs only when it has somewhere to go.
 
-- **Schedule: one grub joins the queue at the end of round 2, and every third round after that** (5, 8, 11, ...), until eight have joined. So the party has two or three rooms of freedom before the first one is even waiting, and the eighth arrives around round 23 of a forty-round floor.
+- **Schedule: one grub joins the queue at the end of round 2, and every third round after that** (5, 8, 11, ...), until **seven** have joined. The eighth is not on the clock: it is the one waiting at the boss door (1.6). So the party has two or three rooms of freedom before the first one is even waiting, and the eighth arrives around round 23 of a forty-round floor.
 - At the start of the monster turn, if any corpse is on the board, every grub in the queue steps onto the stairs and starts walking. Otherwise they wait, and the queue die keeps climbing where everyone can see it.
 - **Eight grub tiles, eight joins.** The schedule adds one grub to the queue at a time until all eight have joined, then stops for the floor. A squashed grub goes back into the queue (1.2) without counting as a new join, so the Crew can be pushed back but never grows past eight. (The simulator first tried a limit of six on the board at once, with no total: on a forty-round floor the Crew never stopped coming, nine fed janitors a game and a wipe in one game of nine. Six in total, with three password copies on the floor, was a 94% walk; eight in total is the number.)
 - **The schedule adds grubs; corpses let them out.** A grub in the queue, new or squashed, leaves the stairs on the very next monster turn that has a corpse on the board. A grub squashed on your turn is walking back out of the stairwell that same round.
@@ -88,32 +88,34 @@ Print a big standee for the Sump door itself, so it reads as the boss door from 
 
 ### 1.6 The clock
 
-- **Floor cap: 44 rounds.** Announced and counted down every round, same as Floor 1. This is a long floor by design: the party has to find the password before it can do anything else, and the Shift Office is in the far corner. The simulator's parties finish in 35 rounds at the median and the cap catches about one game in eight. The Cleanup Crew is the pressure that grows; the cap is the wall at the end. (It was 40 rounds when the collapse was a ramp. A cliff needed 42, and locking the chests to a key pushed it to 44: every route change that slows the password hunt costs rounds here.)
-- **All Hands.** The moment the boss door opens, every grub still in the queue leaves the stairs at once and the schedule doubles: a grub every round. With corpses around, they head for corpses. With none, they head for the boss room. Announcer: "Attention, Crawlers. Facilities has declared an All Hands. This is a standard cleanliness measure and not a reflection on your hygiene. Please enjoy the remainder of your visit."
-- **The collapse** is the Floor 1 rule: at the end of round 44 the floor comes down and everyone still on it dies.
+- **Floor cap: 48 rounds.** Announced and counted down every round, same as Floor 1. This is a long floor by design: the party has to find the password before it can do anything else, and the Shift Office is in the far corner. The simulator's parties finish in 35 rounds at the median and the cap catches about one game in eight. The Cleanup Crew is the pressure that grows; the cap is the wall at the end. (It was 40 rounds when the collapse was a ramp. A cliff needed 42, and locking the chests to a key pushed it to 44: every route change that slows the password hunt costs rounds here.)
+- **All Hands.** The moment the boss door opens, every grub still in the queue leaves the stairs at once, the schedule doubles to a grub every round, and **one grub is already at the door** — put a tile on the corridor square outside the Sump, which is where the door guard's body usually is. The stairwell is right across the floor, so without that tile the Crew can never make this moment. With corpses around, they head for corpses. With none, they head for the boss room. Announcer: "Attention, Crawlers. Facilities has declared an All Hands. This is a standard cleanliness measure and not a reflection on your hygiene. Please enjoy the remainder of your visit."
+- **The collapse** is the Floor 1 rule: at the end of round 48 the floor comes down and everyone still on it dies.
 - **You can leave without killing the boss.** Same rule, same forfeit, say it out loud before the fight.
 
 **Where the simulator stands** (3,000 runs of the current layout, the real party, rules as written above (Spark cleans small corpses only, squashed grubs go back to the queue, the Sump door shuts behind the party, healing in three pieces of furniture), a "blind" party that opens the nearest unexplored door until it holds a password, then heads for the Sump with a random appetite for one to four more rooms, and bleaches medium and large corpses on quiet turns while the goose eats the small ones and Spark gets the rest):
 
 | Measure | Result |
 |---|---|
-| Party wins (boss dead, everyone down the stairs) | 83% |
+| Party wins (boss dead, everyone down the stairs) | 84% |
 | Escaped with the boss alive | 2% |
-| Floor came down on somebody | 14% |
-| Full wipe | 1% |
-| Games where someone dies | 22% |
-| Rounds to finish, median | 35 |
+| Floor came down on somebody | 11% |
+| Full wipe | 3.5% |
+| Games where someone dies | 33% |
+| Rounds to finish, median | 36 |
 | Password found, median round | 21 |
-| Sump door opens, average round | 28 |
+| Sump door opens, average round | 30 |
 | Rooms opened | 9 of 14 |
-| Corpses made / cleaned / left at the end | 20 / 10 / 2 |
-| Bleach found / used | 4.1 / 3.3, against 8.4 medium and 1.7 large corpses a game |
-| Fed janitors per game | 5.9, in every game; the party kills 4.0 of them |
-| Rounds with a janitor chasing someone | 9 |
-| Facilities Managers (a large corpse eaten) | 0.7 a game, in 52% of games |
+| Corpses made / cleaned / left at the end | 20 / 10 / 2.7 |
+| Bleach found / used | 4.1 / 3.5, against 8.4 medium and 2.6 large corpses a game |
+| Fed janitors per game | 6.3, in every game; the party kills 4.7 of them |
+| Rounds with a janitor chasing someone | 11 |
+| Facilities Managers (a large corpse eaten) | 1.5 a game, in 91% of games |
+| The doorstep beat: the Sump guard's body eaten | 79% of games, median the same round the door opens |
+| Boss snacks per game | 0.8, in 76% of games |
 | Boss snacks per game | 1.7 |
 
-**What the recent changes were each worth.** Closing the Sump door: about two points of win rate and five points off "someone dies", because the boss fight stops being a three-way fight with the Crew. Healing in the furniture: about four points of win rate and three points off the wipe rate. Those two took the floor to 91% wins with the old ramp collapse, which was kinder than the 80-to-88 band the earlier drafts sat in. Making the collapse hard moved the failure mode from "the ramp chewed somebody up" to "somebody was still up here at zero": wipes fell to about 1% while the floor coming down on at least one hero rose to 11%. Locking the chests to a key then cost about five points, because a party that has spent its keys explores fewer rooms; the cap went to 44 to pay that back. Sending grubs after the largest corpse rather than the nearest cost another two points and changed what the Crew is made of: fewer Bloated Grubs (3.2 a game down to 2.3), more Custodians and Facilities Managers, and a big body now drags the whole Crew across the floor. Each round of cap is worth roughly two points of win rate, which is the dial to move if 83% is the wrong number.
+**What the recent changes were each worth.** Closing the Sump door: about two points of win rate and five points off "someone dies", because the boss fight stops being a three-way fight with the Crew. Healing in the furniture: about four points of win rate and three points off the wipe rate. Those two took the floor to 91% wins with the old ramp collapse, which was kinder than the 80-to-88 band the earlier drafts sat in. Making the collapse hard moved the failure mode from "the ramp chewed somebody up" to "somebody was still up here at zero": wipes fell to about 1% while the floor coming down on at least one hero rose to 11%. Locking the chests to a key then cost about five points, because a party that has spent its keys explores fewer rooms; the cap went to 44 to pay that back. Sending grubs after the largest corpse rather than the nearest cost another two points and changed what the Crew is made of: fewer Bloated Grubs, more Custodians and Facilities Managers, and a big body now drags the whole Crew across the floor. The doorstep bear and the All Hands door-grub then turned the Facilities Manager from a coin flip into the floor's signature beat: one appears in 91% of games, and the guard's own body is eaten in 79% — a median of zero rounds from the party getting the Sump door open, so the thing usually stands up as they file through and the door shuts on it. That cost about six points, paid back with four more rounds of cap. Deaths went from a fifth of games to a third in the process: that corridor fight lands with the party's bleach spent and the clock short. Each round of cap is worth roughly two points of win rate, which is the dial to move if 82% is the wrong number, and the doorstep bear is the dial for how mean the Sump approach feels.
 
 The table's party never squashes grubs. A party played by the Jev brain in the map editor's Sim tab (sensible play, judged turn by turn) squashes them on the way past, which is what a real table will do. Under the old rule, where a squashed grub left the floor, that party saw two fed janitors a game instead of seven and was almost never chased. With squashed grubs going back to the queue it saw four or five, was chased for about eight rounds a game instead of three or four, and lost time to squashing the same grubs over and over: in six games it squashed eight grubs a game and won once, four games running out of clock. The furniture healing did not change that party's time spent hurt (a fifth of its turns, either way, in six games). Six games is a small sample, but beating back the tide now costs the party something.
 
@@ -163,12 +165,12 @@ The Shift Office's position is the floor's main dial. With it next to the forced
 
 1. **The big chamber is the boss room.** The skeleton on its floor is what the boss ate. Its door is the password door.
 2. **Required by walls: the first two rooms.** Same trick as Floor 1: the entrance corridor dead-ends into them. That guarantees corpses early, and the first grub has somewhere to walk.
-3. **One bear near the front.** The Cave Bear in Records, eleven squares from the entrance, is there so a large corpse hits the floor while the Crew is still arriving. With all three bears in the far corners a Facilities Manager showed up in a quarter of games; with this one forward it is 40%, and the party has to decide early whether a bottle of bleach is worth spending on a body that big.
+3. **One bear near the front, one on the Sump's doorstep.** The Cave Bear in Records, eleven squares from the entrance, is there so a large corpse hits the floor while the Crew is still arriving. The second stands in the **corridor outside the Sump door**, two squares out: a guard with no room, which wakes when the party sees it, and whose body lands on the doorstep just as the party gets the door open. With the door-grub from All Hands (1.6) eating it, a Facilities Manager turns up in 88% of games, a median of one round before the Sump door opens — the party goes in with something very large arriving behind them, and the door shuts on it. It replaced one of the Sump's two kobold guards, so the boss room is one body lighter; the corridor fight and the loss of that kobold as boss food cost about six points of win rate, which the cap paid back by going from 44 rounds to 48.
 4. **The Shift Lead's room is required by content, not by walls.** Put it far from the forced rooms, so the party has to hunt for it, and then carry the password back across the floor with a medium corpse behind them.
 5. **The scroll before the robe.** Scroll: Restructuring on the Shift Lead's desk. The Wizard's Bathrobe on the Laundry shelf, near the Sump. Ethan should own an unreadable scroll for a while.
 6. **Five bleach, two on the required path.** Reception's front desk and the Supply Closet's shelving, so the mechanic gets taught on the first corpse and there is a second bottle before the Shift Lead. The other three sit in optional rooms (Boiler Room, Records, Cafeteria). With only one on the path the party found 1.6 bottles a game and left twice as many bodies.
 7. **Healing and a spare key in the furniture.** A Juice Box on the Dormitory bunk, a Scroll: Heal on the Locker Room bench, and the second Skeleton Key on the Tool Crib's tool rack. The party spends most of the floor hurt and Floor 2's decks only hold four Juice Boxes and a Bandage or two, so the side rooms need to be worth the detour. The key is what makes the second chest openable at all.
-8. **Far more rooms than they can open.** Fourteen rooms in play and a 44-round cap means several stay shut. That is fine. The announcer should say so.
+8. **Far more rooms than they can open.** Fourteen rooms in play and a 48-round cap means several stay shut. That is fine. The announcer should say so.
 9. **Monsters at least two squares from their door**, like Floor 1. That rule was worth thirteen points of win rate.
 
 Room table, monster count and trap placement fill in from the map file once it exists. Corridor traps and secret doors: at least one pit somewhere useful, because a corpse Shoved into a pit is the cheapest clean on the floor.

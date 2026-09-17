@@ -51,6 +51,8 @@ export type FloorDef = {
   doors: DoorDef[];
   entrance: Pt;
   corridorTraps: { at: Pt; kind: "pit" | "spear" }[];
+  /** Guards placed on corridor squares, outside any room. They belong to no room and wake when seen. */
+  corridorMonsters: { at: Pt; id: string }[];
 };
 
 export const SOLID = -2, CORRIDOR = -1;

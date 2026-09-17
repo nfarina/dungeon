@@ -170,9 +170,11 @@ export function toFloorDef(m: MapFile): FloorDef {
     };
   });
 
+  const inAnyRoom = (p: MapMonster) => m.floor.rooms.some(r => m.board.grid[p.y]?.[p.x] === r.at);
   return {
     w: m.board.w, h: m.board.h,
     regionRows,
+    corridorMonsters: (m.floor.monsters ?? []).filter(p => open(p.x, p.y) && !inAnyRoom(p)).map(p => ({ at: { x: p.x, y: p.y }, id: p.id })),
     entrance: entrance ? { x: entrance.x, y: entrance.y } : { x: 0, y: 0 },
     corridors: [],
     rooms,

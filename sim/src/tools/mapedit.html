@@ -422,7 +422,7 @@ const LAYERS = [
   {id:"doors",     name:"Doors",     hint:"Tap near the edge between two squares."},
   {id:"furniture", name:"Furniture", hint:"Entrance, stairs and anything that blocks squares. Drag to size a piece."},
   {id:"traps",     name:"Traps",     hint:""},
-  {id:"monsters",  name:"Monsters",  hint:"Tap a square inside a room to place one. A room with placed monsters spawns exactly those; a room with none scatters its list at random."},
+  {id:"monsters",  name:"Monsters",  hint:"Tap a square in a room to place one. A room with placed monsters spawns exactly those; a room with none scatters its list at random. A monster on a corridor square is a guard belonging to no room: it wakes when the party sees it."},
 ];
 
 // The floor and the tab are remembered per device, so a refresh (or the iPad going to sleep) comes back where you were.
@@ -1488,7 +1488,8 @@ function apply(c, dragging = false) {
       const i = monAt(x, y);
       if (i >= 0) F().monsters.splice(i, 1);
       const r = roomAt(x, y);
-      if (tool.monsters !== "erase" && r) F().monsters.push({ x, y, id: tool.monsters });
+      // A corridor square is allowed: that is a guard with no room, which wakes when the party sees it.
+      if (tool.monsters !== "erase" && open(x, y)) F().monsters.push({ x, y, id: tool.monsters });
       syncRoster(r);
       break;
     }
