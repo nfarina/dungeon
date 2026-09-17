@@ -849,5 +849,269 @@
     "model": "gemini-3.1-flash-image",
     "at": "2026-09-15T23:05:14.783Z",
     "size": "512px"
+  },
+  "bleach": {
+    "file": "bleach.8ad516c05e.png",
+    "hash": "8ad516c05e",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a big white plastic jug of industrial bleach with a red skull warning label and a splash cap, slightly dented. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:37:20.283Z",
+    "size": "512px"
+  },
+  "bandage-f2": {
+    "file": "bandage-f2.1c7def3122.png",
+    "hash": "1c7def3122",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a roll of white gauze bandage, partly unrolled, with a small red cross on the wrapper. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:37:26.530Z",
+    "size": "512px"
+  },
+  "hard-hat": {
+    "file": "hard-hat.2e4b815a5c.png",
+    "hash": "2e4b815a5c",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a scuffed yellow construction hard hat with a faded company sticker on the front. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:38:38.203Z",
+    "size": "512px"
+  },
+  "steel-boots": {
+    "file": "steel-boots.1a908d9db5.png",
+    "hash": "1a908d9db5",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a pair of heavy brown leather work boots with steel toe caps showing through the worn leather. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:38:46.263Z",
+    "size": "512px"
+  },
+  "wet-floor-sign": {
+    "file": "wet-floor-sign.0b85071cd8.png",
+    "hash": "0b85071cd8",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a yellow folding wet floor caution sign with a slipping stick figure, held up like a shield. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:38:56.294Z",
+    "size": "512px"
+  },
+  "hi-vis-vest": {
+    "file": "hi-vis-vest.23cdfdc08c.png",
+    "hash": "23cdfdc08c",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a bright orange high-visibility safety vest with silver reflective stripes, hanging on a hook. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:39:02.111Z",
+    "size": "512px"
+  },
+  "push-broom": {
+    "file": "push-broom.d2d5a46f8d.png",
+    "hash": "d2d5a46f8d",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a wide wooden push broom with stiff black bristles and a long handle, held like a weapon. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:39:41.782Z",
+    "size": "512px"
+  },
+  "mop": {
+    "file": "mop.24bcac5609.png",
+    "hash": "24bcac5609",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a grey string mop on a wooden handle, dripping something faintly green. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:43:10.978Z",
+    "size": "512px"
+  },
+  "contractor-badge": {
+    "file": "contractor-badge.279f3a4515.png",
+    "hash": "279f3a4515",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a laminated contractor ID badge on a lanyard with a blurry photo of a kobold and a barcode. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:39:21.509Z",
+    "size": "512px"
+  },
+  "scroll-lights-out": {
+    "file": "scroll-lights-out.2456288332.png",
+    "hash": "2456288332",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a rolled parchment scroll with a wax seal, an image of a light switch flipped down glowing on it. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:39:30.153Z",
+    "size": "512px"
+  },
+  "skeleton-key-f2-placed": {
+    "file": "skeleton-key-f2-placed.512ec99889.png",
+    "hash": "512ec99889",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: an ornate iron key with a tiny skull for a bow, bits crumbling off it, hanging from a nail on a pegboard. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:46:13.767Z",
+    "size": "512px"
+  },
+  "cattle-prod": {
+    "file": "cattle-prod.9ddcc8704f.png",
+    "hash": "9ddcc8704f",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a long yellow-and-black electric cattle prod with crackling blue sparks at the tip. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:46:19.400Z",
+    "size": "512px"
+  },
+  "keyring": {
+    "file": "keyring.bae6ab9694.png",
+    "hash": "bae6ab9694",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a huge steel ring crowded with dozens of mismatched keys, hanging from a belt clip. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:46:25.563Z",
+    "size": "512px"
+  },
+  "mop-up": {
+    "file": "mop-up.166ab8de97.png",
+    "hash": "166ab8de97",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a small leather spellbook, open, with a glowing blue mop and bucket floating above the page. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:46:32.118Z",
+    "size": "512px"
+  },
+  "static": {
+    "file": "static.c61c252ae3.png",
+    "hash": "c61c252ae3",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a small leather spellbook, open, with a crackling ring of static electricity radiating out from the page. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:46:38.024Z",
+    "size": "512px"
+  },
+  "lunchbox": {
+    "file": "lunchbox.579aebaab3.png",
+    "hash": "579aebaab3",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a battered steel workman's lunchbox with a domed lid, slightly open, a warm glow inside. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:46:43.774Z",
+    "size": "512px"
+  },
+  "bathrobe": {
+    "file": "bathrobe.5f9dd28b5e.png",
+    "hash": "5f9dd28b5e",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a fluffy purple terrycloth bathrobe covered in tiny gold stars and moons, on a wooden hanger. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:46:50.246Z",
+    "size": "512px"
+  },
+  "scroll-restructuring": {
+    "file": "scroll-restructuring.de43c293ec.png",
+    "hash": "de43c293ec",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: an ornate parchment scroll with a red corporate seal, a glowing orange org chart on it with several boxes crossed out. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:46:56.662Z",
+    "size": "512px"
+  },
+  "chainmail-bib-f2": {
+    "file": "chainmail-bib-f2.1b3057398e.png",
+    "hash": "1b3057398e",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a heavy chainmail bib apron with a leather neck strap, dented and stained. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:47:02.956Z",
+    "size": "512px"
+  },
+  "leaf-blower": {
+    "file": "leaf-blower.f8adfe2f11.png",
+    "hash": "f8adfe2f11",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a loud orange gas-powered leaf blower with a long black nozzle, leaves and dust blasting out of it. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:47:08.941Z",
+    "size": "512px"
+  },
+  "pet-biscuit": {
+    "file": "pet-biscuit.d6c75bbc85.png",
+    "hash": "d6c75bbc85",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a large bone-shaped dog biscuit with a tiny crown stamped into it, resting on a red velvet cushion. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:47:22.221Z",
+    "size": "512px"
+  },
+  "password": {
+    "file": "password.65abe05734.png",
+    "hash": "65abe05734",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a yellow sticky note with a scribbled word crossed out and rewritten, stuck to a clipboard. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:47:36.527Z",
+    "size": "512px"
+  },
+  "class-selection": {
+    "file": "class-selection.71afe9bb26.png",
+    "hash": "71afe9bb26",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: an official-looking golden certificate with an embossed seal, a blank line where a name goes, and a small footnote in tiny print. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:47:43.832Z",
+    "size": "512px"
+  },
+  "rat": {
+    "file": "rat.0fcbe45b2b.png",
+    "hash": "0fcbe45b2b",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a large scruffy brown cave rat standing on its hind legs wearing a lanyard, yellow teeth bared. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:47:57.561Z",
+    "size": "512px"
+  },
+  "kobold": {
+    "file": "kobold.94e0b8def9.png",
+    "hash": "94e0b8def9",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a wiry red-scaled kobold in a miner's helmet with a headlamp, holding a pickaxe, dusty overalls. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:48:03.655Z",
+    "size": "512px"
+  },
+  "bear": {
+    "file": "bear.701665b1b0.png",
+    "hash": "701665b1b0",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a huge shaggy dark brown cave bear rearing up on its hind legs, roaring, a torn hi-vis vest snagged on one claw. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:48:10.650Z",
+    "size": "512px"
+  },
+  "shift-lead": {
+    "file": "shift-lead.1a96dd9b7c.png",
+    "hash": "1a96dd9b7c",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a tall kobold in a short-sleeved dress shirt and a hard hat, holding a clipboard and a coffee mug, exhausted and furious. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:48:16.947Z",
+    "size": "512px"
+  },
+  "grub": {
+    "file": "grub.7975a83150.png",
+    "hash": "7975a83150",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a fat pale blind grub the size of a dog, segmented and glistening, wearing a tiny janitor's cap, mouth open. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:48:22.869Z",
+    "size": "512px"
+  },
+  "bloated-grub": {
+    "file": "bloated-grub.8612769574.png",
+    "hash": "8612769574",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a swollen pale grub with a rat's tail hanging out of its mouth, wearing a tiny janitor's cap, moving with purpose. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:48:28.635Z",
+    "size": "512px"
+  },
+  "custodian": {
+    "file": "custodian.2a9793b18d.png",
+    "hash": "2a9793b18d",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a large upright grub with a kobold's helmet fused to its head and a pickaxe held in a new pair of stubby arms, janitor's cap on top. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:48:34.929Z",
+    "size": "512px"
+  },
+  "senior-custodian": {
+    "file": "senior-custodian.23827dd83f.png",
+    "hash": "23827dd83f",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: a colossal ancient grub filling a cavern, pale and wrinkled, wearing a ragged janitor's cap and a name badge, a giant mop in one stubby arm, bones scattered around it. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:48:48.818Z",
+    "size": "512px"
+  },
+  "facilities-manager": {
+    "file": "facilities-manager.6a4ca5c166.png",
+    "hash": "6a4ca5c166",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nSubject: an enormous bloated grub with bear fur sprouting in patches and bear claws on stubby arms, a janitor's cap and a clip-on tie, looming. Landscape composition.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:48:57.419Z",
+    "size": "512px"
+  },
+  "standee-kobold": {
+    "file": "standee-kobold.3df5b7f118.png",
+    "hash": "3df5b7f118",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a stand-up game figure: one character shown full length, standing upright and facing the viewer, head near the top of the frame and feet near the bottom, nothing cropped. Portrait (tall) composition.\n\nSubject: full-body figure of a wiry red-scaled kobold in a miner's helmet with a headlamp, holding a pickaxe, dusty overalls, facing the viewer, whole body visible. The second reference image shows this exact character: match their face, hair, skin, build and clothing, but take ONLY the character from it, not its background or framing.\n\nBACKGROUND OVERRIDE: ignore the dungeon background described in the style above. The background here must be a plain, flat, uniform pale cream parchment colour, edge to edge, with only a soft ground shadow under the feet. No stone, no walls, no scenery, no gradient.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:49:21.817Z",
+    "size": "512px"
   }
 }
