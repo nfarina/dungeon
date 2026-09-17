@@ -73,6 +73,8 @@ export type Config = {
   grubBudget: number;
   /** Floor 2: a squashed grub goes back into the stairwell queue instead of leaving the floor (it doesn't use up the budget). */
   grubsReturn: boolean;
+  /** Floor 2: a grub walks toward the largest corpse it can reach (ties to the nearest), not simply the nearest. */
+  grubsPreferLarge: boolean;
   /** Floor 2: Spark (like the goose) only cleans small corpses; medium and large need bleach, the Mop or Mop-Up. */
   sparkSmallOnly: boolean;
   /** Floor 2: the Sump door swings shut once the whole party is inside, so the Cleanup Crew stays out of the boss fight. */
@@ -141,6 +143,7 @@ export const DEFAULT_CONFIG: Config = {
   grubCap: 6,
   grubBudget: Infinity,
   grubsReturn: true,
+  grubsPreferLarge: true,
   sparkSmallOnly: true,
   sumpDoorCloses: true,
   chestKeyOnly: false,
@@ -607,6 +610,9 @@ export class Game {
 
   // --- policies ------------------------------------------------------------
 
+  /** Close enough to hit, heal, revive or hand something to: next to each other with no wall or shut door between. */
+  melee(a: Pt, b: Pt): boolean { return this.board.touching(a, b, this.openDoors); }
+
   heroPolicy(h: Hero, ignoreHeroes = true): EdgePolicy {
     // Floor 1: they can always knock. Floor 2: the boss door only opens for the password.
     const canUnlock = this.cfg.floor === 2 ? this.partyHasPassword() : true;
@@ -868,7 +874,8 @@ export class Game {
     }
   }
 
-  /** Rule 1.2: each grub walks a fixed distance toward the nearest corpse and eats it on arrival. */
+  /** Rule 1.2: each grub walks a fixed distance toward a corpse -- the largest it can reach, ties to the
+   *  nearest -- and eats it on arrival. Facilities wants the big job done first. */
   private grubPhase() {
     for (const m of this.monsters) {
       if (!m.alive || m.def.janitor !== "grub") continue;
@@ -879,8 +886,14 @@ export class Game {
           || this.standing().some(h => h.pos.x === x && h.pos.y === y),
       };
       const f = field(this.board, m.pos, p);
-      let best: Corpse | null = null, bd = Infinity;
-      for (const c of this.corpses) { const d = f.dist[this.board.idx(c.pos.x, c.pos.y)]; if (d < bd) { bd = d; best = c; } }
+      const rank = (c: Corpse) => this.cfg.grubsPreferLarge ? { large: 2, medium: 1, small: 0 }[c.size] : 0;
+      let best: Corpse | null = null, bd = Infinity, br = -1;
+      for (const c of this.corpses) {
+        const d = f.dist[this.board.idx(c.pos.x, c.pos.y)];
+        if (d >= 0x3fffffff) continue;
+        const r = rank(c);
+        if (r > br || (r === br && d < bd)) { br = r; bd = d; best = c; }
+      }
       if (!best || bd >= 0x3fffffff) continue;
       const path = pathTo(this.board, f, best.pos);
       m.pos = { ...path[Math.min(path.length - 1, this.cfg.grubMove)] };
@@ -938,7 +951,7 @@ export class Game {
       const t = this.cleanTarget(h, f, "goose");
       if (t && t.spot && t.dist <= budget) {
         this.walk(h, f, t.spot);
-        if (adjacent(h.pos, t.corpse.pos) || same(h.pos, t.corpse.pos)) {
+        if (this.melee(h.pos, t.corpse.pos) || same(h.pos, t.corpse.pos)) {
           this.removeCorpse(t.corpse, "goose");
           this.award("Good Boy", [clone(FLOOR2_ITEMS["Pet Biscuit"])]);
           return true;
@@ -951,7 +964,7 @@ export class Game {
       const t = this.cleanTarget(h, f, "bleach");
       if (t && t.spot && t.dist <= budget) {
         this.walk(h, f, t.spot);
-        if (adjacent(h.pos, t.corpse.pos) || same(h.pos, t.corpse.pos)) {
+        if (this.melee(h.pos, t.corpse.pos) || same(h.pos, t.corpse.pos)) {
           if (mop) { mop.cleans!--; this.removeCorpse(t.corpse, "bleach"); return true; }   // the Mop, counted with bleach
           const b = h.pack.find(i => i.use === "bleach")!;
           h.pack = h.pack.filter(x => x !== b);
@@ -975,7 +988,7 @@ export class Game {
     if (this.cfg.castNeedsMind && this.mind(h) < 4) return false;
     const pu = h.learned.find(l => l.item.spell?.id === "patchup" && l.cd === 0);
     if (!pu) return false;
-    const who = [h, ...this.standing().filter(o => o !== h && adjacent(o.pos, h.pos))]
+    const who = [h, ...this.standing().filter(o => o !== h && this.melee(o.pos, h.pos))]
       .filter(o => o.hp <= 3 && o.hp < o.maxHp).sort((a, b) => a.hp - b.hp)[0];
     if (!who) return false;
     pu.cd = pu.item.spell!.cooldown;
@@ -1039,12 +1052,12 @@ export class Game {
     // Reviving a downed friend beats almost everything.
     const down = this.heroes.find(o => o.downed && !o.exited && !o.dead);
     if (down && !fleeing) {
-      if (adjacent(h.pos, down.pos)) { this.revive(h, down); return; }
+      if (this.melee(h.pos, down.pos)) { this.revive(h, down); return; }
       const f = this.walkField(h);
       const spot = this.bestAdjacentSpot(f, down.pos, this.moveBudget(h));
       if (spot && this.rng.next() < 0.85) {
         this.walk(h, f, spot);
-        if (adjacent(h.pos, down.pos)) { this.revive(h, down); return; }
+        if (this.melee(h.pos, down.pos)) { this.revive(h, down); return; }
         return;
       }
     }
@@ -1097,18 +1110,18 @@ export class Game {
     // Static: 1 damage to every adjacent monster, worth it against two or more.
     if (this.cfg.floor === 2 && (!this.cfg.castNeedsMind || this.mind(h) >= 4)) {
       const st = h.learned.find(l => l.item.spell?.id === "static" && l.cd === 0);
-      const adj = this.monsters.filter(m => m.alive && m.def.janitor !== "grub" && adjacent(m.pos, h.pos));
+      const adj = this.monsters.filter(m => m.alive && m.def.janitor !== "grub" && this.melee(m.pos, h.pos));
       if (st && adj.length >= 2) { st.cd = st.item.spell!.cooldown; this.cfg.record && this.say(`${h.name} casts Static: 1 damage to each of ${adj.length} adjacent monsters`); for (const m of adj) this.hurtMonster(m, 1, h); return; }
     }
     // Patch Up beats a swing when somebody is about to drop.
-    if ((h.hp <= 2 || this.standing().some(o => o !== h && adjacent(o.pos, h.pos) && o.hp <= 2)) && this.tryPatchUp(h)) return;
+    if ((h.hp <= 2 || this.standing().some(o => o !== h && this.melee(o.pos, h.pos) && o.hp <= 2)) && this.tryPatchUp(h)) return;
 
     // Already in melee? Swing.
-    if (target && adjacent(h.pos, target.pos) && !this.hasRanged(h)) {
+    if (target && this.melee(h.pos, target.pos) && !this.hasRanged(h)) {
       this.cfg.record && this.say(`${h.name} stays in the fight`);
       this.heroAttack(h, target); return;
     }
-    if (target && this.hasRanged(h) && !adjacent(h.pos, target.pos) && los(this.board, h.pos, target.pos, this.openDoors)) {
+    if (target && this.hasRanged(h) && !this.melee(h.pos, target.pos) && los(this.board, h.pos, target.pos, this.openDoors)) {
       this.heroAttack(h, target); return;
     }
     // Scroll / spell from range when it is the better play.
@@ -1132,7 +1145,7 @@ export class Game {
       if (dest && !same(dest, h.pos)) this.walk(h, f, dest);
       else {
         // Still nowhere to go: swing at whatever is in the way, otherwise say so out loud.
-        const blocker = this.monsters.find(m => m.alive && m.asleep === 0 && adjacent(m.pos, h.pos));
+        const blocker = this.monsters.find(m => m.alive && m.asleep === 0 && this.melee(m.pos, h.pos));
         if (blocker) { this.cfg.record && this.say(`${h.name} is boxed in and swings at the ${blocker.def.name}`); this.heroAttack(h, blocker); return; }
         this.stuck++;
         this.cfg.record && this.say(`${h.name} can't get anywhere useful and holds position`);
@@ -1144,7 +1157,7 @@ export class Game {
     if (fleeing || (this.bossKilledRound !== null && this.roomDone(this.bossRoom))) {
       if (this.onStairs(h)) { h.exited = true; this.log(`${h.name} takes the stairs`); return; }
     }
-    if (t2 && adjacent(h.pos, t2.pos)) { this.heroAttack(h, t2); return; }
+    if (t2 && this.melee(h.pos, t2.pos)) { this.heroAttack(h, t2); return; }
     if (t2 && this.hasRanged(h) && los(this.board, h.pos, t2.pos, this.openDoors)) { this.heroAttack(h, t2); return; }
     if (t2 && this.tryCast(h, t2)) return;
     if (t2 && this.hasSidearm(h) && los(this.board, h.pos, t2.pos, this.openDoors)) { this.heroAttack(h, t2); return; }
@@ -1153,7 +1166,7 @@ export class Game {
     if (this.tryPatchUp(h)) return;
     // A grub in arm's reach that is about to reach a corpse worth keeping: squash it.
     if (this.cfg.floor === 2 && this.cfg.cleanPolicy === "cleaner") {
-      const g = this.monsters.find(m => m.alive && m.def.janitor === "grub" && adjacent(m.pos, h.pos)
+      const g = this.monsters.find(m => m.alive && m.def.janitor === "grub" && this.melee(m.pos, h.pos)
         && this.corpses.some(c => c.size !== "small" && dist1(c.pos, m.pos) <= this.cfg.grubMove));
       if (g) { this.cfg.record && this.say(`${h.name} squashes a grub before it reaches a corpse`); this.heroAttack(h, g); return; }
     }
@@ -1268,7 +1281,7 @@ export class Game {
     // Grubs are never worth a swing here (see the end of heroTurn); fed janitors are fought when they catch you, not chased.
     const live = this.monsters.filter(m => m.alive && m.asleep === 0 && m.def.janitor !== "grub");
     if (!live.length) return null;
-    const near = live.filter(m => adjacent(h.pos, m.pos));
+    const near = live.filter(m => this.melee(h.pos, m.pos));
     if (near.length) return this.bestOf(h, near);
     if (fleeing) return null;
     const room = this.currentRoom();
@@ -1318,6 +1331,7 @@ export class Game {
     for (const d of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
       const x = p.x + d[0], y = p.y + d[1];
       if (!this.board.inBounds(x, y)) continue;
+      if (!this.melee({ x, y }, p)) continue;        // a square across the wall is no use for reaching it
       best = Math.min(best, f.dist[this.board.idx(x, y)]);
     }
     return best;
@@ -1328,6 +1342,7 @@ export class Game {
     for (const d of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
       const x = p.x + d[0], y = p.y + d[1];
       if (!this.board.inBounds(x, y)) continue;
+      if (!this.melee({ x, y }, p)) continue;
       const dist = f.dist[this.board.idx(x, y)];
       if (dist <= budget && dist < bd) { bd = dist; best = { x, y }; }
     }
@@ -1577,7 +1592,7 @@ export class Game {
     }
     // Rule 6.3: casting needs Mind 4+ every time, not just learning. Glasses off, book closed.
     const spark = (!this.cfg.castNeedsMind || this.mind(h) >= 4) ? h.learned.find(l => l.item.spell?.id === "spark" && l.cd === 0) : undefined;
-    if (spark && (!adjacent(h.pos, target.pos) || 2 > this.atk(h))) {
+    if (spark && (!this.melee(h.pos, target.pos) || 2 > this.atk(h))) {
       spark.cd = spark.item.spell!.cooldown;
       this.cfg.record && this.say(`${h.name} casts Spark at ${target.def.name}`);
       this.resolveAttack(h, target, 2);
@@ -1600,7 +1615,7 @@ export class Game {
       h.pack = h.pack.filter(x => x !== rs);
       this.cfg.record && this.say(`${h.name} reads Restructuring at ${target.def.name}`);
       this.resolveAttack(h, target, 4);
-      for (const o of this.monsters.filter(o => o.alive && o !== target && adjacent(o.pos, target.pos))) this.hurtMonster(o, 1, h);
+      for (const o of this.monsters.filter(o => o.alive && o !== target && this.melee(o.pos, target.pos))) this.hurtMonster(o, 1, h);
       return true;
     }
     const fb = h.pack.find(i => i.use === "firebolt");
@@ -1625,11 +1640,11 @@ export class Game {
     let dice = this.atk(h) + h.energy;
     const ranged = h.equip.main?.ranged;
     if (ranged) {
-      if (adjacent(h.pos, m.pos)) { if (!ranged.sidearm) dice = 1; }   // can't use the bow point-blank; a slingshot hero just punches
+      if (this.melee(h.pos, m.pos)) { if (!ranged.sidearm) dice = 1; }   // can't use the bow point-blank; a slingshot hero just punches
       else dice = ranged.dice + h.energy;
     }
-    if (h.equip.main?.bonusVs1hp && m.hp === 1 && !(ranged && !adjacent(h.pos, m.pos))) dice += h.equip.main.bonusVs1hp;
-    this.lastShotRanged = !!ranged && !adjacent(h.pos, m.pos);
+    if (h.equip.main?.bonusVs1hp && m.hp === 1 && !(ranged && !this.melee(h.pos, m.pos))) dice += h.equip.main.bonusVs1hp;
+    this.lastShotRanged = !!ranged && !this.melee(h.pos, m.pos);
     // Energy Drink: spend it when it might matter.
     if (!h.energy && this.rng.next() < this.cfg.competence * 0.5) {
       const e = h.pack.find(i => i.use === "energy");
@@ -1736,7 +1751,7 @@ export class Game {
     if (w.kind === "chest") {
       // No key, no chest: there is no lock-picking in the printed rules. A friend standing next to you can
       // hand theirs over for free (rule 1.5), which is what a table does rather than swapping turns around.
-      const holder = this.chestKey(h) ? h : this.standing().find(o => o !== h && adjacent(o.pos, h.pos) && this.chestKey(o));
+      const holder = this.chestKey(h) ? h : this.standing().find(o => o !== h && this.melee(o.pos, h.pos) && this.chestKey(o));
       if (!holder) return false;
       used();
       if (holder !== h) this.cfg.record && this.say(`  ${holder.name} hands over the ${this.chestKey(holder)!.name}`);
@@ -1792,7 +1807,7 @@ export class Game {
         const lunch = this.cfg.bossSnack ? this.corpses.find(c => this.board.roomIdAt(c.pos) === m.room) : undefined;
         if (lunch) { this.removeCorpse(lunch, "snack"); m.hp = Math.min(m.def.hp, m.hp + this.cfg.snackHeal); this.f2.bossSnacks++; this.log(`  boss heals to ${m.hp}`); if (!this.cfg.snackFree) continue; }
         // Mop: 2 dice at every adjacent hero when two or more are in reach.
-        const adj = targets.filter(h => adjacent(m.pos, h.pos));
+        const adj = targets.filter(h => this.melee(m.pos, h.pos));
         if (m.cd === 0 && adj.length >= 2) { m.cd = 2; this.cfg.record && this.say(`${m.def.name}: Mop`); for (const h of adj) this.monsterAttack(m, h, 2); continue; }
       }
       if (m.def.boss && m.cd === 0 && this.cfg.floor === 1) {
@@ -1806,7 +1821,7 @@ export class Game {
         }
       }
 
-      const near = targets.filter(h => adjacent(m.pos, h.pos));
+      const near = targets.filter(h => this.melee(m.pos, h.pos));
       if (near.length) { this.monsterAttack(m, this.chooseVictim(m, near)); continue; }
 
       const p = this.monsterPolicy(m);
@@ -1833,7 +1848,7 @@ export class Game {
         }
         this.cfg.record && this.trail(this.monKey(m), false, path.slice(0, i));
         if (this.monsterStepTraps(m)) continue;
-        if (adjacent(m.pos, victim.pos)) this.monsterAttack(m, victim);
+        if (this.melee(m.pos, victim.pos)) this.monsterAttack(m, victim);
       } else {
         // shuffle toward the nearest hero anyway
         let bh: Hero | null = null, bdd = Infinity;
@@ -1850,7 +1865,7 @@ export class Game {
             const path = pathTo(this.board, f, spot);
             m.pos = { ...path[Math.min(path.length - 1, mv)] };
             this.cfg.record && this.trail(this.monKey(m), false, path.slice(0, Math.min(path.length - 1, mv) + 1));
-            if (adjacent(m.pos, bh.pos)) this.monsterAttack(m, bh);
+            if (this.melee(m.pos, bh.pos)) this.monsterAttack(m, bh);
           }
         }
       }

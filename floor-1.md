@@ -90,17 +90,17 @@ On the real Side A map with the forced route, final furniture, placed monsters, 
 
 | Measure | Result |
 |---|---|
-| Party wins (Greg dead, everyone alive down the stairs) | 83% |
+| Party wins (Greg dead, everyone alive down the stairs) | 82% |
 | Escaped down the stairs with Greg alive | 9% |
-| Floor came down on somebody | 7.5% |
-| Games where the clock never mattered | 24% |
-| Games where someone dies | 30% |
+| Floor came down on somebody | 9% |
+| Games where the clock never mattered | 23% |
+| Games where someone dies | 32% |
 | Full wipe | under 1% |
 | Round the Office door opens, on average | 11 |
 | Rounds to finish, median | 16 |
 | The floor cap, not the Office fuse, set the deadline | 10% |
 
-Eighty percent is the chosen target: nearly every game is decided in the last two rounds, a death is common enough to fear, and a wipe is a story. The dial that moves this most is the fuse length: with a hard collapse, 10 rounds instead of 9 is worth about seven points of win rate, and 5 rounds (the old ramp number) is unplayable at 7%. After that comes how many squares Greg can be attacked from (he stands against the back wall with two, and one row forward would be worth about five). The hard collapse also made the party quicker and less bloody than the ramp did: the Office opens on round 11 instead of 14.5 and someone dies in 30% of games instead of 37%, because nobody takes ramp damage on the way out any more. Re-run whenever the route or the furniture changes; geometry moves these numbers more than anything else.
+Eighty percent is the chosen target: nearly every game is decided in the last two rounds, a death is common enough to fear, and a wipe is a story. The dial that moves this most is the fuse length: with a hard collapse, 10 rounds instead of 9 is worth about seven points of win rate, and 5 rounds (the old ramp number) is unplayable at 7%. After that comes how many squares Greg can be attacked from (he stands against the back wall with two, and one row forward would be worth about five). The hard collapse also made the party quicker than the ramp did: the Office opens on round 11 instead of 14.5. Nobody can reach through a wall any more either (melee needs an open edge between the two squares, not just a step on the grid), which cost the party about two points of win rate, because heroes had been using that more than the monsters were. Re-run whenever the route or the furniture changes; geometry moves these numbers more than anything else.
 
 ---
 

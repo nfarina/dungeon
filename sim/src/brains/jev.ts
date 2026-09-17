@@ -9,7 +9,7 @@
 import { TypeSafeClient, type ChoiceQuestion, type JsonValue, type Questions } from "@typesafe-ai/sdk";
 import { createHash } from "node:crypto";
 import { mkdir } from "node:fs/promises";
-import { adjacent, dist1, same, type Pt } from "../board";
+import { dist1, same, type Pt } from "../board";
 import type { Game, Hero, HeroBrain, HeroDecision, Monster } from "../engine";
 import { los } from "../pathing";
 import { FLOOR2_ITEMS, clone } from "../content/items";
@@ -23,7 +23,7 @@ export const PLAYERS: Record<string, string> = {
 
 const RULES = {
   1: "A cooperative dungeon-crawl board game played by a family: Mom and her two 11-year-old sons, with Dad as the DM. On a turn a hero rolls 2d6 and moves up to that many squares, then takes one action: attack, cast a spell, read a scroll, use a piece of furniture, pick up a friend, and so on. Attack dice roll skulls about half the time; the defender blocks skulls with shields. At 0 Health a hero is Downed: a friend standing next to them can spend their action to pick them up at 1 Health, otherwise they die at the end of the next round, and that player sits out the rest of the floor as a Viewer. Drinking a healing item is free. The goal: kill the Floor Manager in the Manager's Office, then everyone takes the stairs there before the floor collapses. Leaving without killing him is allowed but forfeits his reward.",
-  2: "A cooperative dungeon-crawl board game played by a family: Mom and her two 11-year-old sons, with Dad as the DM. On a turn a hero rolls 2d6 and moves up to that many squares, then takes one action: attack, cast a spell, read a scroll, use a piece of furniture, pick up a friend, clean a corpse, and so on. Attack dice roll skulls about half the time; the defender blocks skulls with shields. At 0 Health a hero is Downed: a friend standing next to them can spend their action to pick them up at 1 Health, otherwise they die at the end of the next round, and that player sits out the rest of the floor as a Viewer. Drinking a healing item is free. This floor: dead monsters leave corpses. Grubs come out of the stairwell, walk to corpses and eat them, and turn into fed janitors that hunt the party, tougher the bigger the corpse. Spark or the goose eating it removes a small corpse; medium and large corpses need Industrial Bleach, which is scarce. A grub that gets squashed goes back to the stairwell and comes out again. The boss room (the Sump, with the stairs down) only opens for the Password of the Day, which is somewhere on the floor; once the whole party is inside, the door shuts behind them and the janitors outside cannot follow. The goal: find the password, kill the Senior Custodian in the Sump, and get everyone down the stairs before the floor collapses.",
+  2: "A cooperative dungeon-crawl board game played by a family: Mom and her two 11-year-old sons, with Dad as the DM. On a turn a hero rolls 2d6 and moves up to that many squares, then takes one action: attack, cast a spell, read a scroll, use a piece of furniture, pick up a friend, clean a corpse, and so on. Attack dice roll skulls about half the time; the defender blocks skulls with shields. At 0 Health a hero is Downed: a friend standing next to them can spend their action to pick them up at 1 Health, otherwise they die at the end of the next round, and that player sits out the rest of the floor as a Viewer. Drinking a healing item is free. This floor: dead monsters leave corpses. Grubs come out of the stairwell, walk to the largest corpse they can reach and eat it, and turn into fed janitors that hunt the party, tougher the bigger the corpse. Spark or the goose eating it removes a small corpse; medium and large corpses need Industrial Bleach, which is scarce. A grub that gets squashed goes back to the stairwell and comes out again. The boss room (the Sump, with the stairs down) only opens for the Password of the Day, which is somewhere on the floor; once the whole party is inside, the door shuts behind them and the janitors outside cannot follow. The goal: find the password, kill the Senior Custodian in the Sump, and get everyone down the stairs before the floor collapses.",
 } as const;
 
 type Option = { key: string; label: string; detail: Record<string, JsonValue>; run: () => void };
@@ -143,7 +143,7 @@ const hpText = (x: { hp: number; maxHp?: number; def?: { hp: number } }) => `${M
 /** What the table can see, from the acting hero's point of view. Unexplored rooms stay unknown. */
 function describe(g: Game, h: Hero, roll: number, players: Record<string, string> | null): Record<string, JsonValue> {
   const f = g.walkField(h);
-  const d = (p: Pt) => { const v = g.adjacentDist(f, p); return adjacent(h.pos, p) ? 0 : v >= INF ? null : v; };
+  const d = (p: Pt) => { const v = g.adjacentDist(f, p); return g.melee(h.pos, p) ? 0 : v >= INF ? null : v; };
   const roomOf = (p: Pt) => { const id = g.board.roomIdAt(p); return id === null ? "a corridor" : g.board.rooms.get(id)!.name; };
   const canCast = !g.cfg.castNeedsMind || g.mind(h) >= 4;
   const dl = g.hardDeadline(), begins = g.collapseBegins();
@@ -209,7 +209,7 @@ function listOptions(g: Game, h: Hero, roll: number, fleeing: boolean): Option[]
   const opts: Option[] = [];
   const add = (key: string, label: string, detail: Record<string, JsonValue>, run: () => void) => opts.push({ key, label, detail, run });
   const at = (p: Pt) => f.dist[g.board.idx(p.x, p.y)];
-  const near = (p: Pt) => adjacent(h.pos, p) ? 0 : g.adjacentDist(f, p);
+  const near = (p: Pt) => g.melee(h.pos, p) ? 0 : g.adjacentDist(f, p);
   const reach = (n: number) => ({ squares_away: n >= INF ? "no route" : n, reachable_this_turn: n <= roll });
   const say = (msg: string) => g.cfg.record && g.say(msg);
   const canCast = !g.cfg.castNeedsMind || g.mind(h) >= 4;
@@ -217,13 +217,13 @@ function listOptions(g: Game, h: Hero, roll: number, fleeing: boolean): Option[]
   const mkey = (m: Monster) => `m${g.monsters.indexOf(m)}`;
   /** Walk to a square beside `p` (or as close as the roll allows). */
   const approach = (p: Pt) => {
-    if (adjacent(h.pos, p)) return;
+    if (g.melee(h.pos, p)) return;
     const dest = g.bestAdjacentSpot(f, p, roll) ?? g.stepToward(h, f, p, roll);
     if (dest && !same(dest, h.pos)) g.walk(h, f, dest);
   };
   /** After walking somewhere: the obvious thing on arrival. */
   const arrive = () => {
-    const foe = g.monsters.find(m => m.alive && m.active && m.def.janitor !== "grub" && adjacent(m.pos, h.pos));
+    const foe = g.monsters.find(m => m.alive && m.active && m.def.janitor !== "grub" && g.melee(m.pos, h.pos));
     if (foe) { g.heroAttack(h, foe); return; }
     const urgent = g.urgent; g.urgent = false;
     g.tryInteract(h);
@@ -235,7 +235,7 @@ function listOptions(g: Game, h: Hero, roll: number, fleeing: boolean): Option[]
   for (const o of g.heroes.filter(o => o.downed && !o.dead && !o.exited)) {
     add(`pickup_${o.name}`, `Go pick up ${o.name}, who is Downed`, { ...reach(near(o.pos)), urgent: `${o.name} dies at the end of round ${o.downedRound + 1} unless someone next to them picks them up` }, () => {
       approach(o.pos);
-      if (adjacent(h.pos, o.pos)) g.revive(h, o); else say(`${h.name} can't reach ${o.name} this turn`);
+      if (g.melee(h.pos, o.pos)) g.revive(h, o); else say(`${h.name} can't reach ${o.name} this turn`);
     });
   }
 
@@ -246,9 +246,9 @@ function listOptions(g: Game, h: Hero, roll: number, fleeing: boolean): Option[]
     const tag = m.def.boss ? " (the boss)" : m.def.janitor === "fed" ? " (a fed janitor)" : "";
     add(`attack_${mkey(m)}`, `Attack ${the(m.def.name)}${tag}`, { ...reach(n), monster_health: hpText(m), monster_defend_dice: m.def.def }, () => {
       const inSight = () => los(g.board, h.pos, m.pos, g.openDoors);
-      if (g.hasRanged(h) && !adjacent(h.pos, m.pos) && inSight()) { g.heroAttack(h, m); return; }
+      if (g.hasRanged(h) && !g.melee(h.pos, m.pos) && inSight()) { g.heroAttack(h, m); return; }
       approach(m.pos);
-      if (adjacent(h.pos, m.pos) || ((g.hasRanged(h) || g.hasSidearm(h)) && inSight())) g.heroAttack(h, m);
+      if (g.melee(h.pos, m.pos) || ((g.hasRanged(h) || g.hasSidearm(h)) && inSight())) g.heroAttack(h, m);
       else say(`${h.name} can't reach ${the(m.def.name)} this turn`);
     });
   }
@@ -267,7 +267,7 @@ function listOptions(g: Game, h: Hero, roll: number, fleeing: boolean): Option[]
     const rs = scroll("restructuring");
     if (rs && g.mind(h) >= (rs.needMind ?? 5)) add(`restructuring_${mkey(m)}`, `Read Scroll: Restructuring at ${the(m.def.name)} (4 dice, 1 damage to everything next to it, used up)`, { monster_health: hpText(m) }, () => {
       h.pack = h.pack.filter(x => x !== rs); say(`${h.name} reads Restructuring at the ${m.def.name}`); g.resolveAttack(h, m, 4);
-      for (const x of g.monsters.filter(x => x.alive && x !== m && adjacent(x.pos, m.pos))) g.hurtMonster(x, 1, h);
+      for (const x of g.monsters.filter(x => x.alive && x !== m && g.melee(x.pos, m.pos))) g.hurtMonster(x, 1, h);
     });
     const sl = scroll("sleep");
     if (sl && !m.def.undead && m.asleep === 0) add(`sleep_${mkey(m)}`, `Read Scroll: Sleep on ${the(m.def.name)} (it skips two turns, used up)`, { monster_health: hpText(m) }, () => {
@@ -280,7 +280,7 @@ function listOptions(g: Game, h: Hero, roll: number, fleeing: boolean): Option[]
   if (lo && crowd.length) add("lights_out", `Read Scroll: Lights Out (every monster in this room skips its next turn, used up)`, { monsters_in_room: crowd.length }, () => {
     h.pack = h.pack.filter(x => x !== lo); for (const m of crowd) m.asleep = Math.max(m.asleep, 1); say(`${h.name} reads Lights Out`);
   });
-  const adjFoes = g.monsters.filter(m => m.alive && m.def.janitor !== "grub" && adjacent(m.pos, h.pos));
+  const adjFoes = g.monsters.filter(m => m.alive && m.def.janitor !== "grub" && g.melee(m.pos, h.pos));
   const st = book("static");
   if (st && adjFoes.length >= 2) add("static", `Cast Static: 1 damage to each of the ${adjFoes.length} monsters next to you`, {}, () => {
     st.cd = st.item.spell!.cooldown; say(`${h.name} casts Static`); for (const m of adjFoes) g.hurtMonster(m, 1, h);
@@ -298,13 +298,13 @@ function listOptions(g: Game, h: Hero, roll: number, fleeing: boolean): Option[]
     if (n > roll) continue;
     if (pu) add(`patchup_${o.name}`, `Go to ${o.name} and cast Patch Up on them (+2 Health)`, { ...reach(n), their_health: hpText(o) }, () => {
       approach(o.pos);
-      if (!adjacent(h.pos, o.pos)) { say(`${h.name} can't reach ${o.name}`); return; }
+      if (!g.melee(h.pos, o.pos)) { say(`${h.name} can't reach ${o.name}`); return; }
       pu.cd = pu.item.spell!.cooldown; o.hp = Math.min(o.maxHp, o.hp + 2); say(`${h.name} casts Patch Up on ${o.name} (${o.hp}/${o.maxHp})`);
     });
     const potion = potions[0];
     if (potion && o.hp <= 3) add(`give_${o.name}`, `Go to ${o.name} and hand them your ${potion.name} to drink (+${HEALS[potion.use!]} Health)`, { ...reach(n), their_health: hpText(o) }, () => {
       approach(o.pos);
-      if (!adjacent(h.pos, o.pos)) { say(`${h.name} can't reach ${o.name}`); return; }
+      if (!g.melee(h.pos, o.pos)) { say(`${h.name} can't reach ${o.name}`); return; }
       h.pack = h.pack.filter(x => x !== potion); o.hp = Math.min(o.maxHp, o.hp + HEALS[potion.use!]);
       say(`${h.name} hands ${o.name} the ${potion.name} (${o.hp}/${o.maxHp})`);
     });
@@ -327,7 +327,7 @@ function listOptions(g: Game, h: Hero, roll: number, fleeing: boolean): Option[]
       const walkTo = () => {
         const dest = at(c.pos) <= roll ? c.pos : g.bestAdjacentSpot(f, c.pos, roll) ?? g.stepToward(h, f, c.pos, roll);
         if (dest && !same(dest, h.pos)) g.walk(h, f, dest);
-        return adjacent(h.pos, c.pos) || same(h.pos, c.pos);
+        return g.melee(h.pos, c.pos) || same(h.pos, c.pos);
       };
       if (h.goose > 0 && (c.size === "small" || (h.biscuit && c.size === "medium")))
         add(`goose_${ck}`, `Walk to the ${c.size} corpse and let Sir Reginald eat it`, reach(n), () => {
@@ -353,7 +353,7 @@ function listOptions(g: Game, h: Hero, roll: number, fleeing: boolean): Option[]
         });
     }
     for (const m of g.monsters.filter(m => m.alive && m.def.janitor === "grub" && near(m.pos) <= roll).slice(0, 2))
-      add(`squash_${mkey(m)}`, g.cfg.grubsReturn ? "Squash the grub before it reaches a corpse (it goes back to the stairwell and comes out again)" : "Squash the grub before it reaches a corpse", reach(near(m.pos)), () => { approach(m.pos); if (adjacent(h.pos, m.pos)) g.heroAttack(h, m); });
+      add(`squash_${mkey(m)}`, g.cfg.grubsReturn ? "Squash the grub before it reaches a corpse (it goes back to the stairwell and comes out again)" : "Squash the grub before it reaches a corpse", reach(near(m.pos)), () => { approach(m.pos); if (g.melee(h.pos, m.pos)) g.heroAttack(h, m); });
   }
 
   // Rooms: somewhere new, somewhere unfinished, or the boss room.

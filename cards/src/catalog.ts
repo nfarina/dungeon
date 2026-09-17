@@ -570,7 +570,7 @@ const f2monsters: Card[] = ([
   { id: "grub", name: "Grub", deck: "monster", type: "monster", stats: { att: 0, def: 0, hp: 1, mind: 0, move: "4, no roll" },
     loot: ["Nothing. Ever."],
     special: [
-      "Ignores heroes. Moves 4 toward the nearest corpse and eats it on arrival.",
+      "Ignores heroes. Moves 4 toward the largest corpse it can reach (ties: nearest) and eats it on arrival.",
       "Then flip it: small corpse → Bloated Grub, medium → Custodian, large → Facilities Manager.",
       "Squashed: back to the stairwell queue. It will be back.",
       "Janitors leave no corpse.",

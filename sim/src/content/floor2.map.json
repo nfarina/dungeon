@@ -88,7 +88,7 @@
         "name": "Tool Crib",
         "required": false,
         "monsters": [
-      "bear"
+      "kobold"
     ]
       },
       {
@@ -107,7 +107,7 @@
         "name": "Records",
         "required": false,
         "monsters": [
-      "kobold",
+      "bear",
       "rat"
     ]
       },
@@ -222,10 +222,10 @@
       { "x": 18, "y": 2, "id": "rat" },
       { "x": 1, "y": 1, "id": "rat" },
       { "x": 2, "y": 4, "id": "rat" },
-      { "x": 10, "y": 5, "id": "bear" },
+      { "x": 10, "y": 5, "id": "kobold" },
       { "x": 12, "y": 8, "id": "kobold" },
       { "x": 13, "y": 10, "id": "kobold" },
-      { "x": 24, "y": 8, "id": "kobold" },
+      { "x": 24, "y": 8, "id": "bear" },
       { "x": 23, "y": 10, "id": "rat" },
       { "x": 10, "y": 11, "id": "bear" },
       { "x": 10, "y": 13, "id": "rat" },

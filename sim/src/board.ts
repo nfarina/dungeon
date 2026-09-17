@@ -116,6 +116,20 @@ export class Board {
     }
   }
 
+  /**
+   * Can a figure on `a` touch `b`: melee it, hand it a card, pick it up, pour bleach on it? Orthogonally next
+   * to each other is not enough on this board, because walls are edges: two squares either side of a room wall
+   * are one step apart on the grid and cannot reach each other at the table. A doorway counts only when open.
+   */
+  touching(a: Pt, b: Pt, openDoors: Uint8Array): boolean {
+    const k = this.dirOf(a, b);
+    if (k < 0) return false;                        // not orthogonally next to each other
+    const e = this.edge[(this.idx(a.x, a.y) * 4) + k];
+    if (e < 0) return false;                        // wall, or one of the squares is solid or furniture
+    if (e === 0) return true;                       // open floor inside one room or corridor
+    return !!openDoors[e - 1];                      // a doorway: only with the door open
+  }
+
   doorIndex(a: Pt, b: Pt): number {
     const k = this.dirOf(a, b);
     if (k < 0) return -1;
