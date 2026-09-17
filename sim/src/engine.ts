@@ -1746,7 +1746,7 @@ export class Game {
       this.award("Trap Chef", this.cfg.floor === 1 ? [{ name: "Fire Axe", slot: "main", twoHanded: true, atk: 2, unlocks: 99 }] : [clone(FLOOR2_ITEMS["Leaf Blower"])]);
       return;
     }
-    if (this.cfg.floor === 2 && this.lastShotRanged) this.award("Nice Shot", [clone(FLOOR2_ITEMS["Goblin Shortbow"])]);
+    if (this.cfg.floor === 2 && this.lastShotRanged) this.award("My Bad", [clone(FLOOR2_ITEMS["Goblin Shortbow"])]);
     if (m.def.password) { this.give(killer, clone(FLOOR2_ITEMS["Password of the Day"])); this.f2.passwordRound = this.round; this.log(`${killer.name} has the PASSWORD`); }
     const roll = this.rng.d6();
     let kind = m.def.loot(roll);

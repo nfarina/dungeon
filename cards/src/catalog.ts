@@ -528,7 +528,7 @@ const f2biggear: Card[] = ([
   { id: "chainmail-bib-f2", name: "Orc Chainmail Bib", deck: "biggear", type: "item", slot: "Body", placed: "the Evidence locker",
     rules: "Defend +2. Subtract 2 from your movement roll. Can't wear Sneakers with it.", flavor: "They don't fit under.",
     art: "a heavy chainmail bib apron with a leather neck strap, dented and stained" },
-  { id: "shortbow-f2", name: "Goblin Shortbow", deck: "biggear", type: "item", slot: "Both hands", envelope: "Nice Shot",
+  { id: "shortbow-f2", name: "Goblin Shortbow", deck: "biggear", type: "item", slot: "Both hands", envelope: "My Bad",
     rules: "Attack 2 dice at any monster in line of sight. Can't be used on an adjacent monster. Replaces your Attack instead of adding to it.",
     flavor: "Goblin-sized. Still works.",
     art: "a small crude wooden shortbow with a frayed string and three mismatched arrows" },
@@ -611,7 +611,7 @@ const f2standees: Card[] = ([
 ] as Card[]).map(f2);
 
 const f2envelopes: Card[] = ([
-  env("nice-shot", "Nice Shot", "Gold", "Kill a monster from range with a weapon. Spells don't count.", "Goblin Shortbow"),
+  env("nice-shot", "My Bad", "Gold", "Kill a monster from range with a weapon. Spells don't count.", "Goblin Shortbow"),
   env("good-boy", "Good Boy", "Companion", "Sir Reginald eats a corpse", "Pet Biscuit"),
   env("clean-freak", "Clean Freak", "Silver", "Obliterate three corpses", "4 gold, 1 Industrial Bleach", "Gold (2) \u00d72 and an Industrial Bleach, from the spares"),
   env("health-inspector", "Health Inspector", "Gold", "Kill a fed janitor", "5 gold", "one Gold (5), from the Floor 1 coins"),

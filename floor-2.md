@@ -138,7 +138,7 @@ The three upgrades seeded on the floor, and who they are obviously for without s
 
 | Find | For | Where |
 |---|---|---|
-| **Goblin Shortbow** | The one with the slingshot | Nice Shot achievement (section 7) |
+| **Goblin Shortbow** | The one with the slingshot | My Bad achievement (section 7) |
 | **Pet Biscuit** | The one with the goose | Good Boy achievement (section 7) |
 | **Scroll: Restructuring** (Mind 5) and later the **Wizard's Bathrobe** (Body, Mind +1) | The one with the glasses | Furniture, section 3. Scroll early, robe late, so the scroll sits unreadable for a while. |
 | **Orc Chainmail Bib** | Whoever wants to be slow and safe | The Lockup's Evidence locker, behind a key |
@@ -288,7 +288,7 @@ Every Floor 1 Big Gear card is in someone's hands or was sold, so this deck is n
 | **Wizard's Bathrobe** | Body | Mind +1. On the Laundry shelf. |
 | **Scroll: Restructuring** | | Mind 5 to read. 4 attack dice at a monster in line of sight, and 1 damage to every monster adjacent to it. On the Shift Lead's desk. |
 | **Orc Chainmail Bib** | Body | Defend +2, Move -2, no Sneakers. In the Lockup's Evidence locker. |
-| **Goblin Shortbow** | Both hands | 2 dice at range, can't shoot adjacent, replaces your Attack. In the Nice Shot envelope. |
+| **Goblin Shortbow** | Both hands | 2 dice at range, can't shoot adjacent, replaces your Attack. In the My Bad envelope. |
 | **Leaf Blower** | Both hands | Action: Shove. Push a monster or a corpse in line of sight up to 3 squares away. Into a pit, it goes in. A monster into a wall or another monster takes 1. In the Trap Chef envelope. Shove for people who can't read. |
 
 **Carried, not drawn:** the Password of the Day (Junk, one card, waiting at whichever of the three places they reach first) and the Pet Biscuit (Companion upgrade, in the Good Boy envelope). The biscuit lets Sir Reginald go apart from his person, so he gets a standee.
@@ -303,7 +303,7 @@ Seven envelopes. Every trigger is something the announcer will see happen, so no
 
 | Box | Tier | Trigger | Contents |
 |---|---|---|---|
-| **Nice Shot** | Gold | Kill a monster from range with a weapon. Spells don't count. | Goblin Shortbow |
+| **My Bad** | Gold | Awarded to Vicki at start of Floor 2 because the DM forgot to give her a Big Gear draw when she killed the Floor 1 boss | Goblin Shortbow |
 | **Good Boy** | Companion | Sir Reginald eats a corpse | Pet Biscuit |
 | **Clean Freak** | Silver | Obliterate three corpses | 4 gold, 1 Industrial Bleach |
 | **Health Inspector** | Gold | Kill a fed janitor | 5 gold |
