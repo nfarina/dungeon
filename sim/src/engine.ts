@@ -42,6 +42,13 @@ export type Config = {
   reviveHp: number;
   heroHp: number;
   heroAtk: number;
+  /** HeroQuest First Light's out-of-combat stride: with nothing revealed on the board, you may walk 8 instead of
+   *  your roll. You still roll, and a better roll stands, so the stride is a floor under 2d6, not a replacement for it
+   *  (average 8.6 rather than 7). Gear move modifiers apply to both. Grubs never count; fed janitors always do. */
+  strideWhenClear: boolean;
+  strideMove: number;
+  /** Floor 2 ruling: do grubs stop the stride? Written rule says no, they are scenery with a timer. */
+  strideGrubsCount: boolean;
   heroDef: number;
   bossHp: number;
   /** Richer monster loot tables: Orcs/Zombies drop Gear on 5-6 instead of just 6. */
@@ -127,6 +134,7 @@ export const DEFAULT_CONFIG: Config = {
   reviveHp: 1,
   heroHp: 6,
   heroAtk: 2,
+  strideWhenClear: true, strideMove: 8, strideGrubsCount: false,
   heroDef: 2,
   bossHp: 4,
   lootRich: false,
@@ -809,7 +817,7 @@ export class Game {
     if (this.cfg.floor === 1 && !this.monsters.some(m => m.alive && m.room === 4) && this.board.rooms.get(4)!.monsters.length)
       this.award("You Monster", [{ name: "Gold (2)", slot: "pack", gold: 2 }]);
     if (this.cfg.floor === 2 && this.f2.corpsesCleaned >= 3)
-      this.award("Clean Freak", [{ name: "Gold (4)", slot: "pack", gold: 4 }, clone(FLOOR2_ITEMS["Industrial Bleach"])]);
+      this.award("Clean Freak", [{ name: "Gold (2)", slot: "pack", gold: 2 }, { name: "Gold (2)", slot: "pack", gold: 2 }, clone(FLOOR2_ITEMS["Industrial Bleach"])]);
     // Cartographer: six of the nine rooms entered (section 7). Secret doors don't count; Storage is a hidden vault.
     {
       // Count rooms entered, not doors: a room with two doors is still one room.
@@ -1186,7 +1194,12 @@ export class Game {
     }
   }
 
-  moveBudget(h: Hero) { return this.lastRoll = this.moveDice(h); }
+  moveBudget(h: Hero) {
+    const roll = this.moveDice(h);
+    if (this.cfg.strideWhenClear && !this.monsters.some(m => m.alive && m.active && (this.cfg.strideGrubsCount || m.def.janitor !== "grub")))
+      return this.lastRoll = Math.max(roll, 1, this.cfg.strideMove + this.sum(h, "move"));
+    return this.lastRoll = roll;
+  }
   lastRoll = 0;
 
   walkField(h: Hero): Field {
@@ -1747,7 +1760,7 @@ export class Game {
     }
     if (m.def.boss) {
       const b = this.draw("big"); if (b) this.give(killer, b);
-      if (this.cfg.floor === 2) this.award("Boss Box", [{ name: "Gold (8)", slot: "pack", gold: 8 }]);
+      if (this.cfg.floor === 2) this.award("Boss Box", [{ name: "Gold (5)", slot: "pack", gold: 5 }, { name: "Gold (3)", slot: "pack", gold: 3 }]);
     }
   }
 
@@ -1768,6 +1781,9 @@ export class Game {
     const handout = () => {
       if (!fixed) return false;
       const it = namedItem(fixed);
+      // Only one password card is printed. The other two notes are still on the wall, but a party that already knows
+      // the word gets a Pockets draw instead (floor-2.md 1.5).
+      if (it.password && this.partyHasPassword()) { const p = this.draw("pockets"); if (p) this.give(h, p); return true; }
       if (it.use === "bleach") this.f2.bleachFound++;
       if (it.password && this.f2.passwordRound === null) { this.f2.passwordRound = this.round; this.log(`${h.name} finds the PASSWORD in the ${r.name}`); }
       this.give(h, it); return true;

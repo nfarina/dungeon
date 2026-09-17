@@ -8,7 +8,7 @@ A HeroQuest-shaped dungeon crawl for three regular people and one AI announcer. 
 
 ## 1. What changes from HeroQuest
 
-Keep everything from HeroQuest that isn't listed here (movement 2d6, combat dice, line of sight, doors, furniture blocking, monsters act after all heroes).
+Keep everything from HeroQuest that isn't listed here (movement 2d6, combat dice, line of sight, doors, furniture blocking, monsters act after all heroes), **the stride included: with no monster revealed anywhere on the board, you may walk 8 instead of your roll.** You still roll, and a good roll stands, so the stride is a floor under 2d6 rather than a replacement for it. Gear that changes your Move applies either way. It exists so the quiet stretches don't turn into a dice-rolling exercise, and on this floor it covers about two move turns in three.
 
 | HeroQuest | Floor 1 |
 |---|---|
@@ -90,15 +90,17 @@ On the real Side A map with the forced route, final furniture, placed monsters, 
 
 | Measure | Result |
 |---|---|
-| Party wins (Greg dead, everyone alive down the stairs) | 82% |
-| Escaped down the stairs with Greg alive | 9% |
-| Floor came down on somebody | 9% |
-| Games where the clock never mattered | 23% |
-| Games where someone dies | 32% |
+| Party wins (Greg dead, everyone alive down the stairs) | 86% |
+| Games where someone dies | 29% |
+| Escaped down the stairs with Greg alive | 7% |
+| Floor came down on somebody | 7% |
+| Games where the clock never mattered | 27% |
 | Full wipe | under 1% |
 | Round the Office door opens, on average | 11 |
 | Rounds to finish, median | 16 |
-| The floor cap, not the Office fuse, set the deadline | 10% |
+| The floor cap, not the Office fuse, set the deadline | 6% |
+
+These are re-measured with the stride (section 1): the simulator rolled 2d6 every turn until after this floor was played, which cost the modelled party about three and a half points of win rate and made it look slower than it was. The floor still finished on the last round at the table, so treat 86% as the model catching up to what happened, not as a floor that was ever easy.
 
 Eighty percent is the chosen target: nearly every game is decided in the last two rounds, a death is common enough to fear, and a wipe is a story. The dial that moves this most is the fuse length: with a hard collapse, 10 rounds instead of 9 is worth about seven points of win rate, and 5 rounds (the old ramp number) is unplayable at 7%. After that comes how many squares Greg can be attacked from (he stands against the back wall with two, and one row forward would be worth about five). The hard collapse also made the party quicker than the ramp did: the Office opens on round 11 instead of 14.5. Nobody can reach through a wall any more either (melee needs an open edge between the two squares, not just a step on the grid), which cost the party about two points of win rate, because heroes had been using that more than the monsters were. Re-run whenever the route or the furniture changes; geometry moves these numbers more than anything else.
 

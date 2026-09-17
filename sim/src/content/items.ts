@@ -135,16 +135,23 @@ export const FLOOR2_BIG_GEAR: Item[] = [
   { name: "Steel Lunchbox", slot: "pack", use: "heal3" },
 ];
 /** Reprinted Floor 1 Pockets cards that go back into the Floor 2 deck (floor-2.md 6.1). */
+/** What goes back into the Floor 2 Pockets deck on top of the Floor 1 cards nobody is holding.
+ *  The shop returned every gold card the party spent, so nothing here is a reprint but the Bandage (Vicki holds the
+ *  Floor 1 one). Gold is partial, which is why "Gold (1)" is in HELD and one comes back here: of the eleven Floor 1
+ *  coins, the party kept one Gold (1), and the Floor 2 envelopes take Gold (2) x2 (Clean Freak), Gold (5) (Health
+ *  Inspector), Gold (3) (Why Would You Drink That) and Gold (5) + Gold (3) (Boss Box). That leaves Gold (1) x1,
+ *  Gold (2) x2 and Gold (3) x1 to shuffle. */
 export const FLOOR2_POCKETS_RESTOCK: Item[] = [
-  { name: "Gold (2)", slot: "pack", gold: 2, inert: true }, { name: "Gold (2)", slot: "pack", gold: 2, inert: true },
-  { name: "Bandage", slot: "pack", use: "heal1" }, { name: "Energy Drink", slot: "pack", use: "energy" },
+  { name: "Gold (1)", slot: "pack", gold: 1, inert: true }, { name: "Gold (2)", slot: "pack", gold: 2, inert: true },
+  { name: "Bandage", slot: "pack", use: "heal1" },
 ];
 
 const RETIRED = new Set(["Broken Table Leg", "Trash Can Lid", "Frying Pan", "Orc Monocle", "Torch", "Goblin Shortbow"]);
 /** In someone's hands or bought at the shop, so not in a deck. */
 const HELD = new Set(["Kitchen Knife", "Goblin Ear Necklace", "Scroll: Stone Skin", "Spellbook: Shove", "Spellbook: Patch Up",
   "Fire Axe", "Orc Chainmail Bib", "Football Helmet", "Skeleton Key", "Spellbook: Spark", "Sponsored Cape",
-  "Bandage", "Whistle of Doubtful Value", "Scroll: Sleep"]);
+  "Bandage", "Whistle of Doubtful Value", "Scroll: Sleep",
+  "Gold (1)"]);   // partial: the party kept one of the two, the other comes back in FLOOR2_POCKETS_RESTOCK
 
 export const FLOOR2_DECKS = {
   pockets: [...POCKETS.filter(i => !HELD.has(i.name)), ...FLOOR2_POCKETS_RESTOCK],

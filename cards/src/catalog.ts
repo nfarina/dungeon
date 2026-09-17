@@ -469,15 +469,12 @@ const f2pockets: Card[] = ([
     rules: "Opens one locked chest. Then it crumbles. On this floor the Fire Axe opens nothing locked.",
     flavor: "Hanging on the tool rack where a key should never hang.",
     art: "an ornate iron key with a tiny skull for a bow, bits crumbling off it, hanging from a nail on a pegboard" },
-  // Reprints that go back into the Floor 2 Pockets deck (same art as the Floor 1 cards).
-  { id: "gold-2-f2", name: "Gold (2)", deck: "pockets", type: "consumable", qty: 2, rules: "2 gold. Spend at the Stairwell Shop.", flavor: "Slightly sticky.",
-    art: "a small handful of gold coins spilling out of a torn pocket" },
+  // The only Floor 1 Pockets card that has to be reprinted: Vicki still holds the original. Gold is NOT reprinted —
+  // the shop took all 21 spent gold back into the box, so the Floor 1 coins cover both the Floor 2 deck and its envelopes.
+  // Both spare Energy Drinks are free too (three printed, Ethan holds one).
   { id: "bandage-f2", name: "Bandage", deck: "pockets", type: "consumable",
     rules: "Heal 1, or get an adjacent Downed player up without spending your action. One use.", flavor: "Mostly clean.",
     art: "a roll of white gauze bandage, partly unrolled, with a small red cross on the wrapper" },
-  { id: "energy-drink-f2", name: "Energy Drink", deck: "pockets", type: "consumable",
-    rules: "+1 attack die on your next attack this turn. One use.", flavor: "DO NOT GIVE TO CHILDREN.",
-    art: "a tall neon green energy drink can with a lightning bolt logo, condensation dripping, faintly glowing" },
 ] as Card[]).map(f2);
 
 const f2gear: Card[] = ([
@@ -542,7 +539,7 @@ const f2biggear: Card[] = ([
 ] as Card[]).map(f2);
 
 const f2extras: Card[] = ([
-  { id: "password", name: "Password of the Day", deck: "junk", type: "text", qty: 3, placed: "the Shift Lead, the Feed trough and the ash shelf",
+  { id: "password", name: "Password of the Day", deck: "junk", type: "text", placed: "whichever of the Shift Lead, the Feed trough or the Ash shelf they reach first",
     rules: "Today's password is whatever the announcer says it is. Read it aloud at the Sump door. Do not write it down.",
     flavor: "Signed, the Shift Lead. Underlined twice.",
     art: "a yellow sticky note with a scribbled word crossed out and rewritten, stuck to a clipboard" },
@@ -616,11 +613,11 @@ const f2standees: Card[] = ([
 const f2envelopes: Card[] = ([
   env("nice-shot", "Nice Shot", "Gold", "Kill a monster from range with a weapon. Spells don't count.", "Goblin Shortbow"),
   env("good-boy", "Good Boy", "Companion", "Sir Reginald eats a corpse", "Pet Biscuit"),
-  env("clean-freak", "Clean Freak", "Silver", "Obliterate three corpses", "4 gold, 1 Industrial Bleach", "Industrial Bleach, from the spares"),
-  env("health-inspector", "Health Inspector", "Gold", "Kill a fed janitor", "5 gold"),
-  env("drink", "Why Would You Drink That", "Bronze", "Drink the bleach", "3 gold, 1 Juice Box", "Juice Box, from Pockets"),
+  env("clean-freak", "Clean Freak", "Silver", "Obliterate three corpses", "4 gold, 1 Industrial Bleach", "Gold (2) \u00d72 and an Industrial Bleach, from the spares"),
+  env("health-inspector", "Health Inspector", "Gold", "Kill a fed janitor", "5 gold", "one Gold (5), from the Floor 1 coins"),
+  env("drink", "Why Would You Drink That", "Bronze", "Drink the bleach", "3 gold, 1 Juice Box", "one Gold (3) and a Juice Box, from Pockets"),
   env("trap-chef-f2", "Trap Chef", "Gold", "A monster dies from a trap", "Leaf Blower"),
-  env("boss-f2", "Boss Box", "Platinum", "Kill the Senior Custodian", "8 gold, Class Selection Available"),
+  env("boss-f2", "Boss Box", "Platinum", "Kill the Senior Custodian", "8 gold, Class Selection Available", "Gold (5) + Gold (3), from the Floor 1 coins"),
 ] as Card[]).map(f2);
 
 const f2tile = (id: string, name: string, w: number, h: number, kind: "furniture" | "trap", art: string, mapKey: string, qty = 1): Card =>

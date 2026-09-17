@@ -1139,7 +1139,12 @@ function drawDmCell(pane, x, y) {
     section(`${FF.g} ${f.label || FF.n}${(f.w || 1) > 1 || (f.h || 1) > 1 ? ` · ${f.w || 1}×${f.h || 1}` : ""}`, dmFeatureText(f.kind));
     // What the DM hands over when it is used: the fixed contents from the sim, so nothing has to be remembered.
     const held = r && holds[r.name];
-    if (held) pane.append(el("p", { class:"disp", style:`font-size:16px;margin-top:4px;color:${/Password/i.test(held) ? "var(--amber)" : "var(--ink)"}` }, "Hand over: " + held));
+    if (held) {
+      const pw = /Password/i.test(held);
+      pane.append(el("p", { class:"disp", style:`font-size:16px;margin-top:4px;color:${pw ? "var(--amber)" : "var(--ink)"}` }, "Hand over: " + held));
+      // Only one password card is printed: the other notes are scenery once the party knows the word.
+      if (pw) pane.append(el("p", { class:"hint", style:"margin-top:2px" }, "One card only. If they already have the password, hand over a Pockets draw instead."));
+    }
   }
   for (const dir of ["N", "E", "S", "W"]) {
     const di = findDoor(x, y, dir);

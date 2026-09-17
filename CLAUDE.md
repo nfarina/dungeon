@@ -55,8 +55,8 @@ being tuned between plays.
   not as an error. Answers cache in `sim/.cache/jev/`; `bun run src/replay.ts <seed> <floor> jev`
   replays a cached game instantly. `heroTurn` = `beginHeroTurn` (shared) + the fixed policy.
 - Floor 1's regression check after any engine change: `bun run src/run.ts report 3000` should
-  still say about 82% win, 32% someone dies. Floor 2 (`bun run src/floor2.ts report 3000`): 84% win,
-  33% someone dies.
+  still say about 86% win, 29% someone dies. Floor 2 (`bun run src/floor2.ts report 3000`): 84.5% win,
+  29% someone dies.
 - Melee, revives, handing cards over and cleaning corpses go through `Game.melee` (`Board.touching`):
   walls are edges, so `dist1 === 1` alone would let figures hit through a wall. Grid adjacency is only
   right for furniture squares, which are blocked.

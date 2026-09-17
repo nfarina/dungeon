@@ -22,6 +22,7 @@ Everything in `floor-1.md` still applies unless this table says otherwise: stats
 | Boss door is locked | Boss door wants a **password**, carried by a named monster. No key, no axe. See 1.5. The door also shuts behind the party once everyone is inside. |
 | Fire Axe opens locked chests | **Skeleton Key only.** The axe opens nothing locked on this floor. Both chests (the Filing cabinet and the Evidence locker) need a key: the party carries one and a second hangs on the Tool Crib's tool rack. |
 | HeroQuest monsters | Three custom monsters, small, medium, large, each with a fed janitor form. Section 4. |
+| The stride: with no monster revealed on the board, walk 8 instead of your roll | Same rule, and **grubs do not count as monsters for it.** They ignore you, so they do not stop you striding. A fed janitor does, and so does anything else awake and revealed. Without this ruling the stride would cover a tenth of your move turns instead of half, and the floor would crawl. |
 | Sir Reginald dies at 0 Health | Reginald is **Downed** at 0, same rules as a hero: revived by an adjacent action or a Juice Box, dead if still down at the end of the next round. |
 | Furniture gives a deck draw by type (rack: Gear, table: Pockets, shelf: Gear or Big Gear) | **Every piece holds one named card**, no deck draw. Searching it is an action; the announcer hands over the card the DM view (or the room table in section 3) lists for that room, and the tile flips. Chests still need a Skeleton Key, spent. Industrial Bleach is only found this way. |
 
@@ -80,7 +81,9 @@ Grubs arrive on the clock, not on the corpses. Keep the queue on a spindown die 
 
 The boss room door has no lock. It has a speaker. It opens for the **Password of the Day**. The Skeleton Key does nothing, the Fire Axe does nothing, knocking gets you a recorded message about business hours.
 
-Three copies of the password are on the floor, in three corners, so the hunt is fair whichever way the party wanders and nobody has to double back across the whole board: the **Shift Lead**, a named medium monster in the Shift Office, carries one as a guaranteed drop and leaves a medium corpse, the one corpse the party most wants to clean and can least afford the time for. The other two are sticky notes, posted against policy, on the Kennels' Feed trough and the Incinerator's ash shelf, found by using the furniture. Neither is behind a lock: with the password copies in the chests, a party that had spent its keys elsewhere had to go the long way round and the floor came down on somebody in one game in five. One copy is enough. The announcer should be visibly annoyed that the password is written down anywhere.
+The password is in three places, in three corners, so the hunt is fair whichever way the party wanders and nobody has to double back across the whole board: the **Shift Lead**, a named medium monster in the Shift Office, carries it as a guaranteed drop and leaves a medium corpse, the one corpse the party most wants to clean and can least afford the time for. The other two are sticky notes, posted against policy, on the Kennels' Feed trough and the Incinerator's Ash shelf, found by searching the furniture. Neither is behind a lock: with the password in the chests, a party that had spent its keys elsewhere had to go the long way round and the floor came down on somebody in one game in five.
+
+**Only one card is printed.** Whichever of the three they reach first hands it over. If they later search one of the others, the note is on the wall and they already know the word, so hand over a Pockets draw instead and let them feel clever about it. The announcer should be visibly annoyed that the password is written down anywhere.
 
 **The door shuts behind you.** The moment the last member of the party is inside the Sump, close the door: put the standee back across the doorway. Nothing on staff can open a door, so the boss fight is the party, the boss and whatever walked in with them. Fed janitors already inside stay inside; the ones still chasing pile up in the corridor. The party can open it again from inside (they have the password) if they would rather run, and if they do it stays open.
 
@@ -98,18 +101,18 @@ Print a big standee for the Sump door itself, so it reads as the boss door from 
 | Measure | Result |
 |---|---|
 | Party wins (boss dead, everyone down the stairs) | 84% |
-| Escaped with the boss alive | 2% |
-| Floor came down on somebody | 11% |
-| Full wipe | 3.5% |
-| Games where someone dies | 33% |
-| Rounds to finish, median | 36 |
-| Password found, median round | 21 |
-| Sump door opens, average round | 30 |
+| Escaped with the boss alive | 1.7% |
+| Floor came down on somebody | 12% |
+| Full wipe | 2% |
+| Games where someone dies | 30% |
+| Rounds to finish, median | 35 |
+| Password found, median round | 20 |
+| Sump door opens, average round | 28 |
 | Rooms opened | 9 of 14 |
-| Corpses made / cleaned / left at the end | 20 / 10 / 2.7 |
+| Corpses made / cleaned / left at the end | 20 / 10 / 2.5 (the goose eats 4.7, Spark 2.0, bleach the rest) |
 | Bleach found / used | 4.1 / 3.5, against 8.4 medium and 2.6 large corpses a game |
-| Fed janitors per game | 6.3, in every game; the party kills 4.7 of them |
-| Rounds with a janitor chasing someone | 11 |
+| Fed janitors per game | 5.9, in every game; the party kills 4.2 of them |
+| Rounds with a janitor chasing someone | 10 |
 | Facilities Managers (a large corpse eaten) | 1.5 a game, in 91% of games |
 | The doorstep beat: the Sump guard's body eaten | 79% of games, median the same round the door opens |
 | Boss snacks per game | 0.8, in 76% of games |
@@ -120,7 +123,7 @@ The table's party never squashes grubs. A party played by the Jev brain in the m
 
 The two rule changes together cost the table's party about four points of win rate (88% to 84%); that party almost never squashes, so nearly all of it is Spark losing medium and large corpses. Bleach is short on purpose: about four bottles a game against ten medium and large corpses, so the party can clean roughly half of the dangerous bodies at most.
 
-The first draft of this floor had the Shift Office beside the forced path and a party that knew where it was. It looked fine on paper (85% win) and was wrong in the way that matters: a real table does not know which door the password is behind. The blind party on that layout still found it by round 9, because the room was right there; moved to the far corner it takes twenty rounds, which is the hunt this floor is about. One copy of the password in one corner then made the floor a lottery on which way the party wandered: one game in eight ran out of clock without ever finding it. Three copies in three corners fixed that (collapses fell to one game in seventy) and made the floor too easy, so the Crew grew from six grubs to eight.
+The first draft of this floor had the Shift Office beside the forced path and a party that knew where it was. It looked fine on paper (85% win) and was wrong in the way that matters: a real table does not know which door the password is behind. The blind party on that layout still found it by round 9, because the room was right there; moved to the far corner it takes twenty rounds, which is the hunt this floor is about. One copy of the password in one corner then made the floor a lottery on which way the party wandered: one game in eight ran out of clock without ever finding it. Three places in three corners fixed that (collapses fell to one game in seventy) and made the floor too easy, so the Crew grew from six grubs to eight.
 
 Without the Cleanup Crew the floor is a 95% walk, so the grubs are the whole difficulty. The dials, in order of effect: where the password copies are; fed janitor Health (about ten points); the grub budget (each grub is worth about two and a half points of win rate and a few deaths); the floor cap (about two points a round, mostly as collapses). The grub schedule barely matters once the budget is fixed. If the table wants it harder, take a grub away or a round off the cap; easier, the reverse.
 
@@ -232,19 +235,21 @@ Floor 1's three, same tokens. One addition: **a pit eats corpses.** A corpse Sho
 
 Three shuffled decks again. What is physically in each one on the night, so the announcer can build them from the Floor 1 boxes plus the Floor 2 print run.
 
-### 6.1 Pockets deck (16 cards)
+### 6.1 Pockets deck (14 cards)
 
-Floor 1's Pockets deck with the cards the party is holding taken out (Bandage, Whistle, Scroll: Sleep, one Energy Drink), plus four reprints.
+Floor 1's Pockets deck with the cards the party is holding taken out: Vicki's Bandage, Lucas's Whistle and Sleep scroll, Ethan's Energy Drink. One card gets reprinted, the Bandage. Everything else was already printed for Floor 1.
 
 | Card | Qty | Note |
 |---|---|---|
-| **Juice Box** | 4 | Floor 1 cards |
-| **Energy Drink** | 2 | one Floor 1 card, one reprint |
-| **Gold (1)**, **Gold (2)**, **Gold (3)** | 2, 3, 1 | Floor 1 cards plus two reprinted Gold (2) |
+| **Juice Box** | 4 | Floor 1 cards. The fifth goes in the Why Would You Drink That envelope. |
+| **Energy Drink** | 2 | Floor 1 cards. Three were printed and Ethan is holding one. |
+| **Gold (1)**, **Gold (2)**, **Gold (3)** | 1, 2, 1 | Floor 1 cards, whatever the envelopes leave. See below. |
 | **Firecracker** | 1 | Floor 1 card |
 | **Rope** | 1 | Floor 1 card |
-| **Scroll: Heal** | 1 | Floor 1 card |
-| **Bandage** | 1 | reprint |
+| **Scroll: Heal** | 1 | Floor 1 card. A second one lies on the Locker Room bench. |
+| **Bandage** | 1 | Reprint. Vicki still has the Floor 1 card. |
+
+**The gold all came back.** Eleven gold cards were printed for Floor 1, twenty-nine gold between them, and the shop took twenty-one of it straight back into the box. No gold gets reprinted for this floor. Stuff the envelopes first, and no amount needs a card of its own: **Clean Freak**'s four gold is **Gold (2) ×2**, **Health Inspector**'s five is one **Gold (5)**, **Why Would You Drink That**'s three is one **Gold (3)**, and the **Boss Box**'s eight is **Gold (5) + Gold (3)**. The party kept a single coin, one Gold (1). What is left over is the gold in the deck: Gold (1), Gold (2) ×2, Gold (3), which is eight gold in four cards against Floor 1's seven in four. There is no Gold (5) left to draw, which is fine; the big coins are all prizes now.
 
 Not shuffled, all set out in furniture (section 3): **Industrial Bleach** ×5 ("Obliterate a corpse on your square or adjacent to you. One use. Or drink it: lose 1 Health. Why would you."), plus one **Juice Box** on the Dormitory bunk, one **Scroll: Heal** on the Locker Room bench, and a second **Skeleton Key** on the Tool Crib's tool rack.
 
@@ -286,7 +291,7 @@ Every Floor 1 Big Gear card is in someone's hands or was sold, so this deck is n
 | **Goblin Shortbow** | Both hands | 2 dice at range, can't shoot adjacent, replaces your Attack. In the Nice Shot envelope. |
 | **Leaf Blower** | Both hands | Action: Shove. Push a monster or a corpse in line of sight up to 3 squares away. Into a pit, it goes in. A monster into a wall or another monster takes 1. In the Trap Chef envelope. Shove for people who can't read. |
 
-**Carried, not drawn:** the Password of the Day ×3 (Junk: one on the Shift Lead, one on the Kennels' Feed trough, one on the Incinerator's Ash shelf) and the Pet Biscuit (Companion upgrade, in the Good Boy envelope). The biscuit lets Sir Reginald go apart from his person, so he gets a standee.
+**Carried, not drawn:** the Password of the Day (Junk, one card, waiting at whichever of the three places they reach first) and the Pet Biscuit (Companion upgrade, in the Good Boy envelope). The biscuit lets Sir Reginald go apart from his person, so he gets a standee.
 
 **Retired for good:** Orc Monocle, Trash Can Lid, Torch, Frying Pan, Broken Table Leg. Torch stays retired so the Bathrobe isn't competing with a Head item; the floor has no secret doors anyway.
 
@@ -305,6 +310,8 @@ Seven envelopes. Every trigger is something the announcer will see happen, so no
 | **Why Would You Drink That** | Bronze | Drink the bleach | 3 gold, 1 Juice Box. It costs 1 Health to open. Someone will. |
 | **Trap Chef** | Gold | A monster dies from a trap | Leaf Blower |
 | **Boss Box** | Platinum | Kill the Senior Custodian | 8 gold and the **Class Selection Available** card (section 11) |
+
+Gold for these comes out of the Floor 1 coins, in the denominations listed in 6.1. Nothing has to be reprinted.
 
 Cut from the first draft: First Blood and Cartographer (Floor 1 did those), Password Accepted (opening the door is its own reward), Hoarder and Bookworm (nobody wants to count cards mid-fight).
 
@@ -349,10 +356,10 @@ All in the card workshop under the **Floor 2** filter, so the print run is just 
 |---|---|
 | Monster cards: Cave Rat, Kobold Miner, Cave Bear, Shift Lead, Grub, Bloated Grub, Custodian, Facilities Manager, Senior Custodian | 9 |
 | Standees: rat, kobold, bear, Shift Lead, three fed forms, boss, Sir Reginald for the biscuit, and the Sump door | 10 designs |
-| Pockets: Bleach ×5, healing in furniture ×2 (Juice Box, Scroll: Heal), reprints ×4 | 11 |
+| Pockets: Bleach ×5, healing in furniture ×2 (Juice Box, Scroll: Heal), one reprinted Bandage | 8 |
 | Gear: eight new cards | 8 |
 | Big Gear: ten cards, plus the Skeleton Key on the tool rack | 11 |
-| Password of the Day ×3, Pet Biscuit, Class Selection Available | 5 |
+| Password of the Day, Pet Biscuit, Class Selection Available | 3 |
 | Envelope labels | 7 |
 | Furniture tiles, sized from the map, with used backs | 15 fronts, 13 backs |
 | Corpse tiles: small ×6, medium ×6, large ×3. Grub tiles ×8 | 23 |
