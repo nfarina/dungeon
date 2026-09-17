@@ -69,6 +69,8 @@ export type Config = {
   grubEvery: number;
   grubFrom: number;
   grubCap: number;
+  /** Floor 2: grubs that ever join the queue, over the whole floor. The printed tile count. Infinity = no limit. */
+  grubBudget: number;
   grubMove: number;
   fedMove: number;
   /** Floor 2: opening the boss door empties the queue and puts the schedule on every round. */
@@ -82,6 +84,10 @@ export type Config = {
   record: boolean;
   /** Play on this floor instead of the built-in map for `floor` (the editor sends its unsaved map). */
   floorDef: FloorDef | null;
+  /** How the party picks its next room. "route": it knows the floor and walks its route (Floor 1, quest-sheet style).
+   *  "blind": it does not know which room holds the password, so it opens the nearest unexplored door until it has it,
+   *  then heads for the boss room, detouring only into `optionalRooms` it has not seen yet. */
+  explore: "route" | "blind";
   /** Floor 2 tuning: added to every fed janitor's Defend / Health (negative to soften them). */
   fedDef: number;
   fedHp: number;
@@ -125,6 +131,7 @@ export const DEFAULT_CONFIG: Config = {
   grubEvery: 2,
   grubFrom: 2,
   grubCap: 6,
+  grubBudget: Infinity,
   grubMove: 4,
   fedMove: 6,
   allHands: true,
@@ -132,6 +139,7 @@ export const DEFAULT_CONFIG: Config = {
   trace: false,
   record: false,
   floorDef: null,
+  explore: "route",
   fedDef: 0,
   fedHp: 0,
   snackFree: false,
@@ -141,8 +149,9 @@ export const DEFAULT_CONFIG: Config = {
 /** The Floor 2 ruleset as written in floor-2.md. Spread over RECOMMENDED-style dials in floor2.ts. */
 export const FLOOR2_CONFIG: Partial<Config> = {
   floor: 2, party: "carryover",
-  collapseStart: "round", collapseRound: 26, collapseMode: "soft", collapseGrace: 4, collapseEscalation: "gentle",
-  lootRich: true, snackFree: true,
+  collapseStart: "round", collapseMode: "soft", collapseGrace: 4, collapseEscalation: "gentle",
+  lootRich: true, snackFree: true, explore: "blind",
+  collapseRound: 40, grubEvery: 3, grubBudget: 8,
 };
 
 // ---------------------------------------------------------------------------
@@ -280,6 +289,7 @@ export class Game {
   /** Floor 2. */
   corpses: Corpse[] = [];
   queue = 0;
+  grubsQueuedTotal = 0;
   allHandsOn = false;
   f2: Floor2Stats = { corpsesMade: 0, corpsesCleaned: 0, corpsesLeft: 0, bleachUsed: 0, bleachFound: 0,
     janitorsFed: { small: 0, medium: 0, large: 0 }, janitorsKilled: 0, grubsKilled: 0, bossSnacks: 0, chasedRounds: 0,
@@ -738,7 +748,8 @@ export class Game {
     if (this.cfg.floor === 2) {
       const every = this.allHandsOn ? 1 : this.cfg.grubEvery;
       const alive = this.monsters.filter(m => m.alive && m.def.janitor).length;
-      if (this.round >= this.cfg.grubFrom && (this.round - this.cfg.grubFrom) % every === 0 && this.queue + alive < this.cfg.grubCap) { this.queue++; this.cfg.record && this.say(`A grub joins the stairwell queue (${this.queue} waiting)`); }
+      if (this.round >= this.cfg.grubFrom && (this.round - this.cfg.grubFrom) % every === 0 && this.queue + alive < this.cfg.grubCap
+        && this.grubsQueuedTotal < this.cfg.grubBudget) { this.queue++; this.grubsQueuedTotal++; this.cfg.record && this.say(`A grub joins the stairwell queue (${this.queue} waiting)`); }
       if (this.monsters.some(m => m.alive && m.def.janitor === "fed" && this.living().some(h => dist1(h.pos, m.pos) <= 3))) this.f2.chasedRounds++;
     }
   }
@@ -1068,12 +1079,34 @@ export class Game {
 
   private roomTargetCache: { round: number; id: number } | null = null;
   /** The party moves as a group toward the nearest room it still owes a visit. */
+  /** Rooms the party has opened a door into. */
+  private visitedRooms(): Set<number> {
+    const v = new Set<number>();
+    this.board.doors.forEach((d, i) => {
+      if (this.openDoors[i] !== 1) return;
+      for (const c of [d.a, d.b]) { const r = this.board.roomIdAt(c); if (r !== null) v.add(r); }
+    });
+    return v;
+  }
+
   private currentRoom(): number {
     if (this.roomTargetCache?.round === this.round) return this.roomTargetCache.id;
     const lead = this.standing()[0] ?? this.living()[0] ?? this.heroes[0];
     const f = field(this.board, lead.pos, { ...this.heroPolicy(lead), occupied: () => false, avoid: undefined });
     const required = this.requiredRooms;
-    const open = this.route.filter(id =>
+    const unfinished = (id: number) => !this.roomDone(id) || (!this.urgent && !!this.board.rooms.get(id)!.interact && !this.usedInteract.has(id));
+    const open = this.cfg.explore === "blind" ? (() => {
+      // Blind: nobody knows which room has the password. Open the nearest unexplored door until it turns up;
+      // afterwards the boss room is the goal, with the appetite for side rooms limited to the greed list.
+      const visited = this.visitedRooms();
+      const hasPw = this.cfg.floor !== 2 || this.partyHasPassword();
+      return this.floor.rooms.map(r => r.id).filter(id => id !== this.bossRoom).filter(id => {
+        const fresh = !visited.has(id);
+        if (!hasPw) return fresh || unfinished(id);
+        if (this.urgent) return false;
+        return this.cfg.optionalRooms.includes(id) && (fresh || unfinished(id));
+      });
+    })() : this.route.filter(id =>
       id !== this.bossRoom && (this.urgent ? required.includes(id) : true) &&
       (!this.roomDone(id) || (!this.urgent && this.board.rooms.get(id)!.interact && !this.usedInteract.has(id))
         || (this.cfg.floor === 2 && !this.partyHasPassword() && this.monsters.some(m => m.alive && m.room === id && m.def.password))));
@@ -1483,7 +1516,13 @@ export class Game {
     this.cfg.record && this.say(`${h.name} uses the ${w.kind} in ${r.name}`);
     if (w.kind === "cage") { this.usedInteract.add(rid); h.goose = 2; this.cfg.record && this.say(`  Sir Reginald joins ${h.name}`); return true; }
     const fixed = this.cfg.floor === 2 ? FIXED_LOOT[r.name] : undefined;
-    const handout = () => { if (!fixed) return false; const it = namedItem(fixed); if (it.use === "bleach") this.f2.bleachFound++; this.give(h, it); return true; };
+    const handout = () => {
+      if (!fixed) return false;
+      const it = namedItem(fixed);
+      if (it.use === "bleach") this.f2.bleachFound++;
+      if (it.password && this.f2.passwordRound === null) { this.f2.passwordRound = this.round; this.log(`${h.name} finds the PASSWORD in the ${r.name}`); }
+      this.give(h, it); return true;
+    };
     if (w.kind === "chest") {
       if (this.has(h, i => !!i.unlocks)) {
         const key = this.find(h, i => !!i.unlocks)!;

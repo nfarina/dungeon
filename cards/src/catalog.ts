@@ -518,7 +518,7 @@ const f2biggear: Card[] = ([
     rules: "Mind 5 to read. 4 attack dice at a monster in line of sight, and 1 damage to every monster adjacent to it. One use.",
     flavor: "Effective immediately.",
     art: "an ornate parchment scroll with a red corporate seal, a glowing orange org chart on it with several boxes crossed out" },
-  { id: "chainmail-bib-f2", name: "Orc Chainmail Bib", deck: "biggear", type: "item", slot: "Body", placed: "the Evidence locker",
+  { id: "chainmail-bib-f2", name: "Orc Chainmail Bib", deck: "biggear", type: "item", slot: "Body", placed: "the Ash shelf",
     rules: "Defend +2. Subtract 2 from your movement roll. Can't wear Sneakers with it.", flavor: "They don't fit under.",
     art: "a heavy chainmail bib apron with a leather neck strap, dented and stained" },
   { id: "shortbow-f2", name: "Goblin Shortbow", deck: "biggear", type: "item", slot: "Both hands", envelope: "Nice Shot",
@@ -532,7 +532,7 @@ const f2biggear: Card[] = ([
 ] as Card[]).map(f2);
 
 const f2extras: Card[] = ([
-  { id: "password", name: "Password of the Day", deck: "junk", type: "text", placed: "the Shift Lead",
+  { id: "password", name: "Password of the Day", deck: "junk", type: "text", qty: 3, placed: "the Shift Lead, the Evidence locker and the Feed trough",
     rules: "Today's password is whatever the announcer says it is. Read it aloud at the Sump door. Do not write it down.",
     flavor: "Signed, the Shift Lead. Underlined twice.",
     art: "a yellow sticky note with a scribbled word crossed out and rewritten, stuck to a clipboard" },
@@ -594,6 +594,7 @@ const f2standees: Card[] = ([
   standee("bloated-grub", "Bloated Grub", 0.75, 1, "full-body figure of a swollen pale grub with a rat's tail hanging out of its mouth, wearing a tiny janitor's cap, facing the viewer", "bloated-grub"),
   standee("custodian", "Custodian", 1, 1.5, "full-body figure of a large upright grub with a kobold's helmet fused to its head and a pickaxe in stubby arms, janitor's cap, facing the viewer, whole body visible", "custodian"),
   standee("facilities-manager", "Facilities Manager", 1.25, 1.75, "full-body figure of an enormous bloated grub with patches of bear fur and bear claws, a janitor's cap and a clip-on tie, facing the viewer, whole body visible", "facilities-manager"),
+  standee("sump-door", "The Sump Door", 1.5, 2.25, "a massive riveted steel industrial door with a big red AUTHORIZED PERSONNEL ONLY sign, a rusty intercom speaker grille with a glowing green button beside it, a small drain at the bottom, seen straight on, whole door visible"),
   standee("senior-custodian", "The Senior Custodian", 1.5, 2.25, "full-body figure of a colossal ancient pale wrinkled grub wearing a ragged janitor's cap and a name badge, holding a giant mop, facing the viewer, whole body visible", "senior-custodian"),
 ] as Card[]).map(f2);
 
@@ -628,7 +629,7 @@ const f2tiles: Card[] = [
   f2tile("corpse-small", "Small Corpse", 1, 1, "trap", "a dead cave rat lying on a stone floor square seen from directly above, X eyes, lanyard beside it", "corpse", 6),
   f2tile("corpse-medium", "Medium Corpse", 1, 1, "trap", "a dead kobold miner lying on a stone floor square seen from directly above, X eyes, helmet rolled off, pickaxe dropped", "corpse", 6),
   f2tile("corpse-large", "Large Corpse", 1, 1, "trap", "a dead cave bear slumped on a stone floor square seen from directly above, X eyes, one paw over the edge of the square", "corpse", 3),
-  f2tile("grub-tile", "Grub", 1, 1, "trap", "a fat pale blind grub curled on a stone floor square seen from directly above, wearing a tiny janitor's cap", "grub", 6),
+  f2tile("grub-tile", "Grub", 1, 1, "trap", "a fat pale blind grub curled on a stone floor square seen from directly above, wearing a tiny janitor's cap", "grub", 8),
 ];
 const f2used = (id: string, art: string): Card => {
   const front = f2tiles.find(t => t.id === `tile-${id}`)!;

@@ -28,7 +28,7 @@
   "floor": {
     "name": "Floor 2 — Facilities",
     "guide": "floor-2",
-    "note": "Board traced from the Side B board image: 26x19, 19 possible rooms, G is the big chamber with the skeleton. First layout per floor-2.md section 3: entrance top-right dead-ends into Reception, then the Supply Closet, then the floor opens. The Shift Office (password) is required by content. The Sump is the boss room.",
+    "note": "Board traced from the Side B board image: 26x19, 19 possible rooms, G is the big chamber with the skeleton. First layout per floor-2.md section 3: entrance top-right dead-ends into Reception, then the Supply Closet, then the floor opens. The Shift Office (password) is in the far bottom-right corner, required by content: the party has to hunt for it. The Sump is the boss room.",
     "rooms": [
       {
         "at": "B",
@@ -53,11 +53,12 @@
       {
         "at": "D",
         "id": 3,
-        "name": "Shift Office",
-        "required": true,
+        "name": "Dormitory",
+        "required": false,
         "monsters": [
-      "shiftlead",
-      "kobold"
+      "rat",
+      "rat",
+      "rat"
     ]
       },
       {
@@ -151,12 +152,11 @@
       {
         "at": "S",
         "id": 13,
-        "name": "Dormitory",
-        "required": false,
+        "name": "Shift Office",
+        "required": true,
         "monsters": [
-      "rat",
-      "rat",
-      "rat"
+      "shiftlead",
+      "kobold"
     ]
       },
       {
@@ -195,7 +195,6 @@
       { "x": 0, "y": 8, "kind": "stairs", "w": 1, "h": 2 },
       { "x": 21, "y": 2, "kind": "table", "label": "Front desk", "w": 2, "h": 1 },
       { "x": 21, "y": 4, "kind": "rack", "label": "Shelving", "w": 2, "h": 1 },
-      { "x": 13, "y": 1, "kind": "table", "label": "Shift Lead's desk", "w": 2, "h": 1 },
       { "x": 19, "y": 1, "kind": "table", "label": "Bench", "w": 1, "h": 2 },
       { "x": 3, "y": 3, "kind": "table", "label": "Feed trough", "w": 2, "h": 1 },
       { "x": 10, "y": 6, "kind": "rack", "label": "Tool rack", "w": 1, "h": 2 },
@@ -205,8 +204,9 @@
       { "x": 13, "y": 15, "kind": "table", "label": "Lunch table", "w": 2, "h": 2 },
       { "x": 1, "y": 14, "kind": "shelf", "label": "Ash shelf", "w": 2, "h": 1 },
       { "x": 7, "y": 18, "kind": "chest", "label": "Evidence locker", "w": 2, "h": 1 },
-      { "x": 24, "y": 16, "kind": "table", "label": "Bunk", "w": 1, "h": 2 },
-      { "x": 4, "y": 10, "kind": "blocker", "label": "Sump pump", "w": 2, "h": 2 }
+      { "x": 4, "y": 10, "kind": "blocker", "label": "Sump pump", "w": 2, "h": 2 },
+      { "x": 12, "y": 4, "kind": "table", "label": "Bunk", "w": 1, "h": 2 },
+      { "x": 23, "y": 18, "kind": "table", "label": "Shift Lead's desk", "w": 2, "h": 1 }
     ],
     "traps": [
       { "x": 7, "y": 8, "kind": "pit" },
@@ -217,8 +217,6 @@
       { "x": 22, "y": 1, "id": "rat" },
       { "x": 25, "y": 4, "id": "kobold" },
       { "x": 25, "y": 6, "id": "rat" },
-      { "x": 12, "y": 2, "id": "shiftlead" },
-      { "x": 13, "y": 4, "id": "kobold" },
       { "x": 17, "y": 1, "id": "rat" },
       { "x": 18, "y": 2, "id": "rat" },
       { "x": 1, "y": 1, "id": "rat" },
@@ -235,12 +233,14 @@
       { "x": 13, "y": 17, "id": "rat" },
       { "x": 2, "y": 16, "id": "kobold" },
       { "x": 10, "y": 17, "id": "bear" },
-      { "x": 23, "y": 16, "id": "rat" },
-      { "x": 22, "y": 18, "id": "rat" },
-      { "x": 24, "y": 18, "id": "rat" },
       { "x": 2, "y": 9, "id": "custodian" },
       { "x": 3, "y": 6, "id": "kobold" },
-      { "x": 3, "y": 12, "id": "kobold" }
+      { "x": 3, "y": 12, "id": "kobold" },
+      { "x": 12, "y": 2, "id": "rat" },
+      { "x": 13, "y": 4, "id": "rat" },
+      { "x": 14, "y": 1, "id": "rat" },
+      { "x": 24, "y": 16, "id": "shiftlead" },
+      { "x": 22, "y": 18, "id": "kobold" }
     ],
     "speeches": [
       {

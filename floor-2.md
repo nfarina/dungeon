@@ -40,7 +40,7 @@ Janitors never leave corpses. Grubs dissolve, fed janitors get flushed, whatever
 
 ### 1.2 Grubs
 
-The Cleanup Crew are grubs: fat, blind, slow. Flat tiles, not standees; six of them, and six is the hard cap on grubs alive at once.
+The Cleanup Crew are grubs: fat, blind, slow. Flat tiles, not standees; eight of them, and eight is all the floor gets, ever. When the eighth tile is on the board or eaten and flipped, the queue stops.
 
 - **They ignore heroes.** No attack, Defend 0, 1 Health. Killing one costs an action and yields nothing. The only reason to hit one is that it is in your way or about to reach a corpse you care about.
 - **They want corpses.** On the monster turn each grub moves **4 squares, no roll**, toward the nearest corpse it can reach by open doors. No corpse on the board: it stays where it is.
@@ -65,27 +65,49 @@ A fed janitor **follows the party**: each monster turn it moves 6 toward the nea
 
 Grubs arrive on the clock, not on the corpses. Keep the queue on a spindown die on the DM sheet; put a grub tile on the stairs only when it has somewhere to go.
 
-- **Schedule (initial, sim decides): one grub joins the queue at the end of every even round.** So the party has two or three rooms of freedom before the first one is even waiting.
+- **Schedule: one grub joins the queue at the end of round 2, and every third round after that** (5, 8, 11, ...), until eight have joined. So the party has two or three rooms of freedom before the first one is even waiting, and the eighth arrives around round 23 of a forty-round floor.
 - At the start of the monster turn, if any corpse is on the board, every grub in the queue steps onto the stairs and starts walking. Otherwise they wait, and the queue die keeps climbing where everyone can see it.
-- Six grubs alive at once is the cap; the queue does not grow past what the tiles allow.
+- Eight grubs per floor is the budget, not a cap on how many are alive at once. The simulator tried "six alive at once" on a long floor and the Crew never stopped coming: nine fed janitors a game and a wipe in one game of nine. Six ever, with three password copies on the floor, was a 94% walk; eight is the number.
 
 **Announcer, when the first grub leaves the stairs:** "Facilities has been notified of a mess on Floor 2. A member of staff is on the way. Please do not interact with the staff."
 
 ### 1.5 The password
 
-The boss room door has no lock. It has a speaker. It opens for the **Password of the Day**, a card carried by the **Shift Lead**, a named medium monster in a room the party has to go find (section 3). The Skeleton Key does nothing, the Fire Axe does nothing, knocking gets you a recorded message about business hours. The Shift Lead drops the password as a guaranteed drop, and leaves a medium corpse, which is the one corpse the party most wants to clean and can least afford the time for.
+The boss room door has no lock. It has a speaker. It opens for the **Password of the Day**. The Skeleton Key does nothing, the Fire Axe does nothing, knocking gets you a recorded message about business hours.
+
+Three copies of the password are on the floor, in three corners, so the hunt is fair whichever way the party wanders and nobody has to double back across the whole board: the **Shift Lead**, a named medium monster in the Shift Office, carries one as a guaranteed drop and leaves a medium corpse, the one corpse the party most wants to clean and can least afford the time for. The other two are sticky notes, posted against policy, in the Lockup's Evidence locker and the Kennels' Feed trough, found by using the furniture. One copy is enough. The announcer should be visibly annoyed that the password is written down anywhere.
+
+Print a big standee for the Sump door itself, so it reads as the boss door from across the table: riveted steel, a speaker, AUTHORIZED PERSONNEL ONLY.
 
 ### 1.6 The clock
 
-- **Floor cap: 26 rounds.** Announced and counted down every round, same as Floor 1. The Cleanup Crew is the pressure that grows; the cap is the wall at the end. The simulator says 22 to 30 all land within two points of each other, so the cap is about pacing, not difficulty.
+- **Floor cap: 40 rounds.** Announced and counted down every round, same as Floor 1. This is a long floor by design: the party has to find the password before it can do anything else, and the Shift Office is in the far corner. The simulator's parties finish in 36 rounds at the median and the cap catches one game in eight. The Cleanup Crew is the pressure that grows; the cap is the wall at the end.
 - **All Hands.** The moment the boss door opens, every grub still in the queue leaves the stairs at once and the schedule doubles: a grub every round. With corpses around, they head for corpses. With none, they head for the boss room. Announcer: "Attention, Crawlers. Facilities has declared an All Hands. This is a standard cleanliness measure and not a reflection on your hygiene. Please enjoy the remainder of your visit."
 - **The collapse** is the Floor 1 ramp: 1, 1, 2, 2, 3 damage at the end of each round past zero.
 - **You can leave without killing the boss.** Same rule, same forfeit, say it out loud before the fight.
 
-**Where the simulator stands** (3,000 runs of the first layout, the real party, rules as written above, a "cleaner" party that bleaches medium and large corpses on quiet turns and lets the goose eat the small ones):
+**Where the simulator stands** (3,000 runs of the current layout, the real party, rules as written above, a "blind" party that opens the nearest unexplored door until it holds a password, then heads for the Sump with a random appetite for one to four more rooms, and bleaches medium and large corpses on quiet turns while the goose eats the small ones):
 
 | Measure | Result |
 |---|---|
+| Party wins (boss dead, everyone down the stairs) | 88% |
+| Escaped with the boss alive | 3% |
+| Floor came down on somebody | 2.5% |
+| Full wipe | 6% |
+| Games where someone dies | 35% (Ethan most often, then Vicki) |
+| Rounds to finish, median | 37 |
+| Password found, median round | 20 |
+| Sump door opens, average round | 28 |
+| Rooms opened | 9.5 of 14 |
+| Corpses made / cleaned / left at the end | 20 / 8 / 3 |
+| Fed janitors per game | 7.2, in every game; the party kills 6.2 of them |
+| Boss snacks per game | 1.7 |
+
+The first draft of this floor had the Shift Office beside the forced path and a party that knew where it was. It looked fine on paper (85% win) and was wrong in the way that matters: a real table does not know which door the password is behind. The blind party on that layout still found it by round 9, because the room was right there; moved to the far corner it takes twenty rounds, which is the hunt this floor is about. One copy of the password in one corner then made the floor a lottery on which way the party wandered: one game in eight ran out of clock without ever finding it. Three copies in three corners fixed that (collapses fell to one game in seventy) and made the floor too easy, so the Crew grew from six grubs to eight.
+
+Without the Cleanup Crew the floor is a 95% walk, so the grubs are the whole difficulty. The dials, in order of effect: where the password copies are; fed janitor Health (about ten points); the grub budget (each grub is worth about two and a half points of win rate and a few deaths); the floor cap (36 instead of 40 is worth five points, mostly as collapses). The grub schedule barely matters once the budget is fixed. If the table wants it harder, take a grub away or a round off the cap; easier, the reverse.
+
+---|---|
 | Party wins (boss dead, everyone down the stairs) | 84% |
 | Escaped with the boss alive | 5% |
 | Floor came down on somebody | 5% |
@@ -113,18 +135,20 @@ The three upgrades seeded on the floor, and who they are obviously for without s
 | **Goblin Shortbow** | The one with the slingshot | Nice Shot achievement (section 7) |
 | **Pet Biscuit** | The one with the goose | Good Boy achievement (section 7) |
 | **Scroll: Restructuring** (Mind 5) and later the **Wizard's Bathrobe** (Body, Mind +1) | The one with the glasses | Furniture, section 3. Scroll early, robe late, so the scroll sits unreadable for a while. |
-| **Orc Chainmail Bib** | Whoever wants to be slow and safe | Furniture in a late room |
+| **Orc Chainmail Bib** | Whoever wants to be slow and safe | The Incinerator's Ash shelf |
 
 ---
 
 ## 3. Floor layout
 
-A first layout is in `sim/src/content/floor2.map.json` (drawn by the sim, not yet reviewed at the table): entrance top-right, Reception then the Supply Closet forced by stone, the Shift Office top-middle, the Sump on the left with the stairs against its west wall. Fourteen of the nineteen rooms are in play; the five between the columns are stone. What the layout has to do, in order of importance:
+A first layout is in `sim/src/content/floor2.map.json` (drawn by the sim, not yet reviewed at the table): entrance top-right, Reception then the Supply Closet forced by stone, the Sump on the left with the stairs against its west wall, and the Shift Office in the bottom-right corner, as far from the Supply Closet's exits as the board allows. Fourteen of the nineteen rooms are in play; the five between the columns are stone.
+
+The Shift Office's position is the floor's main dial. With it next to the forced path (the first draft) a party that just opens the nearest door finds the password by round 9 and the floor plays in 28 rounds. In the far corner the password turns up around round 20, the party has opened most of the floor looking for it, and the game runs 36 rounds. Anywhere in between scales between those. What the layout has to do, in order of importance:
 
 1. **The big chamber is the boss room.** The skeleton on its floor is what the boss ate. Its door is the password door.
 2. **Required by walls: the first two rooms.** Same trick as Floor 1: the entrance corridor dead-ends into them. That guarantees corpses early, and the first grub has somewhere to walk.
-3. **The Shift Lead's room is required by content, not by walls.** Put it off the main route, two or three rooms deep, so the party has to find it and then carry the password back across the floor with a medium corpse behind them.
-4. **The scroll before the robe.** Scroll: Restructuring in furniture near the Shift Lead. The Wizard's Bathrobe in furniture in one of the last rooms before the boss. Ethan should own an unreadable scroll for at least three rooms.
+3. **The Shift Lead's room is required by content, not by walls.** Put it far from the forced rooms, so the party has to hunt for it, and then carry the password back across the floor with a medium corpse behind them.
+4. **The scroll before the robe.** Scroll: Restructuring on the Shift Lead's desk. The Wizard's Bathrobe on the Laundry shelf, near the Sump. Ethan should own an unreadable scroll for a while.
 5. **Five bleach, two on the required path.** Reception's front desk and the Supply Closet's shelving, so the mechanic gets taught on the first corpse and there is a second bottle before the Shift Lead. The other three sit in optional rooms (Boiler Room, Records, Cafeteria). With only one on the path the party found 1.6 bottles a game and left twice as many bodies.
 6. **Far more rooms than they can open.** Twenty rooms and a 26-round cap means most stay shut. That is fine. The announcer should say so.
 7. **Monsters at least two squares from their door**, like Floor 1. That rule was worth thirteen points of win rate.
@@ -234,11 +258,11 @@ Every Floor 1 Big Gear card is in someone's hands or was sold, so this deck is n
 | **Steel Lunchbox** | Trinket | Once per floor, heal 3. |
 | **Wizard's Bathrobe** | Body | Mind +1. On the Laundry shelf. |
 | **Scroll: Restructuring** | | Mind 5 to read. 4 attack dice at a monster in line of sight, and 1 damage to every monster adjacent to it. On the Shift Lead's desk. |
-| **Orc Chainmail Bib** | Body | Defend +2, Move -2, no Sneakers. In the Evidence locker. |
+| **Orc Chainmail Bib** | Body | Defend +2, Move -2, no Sneakers. On the Ash shelf. |
 | **Goblin Shortbow** | Both hands | 2 dice at range, can't shoot adjacent, replaces your Attack. In the Nice Shot envelope. |
 | **Leaf Blower** | Both hands | Action: Shove. Push a monster or a corpse in line of sight up to 3 squares away. Into a pit, it goes in. A monster into a wall or another monster takes 1. In the Trap Chef envelope. Shove for people who can't read. |
 
-**Carried, not drawn:** the Password of the Day (Junk, on the Shift Lead) and the Pet Biscuit (Companion upgrade, in the Good Boy envelope). Sir Reginald gets a standee of his own once the biscuit is under him.
+**Carried, not drawn:** the Password of the Day ×3 (Junk: one on the Shift Lead, one in the Evidence locker, one in the Feed trough) and the Pet Biscuit (Companion upgrade, in the Good Boy envelope). Sir Reginald gets a standee of his own once the biscuit is under him.
 
 **Retired for good:** Orc Monocle, Trash Can Lid, Torch, Frying Pan, Broken Table Leg. Torch stays retired so the Bathrobe isn't competing with a Head item and secret doors are search-only this floor.
 
@@ -272,16 +296,16 @@ Unchanged. Two notes: **Fog Machine** stops Spark from burning a corpse, since i
 
 ## 9. Pacing budget
 
-| Segment | Minutes |
+| Segment | Rounds |
 |---|---|
-| Inventory recap, announcer intro, the grub rule explained once | 10 |
-| First two rooms, first corpse, first grub | 20 |
-| The hunt for the Shift Lead | 25 |
-| Two optional rooms | 15 |
-| Boss | 15 |
-| Boss Box, class selection, tally | 10 |
+| Inventory recap, announcer intro, the grub rule explained once | 0 |
+| Reception, Supply Closet, first corpse, first grub | 1 to 6 |
+| The hunt for the Shift Lead, most of the floor opened on the way | 7 to 20 |
+| Back across the floor with the password, fed janitors in tow | 21 to 28 |
+| Boss | 29 to 36 |
+| Boss Box, class selection, tally | |
 
-Ninety-five minutes. The queue does the cutting: a party that dawdles meets the Crew, and a party that runs meets the cap.
+Thirty-six rounds at the median, forty at the cap. Two evenings, maybe three. The queue and the cap do the cutting between them: a party that dawdles meets the Crew, and a party that wanders meets the cap.
 
 ---
 
@@ -292,14 +316,14 @@ All in the card workshop under the **Floor 2** filter, so the print run is just 
 | Asset | Count |
 |---|---|
 | Monster cards: Cave Rat, Kobold Miner, Cave Bear, Shift Lead, Grub, Bloated Grub, Custodian, Facilities Manager, Senior Custodian | 9 |
-| Standees: rat, kobold, bear, Shift Lead, three fed forms, boss, and Sir Reginald for the biscuit | 9 designs |
+| Standees: rat, kobold, bear, Shift Lead, three fed forms, boss, Sir Reginald for the biscuit, and the Sump door | 10 designs |
 | Pockets: Bleach ×5, reprints ×4 | 9 |
 | Gear: eight new cards | 8 |
 | Big Gear: ten cards | 10 |
-| Password of the Day, Pet Biscuit | 2 |
+| Password of the Day ×3, Pet Biscuit | 4 |
 | Envelope labels | 7 |
 | Furniture tiles, sized from the map, with used backs | 15 fronts, 13 backs |
-| Corpse tiles: small ×6, medium ×6, large ×3. Grub tiles ×6 | 21 |
+| Corpse tiles: small ×6, medium ×6, large ×3. Grub tiles ×8 | 23 |
 | Announcer speeches: intro, first grub, All Hands, collapse, stairs (in the map file, read from the iPad) | 5 |
 
 ---
@@ -325,6 +349,6 @@ Behind a `floor2` config so Floor 1 numbers stay intact.
 - Two hero policies, not one: a **cleaner** (bleach the nearest medium or large corpse when no grub is within eight squares and nobody is in combat) and a **runner** (never clean, keep moving). Tune the schedule and the bleach count until both land near 80% with different failure stories.
 - Report: win rate, deaths, corpses cleaned, janitors fed by size, rounds the party spent within reach of a fed janitor, and how often the boss got a Snack.
 
-**Answered by the first runs:** a grub every round, every other round or every third round is within seven points, so the even-round schedule stays for pacing. Six is fine as the cap; four and eight are within four points. A running party does not escape fed janitors at move 6 (it loses more people, not fewer), and move 7 costs three more points. Snack matters only if it is free; as the boss's action it helped the party. The two Kobolds in the Sump produce about two snacks a game.
+**Answered by the first runs:** the sim's party must not know where the password is (the "blind" brain opens the nearest unexplored door), and that single fact decides the floor's length. With a far Shift Office the grub cap had to become a budget or the Crew never stops. A running party does not escape fed janitors at move 6 (it loses more people, not fewer), and move 7 costs three more points. Snack matters only if it is free; as the boss's action it helped the party. The two Kobolds in the Sump produce about one and a half snacks a game.
 
 **Still open:** the layout has not been played, the placeholder Big Gear cards are stand-ins, and the sim's cleaner never Shoves a corpse into the pit or out of the boss room, so those tricks are unmeasured upside for the real table.
