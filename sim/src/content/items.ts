@@ -130,7 +130,7 @@ export const FLOOR2_BIG_GEAR: Item[] = [
   { name: "Cattle Prod", slot: "main", atk: 1 },
   { name: "Spellbook: Static", slot: "learned", spell: { id: "static", cooldown: 3 } },
   { name: "Janitor's Keyring", slot: "trinket", unlocks: 3 },
-  { name: "Spellbook: Mop-Up", slot: "learned", spell: { id: "mopup", cooldown: 2 } },
+  { name: "Spellbook: Mop-Up", slot: "learned", spell: { id: "mopup", cooldown: 3 } },
   { name: "Steel Lunchbox", slot: "pack", use: "heal3" },
 ];
 /** Reprinted Floor 1 Pockets cards that go back into the Floor 2 deck (floor-2.md 6.1). */

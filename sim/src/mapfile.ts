@@ -60,6 +60,10 @@ export type FloorRoom = {
 export type FloorSpec = {
   name: string;
   note?: string;
+  /** Floor cap in rounds, for the DM view's countdown. */
+  cap?: number;
+  /** Rounds left when the boss door opens (Floor 1's Emergency Floor Reset). Absent = no reset. */
+  fuse?: number;
   /** Basename of the floor's guidebook markdown, next to the sim folder (e.g. "floor-1" -> ../floor-1.md). */
   guide?: string;
   rooms: FloorRoom[];

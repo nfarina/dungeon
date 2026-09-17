@@ -8,8 +8,8 @@ import type { FloorDef } from "./board";
 /** Floor 1 as we play it. `bun run src/run.ts report` measures this. */
 export const RECOMMENDED: Partial<Config> = {
   lootRich: true, richRack: true, guaranteedSpellbook: true,
-  collapseStart: "both", collapseRound: 22, collapseAfterDoor: 5,
-  collapseMode: "soft", collapseGrace: 4, collapseEscalation: "gentle",
+  collapseStart: "both", collapseRound: 22, collapseAfterDoor: 9,
+  collapseMode: "hard",
   bossHp: 4,
 };
 

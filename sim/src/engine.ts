@@ -71,6 +71,14 @@ export type Config = {
   grubCap: number;
   /** Floor 2: grubs that ever join the queue, over the whole floor. The printed tile count. Infinity = no limit. */
   grubBudget: number;
+  /** Floor 2: a squashed grub goes back into the stairwell queue instead of leaving the floor (it doesn't use up the budget). */
+  grubsReturn: boolean;
+  /** Floor 2: Spark (like the goose) only cleans small corpses; medium and large need bleach, the Mop or Mop-Up. */
+  sparkSmallOnly: boolean;
+  /** Floor 2: the Sump door swings shut once the whole party is inside, so the Cleanup Crew stays out of the boss fight. */
+  sumpDoorCloses: boolean;
+  /** Floor 2: a locked chest opens for a Skeleton Key only. The Fire Axe opens everything on Floor 1, which is too easy. */
+  chestKeyOnly: boolean;
   grubMove: number;
   fedMove: number;
   /** Floor 2: opening the boss door empties the queue and puts the schedule on every round. */
@@ -132,6 +140,10 @@ export const DEFAULT_CONFIG: Config = {
   grubFrom: 2,
   grubCap: 6,
   grubBudget: Infinity,
+  grubsReturn: true,
+  sparkSmallOnly: true,
+  sumpDoorCloses: true,
+  chestKeyOnly: false,
   grubMove: 4,
   fedMove: 6,
   allHands: true,
@@ -149,9 +161,9 @@ export const DEFAULT_CONFIG: Config = {
 /** The Floor 2 ruleset as written in floor-2.md. Spread over RECOMMENDED-style dials in floor2.ts. */
 export const FLOOR2_CONFIG: Partial<Config> = {
   floor: 2, party: "carryover",
-  collapseStart: "round", collapseMode: "soft", collapseGrace: 4, collapseEscalation: "gentle",
-  lootRich: true, snackFree: true, explore: "blind",
-  collapseRound: 40, grubEvery: 3, grubBudget: 8,
+  collapseStart: "round", collapseMode: "hard",
+  lootRich: true, snackFree: true, explore: "blind", chestKeyOnly: true,
+  collapseRound: 44, grubEvery: 3, grubBudget: 8,
 };
 
 // ---------------------------------------------------------------------------
@@ -190,6 +202,10 @@ export type Monster = {
 
 export type Floor2Stats = {
   corpsesMade: number; corpsesCleaned: number; corpsesLeft: number; bleachUsed: number; bleachFound: number;
+  /** Corpses by size: made over the game, and cleaned by a hero (bleach, Mop, Spark, Mop-Up, goose, pit). */
+  madeBySize: Record<Corpse["size"], number>; cleanedBySize: Record<Corpse["size"], number>;
+  /** Bleach still in the party's packs when the game ended. */
+  bleachLeft: number;
   janitorsFed: { small: number; medium: number; large: number }; janitorsKilled: number; grubsKilled: number;
   bossSnacks: number; chasedRounds: number; passwordRound: number | null; allHandsRound: number | null;
   cleanedBy: { bleach: number; spark: number; goose: number; pit: number };
@@ -276,7 +292,31 @@ export type Frame = {
   achievements: string[];
   /** Set on the last frame. */
   outcome: Result["outcome"] | null;
+  /** A hero frame played by an AI brain: what it was offered and how it chose. */
+  decision: HeroDecision | null;
 };
+
+/** One AI-made hero turn, as shown in the Sim view. */
+export type HeroDecision = {
+  player: string;
+  /** Weight on the person's habits; the rest is "what a sensible player would do". */
+  personality: number;
+  /** `p` is the blend actually rolled from; `persona` and `sensible` are the two answers behind it. */
+  options: { key: string; label: string; p: number; persona: number; sensible: number }[];
+  chosen: string;
+  /** False when the brain rolled a less likely option instead of the favourite. */
+  favourite: boolean;
+  /** 0..2: how tense the moment looks from the table. */
+  tension: number | null;
+  /** Probability the kids at the table are into it. */
+  engaged: number | null;
+  ms: number;
+  cached: boolean;
+  error: string | null;
+};
+
+/** Plays one hero's whole turn. The rules-and-geometry half stays in Game; a brain only decides. */
+export type HeroBrain = (game: Game, h: Hero) => Promise<void>;
 
 const SLOTS: Slot[] = ["main", "off", "body", "head", "feet"];
 
@@ -292,6 +332,7 @@ export class Game {
   grubsQueuedTotal = 0;
   allHandsOn = false;
   f2: Floor2Stats = { corpsesMade: 0, corpsesCleaned: 0, corpsesLeft: 0, bleachUsed: 0, bleachFound: 0,
+    madeBySize: { small: 0, medium: 0, large: 0 }, cleanedBySize: { small: 0, medium: 0, large: 0 }, bleachLeft: 0,
     janitorsFed: { small: 0, medium: 0, large: 0 }, janitorsKilled: 0, grubsKilled: 0, bossSnacks: 0, chasedRounds: 0,
     passwordRound: null, allHandsRound: null, cleanedBy: { bleach: 0, spark: 0, goose: 0, pit: 0 } };
   events: string[] = [];
@@ -303,7 +344,11 @@ export class Game {
   /** Play-by-play for recorded games only. Call as `this.cfg.record && this.say(...)` so batches never build the string. */
   say(msg: string) { this.said.push(msg); }
   frames: Frame[] = [];
-  private said: string[] = [];
+  /** Called with every frame as it is recorded, for streaming a game that is still being played. */
+  onFrame: ((f: Frame) => void) | null = null;
+  /** Set by a brain during a hero turn; attached to that turn's frame. */
+  decision: HeroDecision | null = null;
+  said: string[] = [];
   private trails: Frame["trails"] = [];
   private trail(key: string, hero: boolean, path: Pt[]) { if (this.cfg.record && path.length > 1) this.trails.push({ key, hero, path: path.map(p => ({ ...p })) }); }
   private monKey(m: Monster) { return `m${this.monsters.indexOf(m)}`; }
@@ -505,14 +550,14 @@ export class Game {
     return this.floor.corridorTraps.some(t => t.at.x === x && t.at.y === y);
   }
 
-  private score(i: Item) {
+  score(i: Item) {
     return (i.atk ?? 0) * 3 + (i.def ?? 0) * 3 + (i.mind ?? 0) * 2 + (i.move ?? 0) * 0.5 + (i.bonusVs1hp ?? 0) * 1.5
       + (i.torch ? 1 : 0) + (i.ranged ? 2 : 0) + (i.trapImmuneOnce ? 1 : 0)
       + (i.disarms ? 0.5 : 0) + (i.unlocks ? 1.5 : 0) + (i.reroll ? 1 : 0) + (i.rope ? 0.5 : 0) + (i.capeOnce ? 2.5 : 0) + (i.resetCd ? 1.5 : 0)
       + (i.cleans ? 1 : 0) + (i.koboldAversion ? 1 : 0) + (i.goblinAversion ? 1 : 0);
   }
 
-  private equipOrStash(h: Hero, item: Item) {
+  equipOrStash(h: Hero, item: Item) {
     if (item.slot === "trinket") {
       const free = h.trinkets.indexOf(null);
       if (free >= 0) { h.trinkets[free] = item; return; }
@@ -591,46 +636,73 @@ export class Game {
   run(): Result {
     this.snap("start", null);
     while (this.round < this.cfg.maxRounds) {
-      this.round++;
-      this.goalFieldCache.clear();
-      this.fanShield = 0; this.fanReroll = 0;
-      this.tradePhase();
-      this.fanDeckPhase();
+      this.startRound();
       for (const h of this.heroes) {
         const acts = !h.exited && !h.dead;
         this.heroTurn(h);
         if (acts) this.snap("hero", h.name);
       }
-      if (this.cfg.floor === 2) this.releaseQueue();
-      this.monsterPhase();
-      if (this.cfg.floor === 2) this.grubPhase();
-      this.endOfRound();
-      const alive = this.living();
-      this.minPartyHp = Math.min(this.minPartyHp,
-        alive.length ? alive.reduce((a, h) => a + Math.max(0, h.hp), 0) : this.minPartyHp);
-      // "If all three heroes are dead, the floor collapses immediately."
-      if (this.heroes.every(h => h.dead)) return this.result("wiped");
-      if (this.heroes.every(h => h.exited || h.dead)) return this.result("done");
-
-      const begins = this.collapseBegins();
-      if (begins !== null && this.round >= begins) {
-        if (this.collapseFrom === null) this.collapseFrom = this.round;
-        if (this.cfg.collapseMode === "soft") {
-          // The ceiling comes down harder every round you stay.
-          const k = this.round - this.collapseFrom;
-          const dmg = this.cfg.collapseEscalation === "steep" ? k + 1 : 1 + Math.floor(k / 2);
-          this.cfg.record && this.say(`The ceiling comes down: ${dmg} damage to everyone still standing on the floor`);
-          for (const h of this.heroes) if (!h.exited && !h.downed) this.damage(h, dmg);
-        }
-      }
-      const dl = this.hardDeadline();
-      if (dl !== null && this.round >= dl) {
-        this.heroesLost = this.living().length;
-        return this.result("collapsed");
-      }
-      this.snap("dm", null);
+      const done = this.finishRound();
+      if (done) return done;
     }
     return this.result("stalled");
+  }
+
+  /** The same game loop with each hero's turn played by `brain` (the monsters and the clock stay rules). */
+  async runAsync(brain: HeroBrain): Promise<Result> {
+    this.snap("start", null);
+    while (this.round < this.cfg.maxRounds) {
+      this.startRound();
+      for (const h of this.heroes) {
+        const acts = !h.exited && !h.dead;
+        await brain(this, h);
+        if (acts) this.snap("hero", h.name);
+      }
+      const done = this.finishRound();
+      if (done) return done;
+    }
+    return this.result("stalled");
+  }
+
+  private startRound() {
+    this.round++;
+    this.goalFieldCache.clear();
+    this.fanShield = 0; this.fanReroll = 0;
+    this.tradePhase();
+    this.fanDeckPhase();
+  }
+
+  /** Monsters, grubs, deaths and the collapse. Returns the result if the game is over. */
+  private finishRound(): Result | null {
+    if (this.cfg.floor === 2) { this.closeBossDoor(); this.releaseQueue(); }
+    this.monsterPhase();
+    if (this.cfg.floor === 2) this.grubPhase();
+    this.endOfRound();
+    const alive = this.living();
+    this.minPartyHp = Math.min(this.minPartyHp,
+      alive.length ? alive.reduce((a, h) => a + Math.max(0, h.hp), 0) : this.minPartyHp);
+    // "If all three heroes are dead, the floor collapses immediately."
+    if (this.heroes.every(h => h.dead)) return this.result("wiped");
+    if (this.heroes.every(h => h.exited || h.dead)) return this.result("done");
+
+    const begins = this.collapseBegins();
+    if (begins !== null && this.round >= begins) {
+      if (this.collapseFrom === null) this.collapseFrom = this.round;
+      if (this.cfg.collapseMode === "soft") {
+        // The ceiling comes down harder every round you stay.
+        const k = this.round - this.collapseFrom;
+        const dmg = this.cfg.collapseEscalation === "steep" ? k + 1 : 1 + Math.floor(k / 2);
+        this.cfg.record && this.say(`The ceiling comes down: ${dmg} damage to everyone still standing on the floor`);
+        for (const h of this.heroes) if (!h.exited && !h.downed) this.damage(h, dmg);
+      }
+    }
+    const dl = this.hardDeadline();
+    if (dl !== null && this.round >= dl) {
+      this.heroesLost = this.living().length;
+      return this.result("collapsed");
+    }
+    this.snap("dm", null);
+    return null;
   }
 
   private snap(phase: Frame["phase"], who: string | null, outcome: Result["outcome"] | null = null) {
@@ -668,8 +740,10 @@ export class Game {
       collapsing: this.collapseFrom !== null,
       achievements: [...this.achievements],
       outcome,
+      decision: this.decision,
     });
-    this.said = []; this.trails = [];
+    this.onFrame?.(this.frames[this.frames.length - 1]);
+    this.said = []; this.trails = []; this.decision = null;
   }
 
   private result(kind: "done" | "collapsed" | "stalled" | "wiped"): Result {
@@ -696,7 +770,8 @@ export class Game {
         for (const c of [d.a, d.b]) { const r = this.board.roomIdAt(c); if (r !== null) o.add(r); } }); return o.size; })(),
       capBound: this.cfg.collapseRound !== null && this.bossDoorRound !== null &&
         this.cfg.collapseRound <= this.bossDoorRound + this.cfg.collapseAfterDoor,
-      f2: this.cfg.floor === 2 ? { ...this.f2, corpsesLeft: this.corpses.length } : null,
+      f2: this.cfg.floor === 2 ? { ...this.f2, corpsesLeft: this.corpses.length,
+        bleachLeft: this.heroes.reduce((a, h) => a + h.pack.filter(i => i.use === "bleach").length, 0) } : null,
       deadNames: this.heroes.filter(h => h.dead).map(h => h.name),
       downs: this.stats.downs, respawns: this.stats.respawns, monstersKilled: this.stats.kills,
       roomsCleared: [...this.board.rooms.keys()].filter(id =>
@@ -758,11 +833,31 @@ export class Game {
 
   private corpseAt(p: Pt): Corpse | undefined { return this.corpses.find(c => same(c.pos, p)); }
 
-  private removeCorpse(c: Corpse, how: "bleach" | "spark" | "goose" | "pit" | "eaten" | "snack") {
+  removeCorpse(c: Corpse, how: "bleach" | "spark" | "goose" | "pit" | "eaten" | "snack") {
     this.corpses = this.corpses.filter(x => x !== c);
     this.log(`corpse (${c.size}) at ${c.pos.x},${c.pos.y} ${how === "eaten" ? "EATEN by a grub" : how === "snack" ? "eaten by the BOSS" : "cleaned by " + how}`);
-    if (how === "bleach" || how === "spark" || how === "goose" || how === "pit") { this.f2.corpsesCleaned++; this.f2.cleanedBy[how]++; }
+    if (how === "bleach" || how === "spark" || how === "goose" || how === "pit") { this.f2.corpsesCleaned++; this.f2.cleanedBy[how]++; this.f2.cleanedBySize[c.size]++; }
   }
+
+  /** The Sump door shuts behind the party: once everyone still on the floor is inside the boss room, the heavy
+   *  door swings to. Monsters cannot open doors, so the boss fight is the party and the boss. It stays shut. */
+  private closeBossDoor() {
+    if (!this.cfg.sumpDoorCloses || this.bossDoorShut) return;
+    const inside = this.living();
+    if (!inside.length || !inside.every(h => this.board.roomIdAt(h.pos) === this.bossRoom)) return;
+    this.bossDoorShut = true;
+    let shut = 0;
+    this.board.doors.forEach((d, i) => {
+      if (!this.openDoors[i]) return;
+      const ra = this.board.roomIdAt(d.a), rb = this.board.roomIdAt(d.b);
+      if (ra !== this.bossRoom && rb !== this.bossRoom) return;
+      this.openDoors[i] = 0; shut++;
+    });
+    if (!shut) return;
+    this.goalFieldCache.clear();
+    this.log(`the Sump door swings shut behind the party`);
+  }
+  bossDoorShut = false;
 
   /** Rule 1.4: grubs wait in the stairwell until there is a corpse to walk to, then all come out at once. */
   private releaseQueue() {
@@ -805,12 +900,15 @@ export class Game {
   }
 
   /** The nearest corpse worth a hero's action, by walking distance from the hero. */
-  private cleanTarget(h: Hero, f: Field, method: "bleach" | "goose" | "spark"): { corpse: Corpse; spot: Pt | null; dist: number } | null {
+  private cleanTarget(h: Hero, f: Field, method: "bleach" | "goose" | "spark" | "mopup"): { corpse: Corpse; spot: Pt | null; dist: number } | null {
     let best: { corpse: Corpse; spot: Pt | null; dist: number } | null = null;
+    const sparkSmall = method === "spark" && this.cfg.sparkSmallOnly;
     for (const c of this.corpses) {
       if (method === "goose" && !(c.size === "small" || (h.biscuit && c.size === "medium"))) continue;
-      if (method !== "goose" && c.size === "small") continue;     // small corpses are not worth bleach or a Spark
-      if (method === "spark") {
+      if (sparkSmall && c.size !== "small") continue;
+      // Otherwise small corpses aren't worth bleach or a cast.
+      if (method !== "goose" && !sparkSmall && c.size === "small") continue;
+      if (method === "spark" || method === "mopup") {
         if (!los(this.board, h.pos, c.pos, this.openDoors)) continue;
         const d = dist1(h.pos, c.pos);
         if (!best || d < best.dist) best = { corpse: c, spot: null, dist: d };
@@ -864,10 +962,10 @@ export class Game {
       }
     }
     const canCast = !this.cfg.castNeedsMind || this.mind(h) >= 4;
-    const book = canCast ? (h.learned.find(l => l.item.spell?.id === "mopup" && l.cd === 0) ?? h.learned.find(l => l.item.spell?.id === "spark" && l.cd === 0)) : undefined;
-    if (book) {
-      const t = this.cleanTarget(h, f, "spark");
-      if (t) { book.cd = book.item.spell!.cooldown; this.removeCorpse(t.corpse, "spark"); return true; }
+    for (const id of ["mopup", "spark"] as const) {
+      const book = canCast ? h.learned.find(l => l.item.spell?.id === id && l.cd === 0) : undefined;
+      const t = book && this.cleanTarget(h, f, id);
+      if (book && t) { book.cd = book.item.spell!.cooldown; this.removeCorpse(t.corpse, "spark"); return true; }
     }
     return false;
   }
@@ -933,21 +1031,44 @@ export class Game {
 
   // --- hero turn -----------------------------------------------------------
 
-  private heroTurn(h: Hero) {
-    if (h.exited || h.dead) return;
+  heroTurn(h: Hero) {
+    const pre = this.beginHeroTurn(h, true);
+    if (!pre) return;
+    const { fleeing } = pre;
+
+    // Reviving a downed friend beats almost everything.
+    const down = this.heroes.find(o => o.downed && !o.exited && !o.dead);
+    if (down && !fleeing) {
+      if (adjacent(h.pos, down.pos)) { this.revive(h, down); return; }
+      const f = this.walkField(h);
+      const spot = this.bestAdjacentSpot(f, down.pos, this.moveBudget(h));
+      if (spot && this.rng.next() < 0.85) {
+        this.walk(h, f, spot);
+        if (adjacent(h.pos, down.pos)) { this.revive(h, down); return; }
+        return;
+      }
+    }
+    return this.heroTurnRest(h, fleeing);
+  }
+
+  /** Everything a turn does before anyone decides anything: cooldowns, Downed, pending gear, the pit, the goose,
+   *  and how scared of the clock the party is. Returns null when the turn is already spent. `drink` = the fixed
+   *  brain's free drink when hurt; an AI brain decides that itself. */
+  beginHeroTurn(h: Hero, drink: boolean): { fleeing: boolean } | null {
+    if (h.exited || h.dead) return null;
     for (const l of h.learned) if (l.cd > 0) l.cd--;
     h.stoneSkin = false;
-    if (h.downed) { this.cfg.record && this.say(`${h.name} is Downed and can't act; dies at the end of round ${h.downedRound + 1} unless picked up`); return; }
+    if (h.downed) { this.cfg.record && this.say(`${h.name} is Downed and can't act; dies at the end of round ${h.downedRound + 1} unless picked up`); return null; }
 
     // Out of combat, gear picked up during a fight gets equipped for free.
     if (h.pending.length && !this.inCombat(h)) { for (const it of h.pending) this.equipOrStash(h, it); h.pending = []; }
 
     // Free: drink when hurt (consumables cost no action).
-    this.maybeHeal(h);
+    if (drink) this.maybeHeal(h);
 
     if (h.inPit) {
       if (this.has(h, i => !!i.rope)) h.inPit = false;
-      else { h.inPit = false; this.cfg.record && this.say(`${h.name} climbs out of the pit (that's the turn)`); return; }        // climbing out costs the action
+      else { h.inPit = false; this.cfg.record && this.say(`${h.name} climbs out of the pit (that's the turn)`); return null; }        // climbing out costs the action
     }
 
     const dl = this.hardDeadline();
@@ -964,23 +1085,13 @@ export class Game {
       || lastOneStanding;
 
     // Floor 2: a Downed goose gets picked up on a quiet turn (his person's action).
-    if (h.gooseDown >= 0 && !this.inCombat(h)) { h.gooseDown = -99; h.goose = 1; this.cfg.record && this.say(`${h.name} picks up Sir Reginald`); return; }
+    if (h.gooseDown >= 0 && !this.inCombat(h)) { h.gooseDown = -99; h.goose = 1; this.cfg.record && this.say(`${h.name} picks up Sir Reginald`); return null; }
     // Pet Biscuit: slide it under the goose the moment it is in hand.
     if (!h.biscuit && h.goose > 0 && h.pack.some(i => i.biscuit)) { h.biscuit = true; h.gooseMax = 3; h.goose = 3; h.pack = h.pack.filter(i => !i.biscuit); }
+    return { fleeing };
+  }
 
-    // Reviving a downed friend beats almost everything.
-    const down = this.heroes.find(o => o.downed && !o.exited && !o.dead);
-    if (down && !fleeing) {
-      if (adjacent(h.pos, down.pos)) { this.revive(h, down); return; }
-      const f = this.walkField(h);
-      const spot = this.bestAdjacentSpot(f, down.pos, this.moveBudget(h));
-      if (spot && this.rng.next() < 0.85) {
-        this.walk(h, f, spot);
-        if (adjacent(h.pos, down.pos)) { this.revive(h, down); return; }
-        return;
-      }
-    }
-
+  private heroTurnRest(h: Hero, fleeing: boolean) {
     const target = this.pickTarget(h, fleeing);
 
     // Static: 1 damage to every adjacent monster, worth it against two or more.
@@ -1010,9 +1121,22 @@ export class Game {
     const goal = this.goalCell(h, fleeing, target);
     if (goal) {
       const f = this.walkField(h);
-      const dest = this.stepToward(h, f, goal, this.moveBudget(h));
-      if (dest) this.walk(h, f, dest);
-      else { this.stuck++; this.cfg.record && this.say(`${h.name} can't find a way forward and stays put`); }
+      const budget = this.moveBudget(h);
+      let dest = this.stepToward(h, f, goal, budget);
+      // No progress (the way is blocked by a figure, or the goal is behind a door this hero can't open):
+      // try the next room on the list instead of standing on the spot, which is what this used to do silently.
+      if (!dest || same(dest, h.pos)) {
+        const alt = this.altGoal(h, f, goal);
+        if (alt) dest = this.stepToward(h, f, alt, budget);
+      }
+      if (dest && !same(dest, h.pos)) this.walk(h, f, dest);
+      else {
+        // Still nowhere to go: swing at whatever is in the way, otherwise say so out loud.
+        const blocker = this.monsters.find(m => m.alive && m.asleep === 0 && adjacent(m.pos, h.pos));
+        if (blocker) { this.cfg.record && this.say(`${h.name} is boxed in and swings at the ${blocker.def.name}`); this.heroAttack(h, blocker); return; }
+        this.stuck++;
+        this.cfg.record && this.say(`${h.name} can't get anywhere useful and holds position`);
+      }
     }
 
     // Act after moving.
@@ -1035,10 +1159,10 @@ export class Game {
     }
   }
 
-  private moveBudget(h: Hero) { return this.lastRoll = this.moveDice(h); }
-  private lastRoll = 0;
+  moveBudget(h: Hero) { return this.lastRoll = this.moveDice(h); }
+  lastRoll = 0;
 
-  private walkField(h: Hero): Field {
+  walkField(h: Hero): Field {
     return field(this.board, h.pos, this.heroPolicy(h));
   }
 
@@ -1075,12 +1199,26 @@ export class Game {
   stairsCells(): Pt[] { return this.board.rooms.get(this.bossRoom)!.interact!.cells; }
   onStairs(h: Hero) { return this.stairsCells().some(c => same(h.pos, c)); }
 
-  private roomDone(id: number) { return !this.monsters.some(m => m.alive && m.room === id); }
+  roomDone(id: number) { return !this.monsters.some(m => m.alive && m.room === id); }
+
+  /** Furniture worth a visit: unused, and not a chest nobody can open. */
+  usableInteract(id: number): boolean {
+    const r = this.board.rooms.get(id);
+    if (!r?.interact || this.usedInteract.has(id)) return false;
+    if (r.interact.what.kind === "stairs") return false;
+    return r.interact.what.kind !== "chest" || this.partyHasChestKey();
+  }
+  /** The same, for one hero: a chest is only worth walking to if the key is with you or close behind. */
+  usableInteractFor(h: Hero, id: number): boolean {
+    if (!this.usableInteract(id)) return false;
+    if (this.board.rooms.get(id)!.interact!.what.kind !== "chest") return true;
+    return !!this.chestKey(h) || this.standing().some(o => o !== h && dist1(o.pos, h.pos) <= 4 && this.chestKey(o));
+  }
 
   private roomTargetCache: { round: number; id: number } | null = null;
   /** The party moves as a group toward the nearest room it still owes a visit. */
   /** Rooms the party has opened a door into. */
-  private visitedRooms(): Set<number> {
+  visitedRooms(): Set<number> {
     const v = new Set<number>();
     this.board.doors.forEach((d, i) => {
       if (this.openDoors[i] !== 1) return;
@@ -1089,12 +1227,10 @@ export class Game {
     return v;
   }
 
-  private currentRoom(): number {
-    if (this.roomTargetCache?.round === this.round) return this.roomTargetCache.id;
-    const lead = this.standing()[0] ?? this.living()[0] ?? this.heroes[0];
-    const f = field(this.board, lead.pos, { ...this.heroPolicy(lead), occupied: () => false, avoid: undefined });
+  /** The rooms the party still owes a visit, in no particular order. */
+  openRoomIds(): number[] {
     const required = this.requiredRooms;
-    const unfinished = (id: number) => !this.roomDone(id) || (!this.urgent && !!this.board.rooms.get(id)!.interact && !this.usedInteract.has(id));
+    const unfinished = (id: number) => !this.roomDone(id) || (!this.urgent && this.usableInteract(id));
     const open = this.cfg.explore === "blind" ? (() => {
       // Blind: nobody knows which room has the password. Open the nearest unexplored door until it turns up;
       // afterwards the boss room is the goal, with the appetite for side rooms limited to the greed list.
@@ -1108,8 +1244,16 @@ export class Game {
       });
     })() : this.route.filter(id =>
       id !== this.bossRoom && (this.urgent ? required.includes(id) : true) &&
-      (!this.roomDone(id) || (!this.urgent && this.board.rooms.get(id)!.interact && !this.usedInteract.has(id))
+      (!this.roomDone(id) || (!this.urgent && this.usableInteract(id))
         || (this.cfg.floor === 2 && !this.partyHasPassword() && this.monsters.some(m => m.alive && m.room === id && m.def.password))));
+    return open;
+  }
+
+  currentRoom(): number {
+    if (this.roomTargetCache?.round === this.round) return this.roomTargetCache.id;
+    const lead = this.standing()[0] ?? this.living()[0] ?? this.heroes[0];
+    const f = field(this.board, lead.pos, { ...this.heroPolicy(lead), occupied: () => false, avoid: undefined });
+    const open = this.openRoomIds();
     let best = this.bossRoom, bd = Infinity;
     for (const id of open) {
       const c = this.board.center(id);
@@ -1128,14 +1272,19 @@ export class Game {
     if (near.length) return this.bestOf(h, near);
     if (fleeing) return null;
     const room = this.currentRoom();
-    const pool = live.filter(m => !m.def.janitor && (m.room === room || m.active ||
-      los(this.board, h.pos, m.pos, this.openDoors)));
+    // A fed janitor is a chase, not a target -- unless it is right on top of you, and in particular when it is
+    // parked in the only doorway, which used to leave the party standing in a dead end until the floor fell in.
+    const pool = live.filter(m => m.def.janitor
+      ? m.def.janitor === "fed" && dist1(m.pos, h.pos) <= 3
+      : (m.room === room || m.active || los(this.board, h.pos, m.pos, this.openDoors)));
     if (!pool.length) return null;   // nothing to fight: go do the objective
     // reachable-ish: prefer nearest by path
     const f = this.walkField(h);
     let best: Monster | null = null, bestD = Infinity;
     for (const m of pool) {
       const d = this.adjacentDist(f, m.pos);
+      // Every square beside it is a wall, furniture or another hero: someone else is dealing with this one.
+      if (d >= 0x3fffffff && !this.hasRanged(h)) continue;
       const pri = this.priority(h, m);
       const score = d - pri * 4;
       if (score < bestD) { bestD = score; best = m; }
@@ -1164,7 +1313,7 @@ export class Game {
     return best;
   }
 
-  private adjacentDist(f: Field, p: Pt): number {
+  adjacentDist(f: Field, p: Pt): number {
     let best = Infinity;
     for (const d of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
       const x = p.x + d[0], y = p.y + d[1];
@@ -1174,7 +1323,7 @@ export class Game {
     return best;
   }
 
-  private bestAdjacentSpot(f: Field, p: Pt, budget: number): Pt | null {
+  bestAdjacentSpot(f: Field, p: Pt, budget: number): Pt | null {
     let best: Pt | null = null, bd = Infinity;
     for (const d of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
       const x = p.x + d[0], y = p.y + d[1];
@@ -1186,24 +1335,67 @@ export class Game {
   }
 
   private goalCell(h: Hero, fleeing: boolean, target: Monster | null): Pt | null {
-    if (fleeing || (this.bossKilledRound !== null && this.roomDone(this.bossRoom))) return this.stairsCell();
+    // Bailing out only makes sense if the stairs can be reached: on Floor 2 the Sump needs the password, and a
+    // party without one used to run at a door it could not open and then stand there until the floor fell in.
+    if (fleeing || (this.bossKilledRound !== null && this.roomDone(this.bossRoom))) {
+      const stairs = this.stairsCell();
+      const f = field(this.board, h.pos, { ...this.heroPolicy(h), occupied: () => false, avoid: undefined });
+      if (f.dist[this.board.idx(stairs.x, stairs.y)] < 0x3fffffff) return stairs;
+    }
     if (target) return target.pos;
     const room = this.currentRoom();
     const rd = this.board.rooms.get(room)!;
+    const here = this.board.roomIdAt(h.pos) === room;
+    const canUse = this.usableInteractFor(h, room) && !this.urgent;
+    // Standing in the party's target room with nothing left to do here (no monster this hero can reach, no
+    // furniture they can use) means moving on, not standing still while somebody else finishes the fight.
+    if (here && !canUse) {
+      const f = field(this.board, h.pos, { ...this.heroPolicy(h), occupied: () => false, avoid: undefined });
+      let next: number | null = null, nd = Infinity;
+      for (const id of this.openRoomIds()) {
+        if (id === room) continue;
+        const c = this.board.center(id);
+        const d = f.dist[this.board.idx(c.x, c.y)];
+        if (d < nd) { nd = d; next = id; }
+      }
+      if (next !== null) return this.board.center(next);
+      return this.stairsCell();
+    }
     if (!this.roomDone(room)) return this.board.center(room);
-    if (rd.interact && !this.usedInteract.has(room) && !this.urgent) return rd.interact.at;
+    if (canUse) return rd.interact!.at;
     return this.stairsCell();
   }
 
   /** Choose the reachable cell within budget that gets closest to `goal`. */
   /** Sources for a goal field: the goal itself, or the squares beside it if it
    *  is a piece of furniture you can only reach by standing next to it. */
+  /** Somewhere else worth walking to when the first objective can't be approached this turn. */
+  private altGoal(h: Hero, f: Field, goal: Pt): Pt | null {
+    const goalRoom = this.board.roomIdAt(goal);
+    let best: Pt | null = null, bd = Infinity;
+    for (const id of this.openRoomIds()) {
+      if (id === goalRoom) continue;
+      const c = this.board.center(id);
+      const d = f.dist[this.board.idx(c.x, c.y)];
+      if (d < bd) { bd = d; best = c; }
+    }
+    if (best) return best;
+    // Nothing left on the list: the stairs, if this hero can reach them at all.
+    const stairs = this.stairsCell();
+    return f.dist[this.board.idx(stairs.x, stairs.y)] < 0x3fffffff ? stairs : null;
+  }
+
   private goalSources(goal: Pt): Pt[] {
     if (this.board.isFloor(goal.x, goal.y)) return [goal];
+    // Furniture is used from inside its own room. A corridor square on the far side of the room's wall is
+    // next to the piece on the grid and useless at the table, and a hero who walks there stands for ever.
+    const rid = this.board.roomIdAt(goal);
     const out: Pt[] = [];
     for (const d of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) {
       const p = { x: goal.x + d[0], y: goal.y + d[1] };
-      if (this.board.isFloor(p.x, p.y)) out.push(p);
+      if (!this.board.isFloor(p.x, p.y)) continue;
+      if (rid !== null && this.board.roomIdAt(p) !== rid) continue;
+      out.push(p);
     }
     return out.length ? out : [goal];
   }
@@ -1218,7 +1410,7 @@ export class Game {
     return gf;
   }
 
-  private stepToward(h: Hero, f: Field, goal: Pt, budget: number): Pt | null {
+  stepToward(h: Hero, f: Field, goal: Pt, budget: number): Pt | null {
     const gf = this.goalField(h, goal);
     let best: Pt | null = null, bs = Infinity;
     for (let y = 0; y < this.board.h; y++) for (let x = 0; x < this.board.w; x++) {
@@ -1233,7 +1425,7 @@ export class Game {
     return best;
   }
 
-  private walk(h: Hero, f: Field, dest: Pt) {
+  walk(h: Hero, f: Field, dest: Pt) {
     const path = pathTo(this.board, f, dest);
     let i = 1;
     for (; i < path.length; i++) {
@@ -1289,11 +1481,24 @@ export class Game {
       }
     } else if (d.kind === "locked") {
       const key = this.find(h, i => !!i.unlocks && i.unlocks < 99);
-      if (key) { key.unlocks = 0; this.dropItem(h, key); }
+      if (key) this.spendCharge(h, key);
     }
   }
 
-  private dropItem(h: Hero, item: Item) {
+  /** What this hero can open a locked chest with. The Fire Axe is unlocks: 99; Floor 2's chests refuse it. */
+  chestKey(h: Hero): Item | undefined {
+    return this.find(h, i => !!i.unlocks && !(this.cfg.chestKeyOnly && i.unlocks >= 99));
+  }
+  /** Anyone still on the floor who could open one (the party hands cards around freely, rule 1.5). */
+  partyHasChestKey(): boolean { return this.living().some(h => !!this.chestKey(h)); }
+  /** One use off a key: the Janitor's Keyring has three, the Skeleton Key one, the Fire Axe unlimited. */
+  private spendCharge(h: Hero, key: Item) {
+    if (key.unlocks! >= 99) return;
+    key.unlocks!--;
+    if (key.unlocks! <= 0) this.dropItem(h, key);
+  }
+
+  dropItem(h: Hero, item: Item) {
     for (let i = 0; i < h.trinkets.length; i++) if (h.trinkets[i] === item) h.trinkets[i] = null;
     h.pack = h.pack.filter(p => p !== item);
   }
@@ -1339,7 +1544,7 @@ export class Game {
     return false;
   }
 
-  private maybeHeal(h: Hero) {
+  maybeHeal(h: Hero) {
     const threshold = this.monsters.some(m => m.alive && m.active && dist1(m.pos, h.pos) <= 3) ? 3 : 2;
     while (h.hp <= threshold && h.hp < h.maxHp) {
       const c = h.pack.find(i => i.use === "heal4") ?? h.pack.find(i => i.use === "heal3")
@@ -1351,7 +1556,7 @@ export class Game {
     }
   }
 
-  private revive(h: Hero, down: Hero) {
+  revive(h: Hero, down: Hero) {
     const bandage = h.pack.find(i => i.use === "heal1");
     if (bandage) h.pack = h.pack.filter(x => x !== bandage);
     down.downed = false; down.hp = this.cfg.reviveHp;
@@ -1359,9 +1564,9 @@ export class Game {
   }
 
   /** A true ranged weapon (the Shortbow): shoot instead of closing to melee. */
-  private hasRanged(h: Hero) { const r = h.equip.main?.ranged; return !!r && !r.sidearm; }
+  hasRanged(h: Hero) { const r = h.equip.main?.ranged; return !!r && !r.sidearm; }
   /** A sidearm (the Slingshot): melee as normal, but take a shot if the turn ends out of reach. */
-  private hasSidearm(h: Hero) { return !!h.equip.main?.ranged?.sidearm; }
+  hasSidearm(h: Hero) { return !!h.equip.main?.ranged?.sidearm; }
 
   private tryCast(h: Hero, target: Monster): boolean {
     if (!los(this.board, h.pos, target.pos, this.openDoors)) return false;
@@ -1416,7 +1621,7 @@ export class Game {
     return false;
   }
 
-  private heroAttack(h: Hero, m: Monster) {
+  heroAttack(h: Hero, m: Monster) {
     let dice = this.atk(h) + h.energy;
     const ranged = h.equip.main?.ranged;
     if (ranged) {
@@ -1434,9 +1639,9 @@ export class Game {
     this.resolveAttack(h, m, dice);
     this.lastShotRanged = false;
   }
-  private lastShotRanged = false;
+  lastShotRanged = false;
 
-  private resolveAttack(h: Hero, m: Monster, dice: number) {
+  resolveAttack(h: Hero, m: Monster, dice: number) {
     let skulls = rollSkulls(this.rng, dice);
     if (skulls === 0 && h.equip.main?.fragile) h.equip.main = null;   // the stick snaps
     if (skulls === 0 && !h.rerollUsed && this.items(h).some(i => i.reroll)) {
@@ -1456,7 +1661,7 @@ export class Game {
     if (dmg > 0) this.hurtMonster(m, dmg, h);
   }
 
-  private hurtMonster(m: Monster, dmg: number, killer: Hero | null) {
+  hurtMonster(m: Monster, dmg: number, killer: Hero | null) {
     m.hp -= dmg;
     m.active = true;
     if (m.room === 9 && this.bossEngagedRound === null) this.bossEngagedRound = this.round;
@@ -1464,7 +1669,11 @@ export class Game {
     m.alive = false;
     if (m.def.janitor) {
       // Janitors leave no corpse and no loot. A fed one is worth an achievement.
-      if (m.def.janitor === "grub") this.f2.grubsKilled++;
+      if (m.def.janitor === "grub") {
+        this.f2.grubsKilled++;
+        // Beating back the tide: the tile goes back on the queue die, it doesn't leave the floor.
+        if (this.cfg.grubsReturn) { this.queue++; this.cfg.record && this.say(`  the grub goes back to the stairwell queue (${this.queue} waiting)`); }
+      }
       else { this.f2.janitorsKilled++; this.award("Health Inspector", [{ name: "Gold (5)", slot: "pack", gold: 5 }]); }
       this.log(`${killer?.name ?? "a trap"} kills a ${m.def.name}`);
       return;
@@ -1479,7 +1688,7 @@ export class Game {
     if (this.cfg.floor === 2 && m.def.size && !m.def.boss) {
       // Rule 1.1: the body stays where it fell, unless it fell into a pit.
       if (this.isLiveTrap(m.pos.x, m.pos.y) || this.spentTraps.has(`${m.pos.x},${m.pos.y}`)) this.f2.cleanedBy.pit++;
-      else { this.corpses.push({ pos: { ...m.pos }, size: m.def.size }); this.f2.corpsesMade++; this.log(`${killer?.name ?? "a trap"} kills ${m.def.name} at ${m.pos.x},${m.pos.y} (${m.def.size} corpse)`); }
+      else { this.corpses.push({ pos: { ...m.pos }, size: m.def.size }); this.f2.corpsesMade++; this.f2.madeBySize[m.def.size]++; this.log(`${killer?.name ?? "a trap"} kills ${m.def.name} at ${m.pos.x},${m.pos.y} (${m.def.size} corpse)`); }
     }
     if (!killer) {
       this.award("Trap Chef", this.cfg.floor === 1 ? [{ name: "Fire Axe", slot: "main", twoHanded: true, atk: 2, unlocks: 99 }] : [clone(FLOOR2_ITEMS["Leaf Blower"])]);
@@ -1503,7 +1712,7 @@ export class Game {
     }
   }
 
-  private tryInteract(h: Hero): boolean {
+  tryInteract(h: Hero): boolean {
     const rid = this.board.roomIdAt(h.pos);
     if (rid === null) return false;
     const r = this.board.rooms.get(rid)!;
@@ -1513,8 +1722,9 @@ export class Game {
     const w = r.interact.what;
     if (w.kind === "stairs") return false;
     if (this.urgent) return false;
-    this.cfg.record && this.say(`${h.name} uses the ${w.kind} in ${r.name}`);
-    if (w.kind === "cage") { this.usedInteract.add(rid); h.goose = 2; this.cfg.record && this.say(`  Sir Reginald joins ${h.name}`); return true; }
+    const used = () => this.cfg.record && this.say(`${h.name} uses the ${w.kind} in ${r.name}`);
+    if (w.kind === "cage") {
+      used(); this.usedInteract.add(rid); h.goose = 2; this.cfg.record && this.say(`  Sir Reginald joins ${h.name}`); return true; }
     const fixed = this.cfg.floor === 2 ? FIXED_LOOT[r.name] : undefined;
     const handout = () => {
       if (!fixed) return false;
@@ -1524,20 +1734,18 @@ export class Game {
       this.give(h, it); return true;
     };
     if (w.kind === "chest") {
-      if (this.has(h, i => !!i.unlocks)) {
-        const key = this.find(h, i => !!i.unlocks)!;
-        if (key.unlocks! < 99) { key.unlocks = 0; this.dropItem(h, key); }
-      } else if (rollSkulls(this.rng, this.mind(h)) === 0) {
-        // Failed pick: it screams, and a goblin comes running.
-        const g = this.monsters.find(m => m.alive && m.def.id === "goblin" && !m.active);
-        if (g) g.active = true;
-        this.cfg.record && this.say(`  the lock pick fails and the chest screams`);
-        return true;
-      }
+      // No key, no chest: there is no lock-picking in the printed rules. A friend standing next to you can
+      // hand theirs over for free (rule 1.5), which is what a table does rather than swapping turns around.
+      const holder = this.chestKey(h) ? h : this.standing().find(o => o !== h && adjacent(o.pos, h.pos) && this.chestKey(o));
+      if (!holder) return false;
+      used();
+      if (holder !== h) this.cfg.record && this.say(`  ${holder.name} hands over the ${this.chestKey(holder)!.name}`);
+      this.spendCharge(holder, this.chestKey(holder)!);
       this.usedInteract.add(rid);
       if (!handout()) { const it = this.draw("big"); if (it) this.give(h, it); }
       return true;
     }
+    used();
     this.usedInteract.add(rid);
     if (handout()) return true;
     const deck = w.kind === "shelf" ? (this.mind(h) >= 4 ? "big" : "gear")
@@ -1549,7 +1757,7 @@ export class Game {
     return true;
   }
 
-  private tryLearn(h: Hero): boolean {
+  tryLearn(h: Hero): boolean {
     if (this.mind(h) < 4) return false;
     const bk = h.pack.find(i => i.slot === "learned");
     if (!bk) return false;

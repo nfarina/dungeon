@@ -18,6 +18,7 @@ bun run src/floor2.ts trace 7       # one Floor 2 game, narrated
 bun run src/floor2.ts brains 1200   # cleaner vs runner party, no grubs, no cap
 bun run src/floor2.ts sweep 1200    # grub schedule, cap, fed move, floor cap, All Hands, Snack
 bun run src/replay.ts 7 2            # one recorded game (seed 7, Floor 2), step by step
+bun run src/replay.ts 7 2 jev        # the same, with the heroes played by Jev as the family (needs ../.typesafe.key)
 bun run map                         # the map editor at http://localhost:5173
 ```
 
@@ -50,7 +51,7 @@ on one side, furniture on a wall, and missing entrance/stairs. Get it to
 "connected and complete" before trusting a simulation.
 
 **DM mode** hides the tools: tap a room to strike it off, tap a door to open it,
-and run the two clocks from section 1.7 — End round ticks down, "Reset! (→5)"
+and run the two clocks from section 1.7 — End round ticks down, "Reset! (→9)"
 is Greg hitting the emergency reset when the Office opens. That state lives in
 the browser, separate from the map, so marking rooms cleared never edits the
 floor. The **Players** preset hides traps, monsters and secret doors, for when
@@ -63,6 +64,24 @@ Space autoplays, N rolls a new game. A seed replays the same game, so change a
 monster placement and hit "Replay seed" to see what it does to that evening
 (it diverges from the first die the change touches). The engine records it
 behind `record: true` (`Frame` in `engine.ts`); recording draws no dice.
+
+**Jev** (the switch above the Sim controls) plays the heroes with TypeSafe's Jev
+model instead of the fixed policy (`src/brains/jev.ts`). Each turn the code rolls
+the move and lists every legal option with its walking distance; Jev answers which
+one an experienced player would pick for the party, and the brain rolls from those
+probabilities. Code also tags the option that follows the party's plan (the rules
+brain's next room), because Jev sees one turn at a time and without a plan the
+party drifts until the clock runs out. Drinking uses the rules brain's threshold.
+Monsters, dice and the clock stay rules. A game is 60 to 130 decisions at about
+200 ms each, so frames stream into the page while it plays; the log shows every
+option's percentage and a tension line runs under the slider. Answers are cached
+in `sim/.cache/jev/` by exact request, so replaying a seed on an unchanged map
+costs nothing and plays the same game. `PLAYERS` and the `personality` option
+weight in how each family member habitually plays; off by default, because every
+turn then followed the quirk and the party fell apart. Unlike the rules brain,
+Jev squashes grubs on its way past, which is what a table would do. Treat it as a curiosity for
+watching one game unfold rather than a source of numbers: its parties wander off alone and split
+up more than a real table does, so the fixed policy is what the reports and the tuning rely on.
 
 ## The map format
 

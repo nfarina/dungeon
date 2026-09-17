@@ -28,6 +28,7 @@
   "floor": {
     "name": "Floor 2 — Facilities",
     "guide": "floor-2",
+    "cap": 44,
     "note": "Board traced from the Side B board image: 26x19, 19 possible rooms, G is the big chamber with the skeleton. First layout per floor-2.md section 3: entrance top-right dead-ends into Reception, then the Supply Closet, then the floor opens. The Shift Office (password) is in the far bottom-right corner, required by content: the party has to hunt for it. The Sump is the boss room.",
     "rooms": [
       {

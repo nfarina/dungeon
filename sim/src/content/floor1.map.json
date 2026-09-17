@@ -28,6 +28,8 @@
   "floor": {
     "name": "Floor 1 — The Tutorial Floor",
     "guide": "floor-1",
+    "cap": 22,
+    "fuse": 9,
     "note": "Board traced from a photo of the printed Side A: 26x19, outer edge is corridor, 22 possible rooms, no printed stone. The ROOM ASSIGNMENT below (which possible room is the Welcome Center, etc.) and the door placements are a first pass — check them against the quest sheet.",
     "rooms": [
       {

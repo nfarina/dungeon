@@ -202,6 +202,18 @@ aside.right.simside #simCtl{flex:none}
 .simbar input[type=number]{width:84px; padding:5px 6px; background:var(--paper); border:1px solid var(--line-2); border-radius:3px}
 .simbar select{padding:5px 4px; background:var(--paper); border:1px solid var(--line-2); border-radius:3px}
 #simScrub{width:100%; margin:8px 0 2px; accent-color:var(--amber)}
+#simTension{display:block; width:100%; height:34px; margin:0 0 2px; cursor:pointer}
+.simlive{display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--ok); margin-right:6px; animation:simpulse 1s infinite alternate}
+@keyframes simpulse{to{opacity:.25}}
+.decide{margin:3px 0 5px; padding:5px 7px; border:1px solid var(--line-2); border-radius:4px; background:var(--paper)}
+.decide .why{font-size:10.5px; color:var(--muted); margin-bottom:3px}
+.decide .opt{display:grid; grid-template-columns:34px 1fr; gap:6px; align-items:center; font-size:11px; line-height:1.3; padding:1px 0}
+.decide .opt b{font-weight:600; text-align:right; font-variant-numeric:tabular-nums}
+.decide .opt span{position:relative; padding:1px 4px; border-radius:2px; overflow:hidden}
+.decide .opt span i{position:absolute; left:0; top:0; bottom:0; background:var(--amber-soft); z-index:0}
+.decide .opt span em{position:relative; font-style:normal}
+.decide .opt.pick{color:var(--ink); font-weight:600}
+.decide .opt.pick span{box-shadow:inset 0 0 0 1px var(--amber)}
 .simnow{font-family:"Barlow Condensed",sans-serif; font-size:22px; font-weight:700; line-height:1.1; margin:8px 0 2px}
 .simfacts{display:flex; gap:5px; flex-wrap:wrap; margin-top:6px}
 .simfacts span{font-size:11px; border:1px solid var(--line-2); border-radius:10px; padding:1px 8px; background:var(--paper); white-space:nowrap}
@@ -374,7 +386,7 @@ const DM_MONSTERS = {
   kobold:      { n:"Kobold Miner", att:3, def:2, hp:1, mind:2, move:"8", loot:"1–2 nothing · 3–4 Pockets · 5–6 Gear", rules:"Leaves a medium corpse.", flavor:"Contractor. Paid by the corpse. Hasn't been paid." },
   bear:        { n:"Cave Bear", att:3, def:3, hp:2, mind:2, move:"6", loot:"1–3 Gear · 4–6 Big Gear", rules:"Leaves a large corpse.", flavor:"Not staff. Nobody has told the bear this." },
   shiftlead:   { n:"The Shift Lead", att:3, def:3, hp:2, mind:3, move:"8", loot:"Password of the Day, plus one Gear", rules:"Leaves a medium corpse. The password opens the Sump door.", flavor:"Has the password. Has a clipboard. Has had enough." },
-  grub:        { n:"Grub", att:0, def:0, hp:1, mind:0, move:"4, no roll", loot:"nothing", rules:"One joins the stairwell queue every third round from round 2, eight per floor, ever. They leave the stairs only when a corpse exists. Ignores heroes. Walks toward the nearest corpse and eats it, then flips: small → Bloated Grub (2/2/1), medium → Custodian (3/3/2), large → Facilities Manager (4/3/3), all Move 6 fixed, hunting the nearest hero. Janitors leave no corpse.", flavor:"Facilities. Please do not interact with the staff." },
+  grub:        { n:"Grub", att:0, def:0, hp:1, mind:0, move:"4, no roll", loot:"nothing", rules:"One joins the stairwell queue every third round from round 2, eight per floor, ever. They leave the stairs only when a corpse exists. Squashed: back to the stairwell queue, it doesn't use up one of the eight. Ignores heroes. Walks toward the nearest corpse and eats it, then flips: small → Bloated Grub (2/2/1), medium → Custodian (3/3/2), large → Facilities Manager (4/3/3), all Move 6 fixed, hunting the nearest hero. Janitors leave no corpse.", flavor:"Facilities. Please do not interact with the staff." },
   custodian:   { n:"The Senior Custodian", att:4, def:3, hp:5, mind:4, move:"6", loot:"Boss Box, plus one Big Gear",
     rules:"Snack: if a corpse is in the room, eats it and heals 2, and still attacks. Corpses in here are lunch. Mop (cooldown 2): 2 dice at every adjacent hero when two or more are adjacent. Understaffed: while any fed janitor is alive, defends with 4 dice.",
     flavor:"A grub that ate something with a very large skeleton, a long time ago." },
@@ -385,7 +397,7 @@ const DM_TRAPS = {
 };
 const DM_DOORS = {
   normal: "Opens as you walk through.",
-  locked: "Locked. Floor 1: opens with a Skeleton Key, a Fire Axe, or Knock. Floor 2 (the Sump): opens only for the Password of the Day, read aloud.",
+  locked: "Locked. Floor 1: opens with a Skeleton Key, a Fire Axe, or Knock. Floor 2 (the Sump): opens only for the Password of the Day, read aloud, and shuts again once the whole party is inside — nothing on staff can open a door, so the boss fight stays private.",
   secret: "Secret door. Players don't know it's there until someone searches or walks past it with a Torch.",
   block:  "Falling block. 2 damage to whoever opens it unless they roll a white shield on 1 die. The block then fills the doorway: come in the other way or spend an action clearing it. A Football Helmet eats the damage.",
 };
@@ -393,7 +405,7 @@ const DM_BLOCK = DM_DOORS.block;
 const DM_FEATURES = {
   entrance: "Where the party comes in.",
   stairs:   "Stairs down. Any hero on one of these squares at the end of a round has escaped the floor. Leaving with Greg alive forfeits the Boss Box.",
-  chest:    "Locked chest: 1 Big Gear draw. Opening it is an action and needs a Skeleton Key or a Fire Axe.",
+  chest:    "Locked chest: 1 Big Gear draw. Opening it is an action. Floor 1: a Skeleton Key or a Fire Axe. Floor 2: a Skeleton Key only — the axe opens nothing locked down here.",
   rack:     "Weapon rack: 1 Gear draw plus the Spellbook: Spark. Using it is an action.",
   table:    "Table: 1 Pockets draw, as an action.",
   shelf:    "Bookshelf: 1 Big Gear draw if the reader has Mind 4 or more, otherwise 1 Gear draw. An action.",
@@ -413,12 +425,17 @@ const LAYERS = [
   {id:"monsters",  name:"Monsters",  hint:"Tap a square inside a room to place one. A room with placed monsters spawns exactly those; a room with none scatters its list at random."},
 ];
 
-let map = null, name = "floor1", hasServer = false;
+// The floor and the tab are remembered per device, so a refresh (or the iPad going to sleep) comes back where you were.
+const MODES = ["edit", "dm", "intro", "guide", "sim"];
+let map = null, name = localStorage.getItem("dungeon.floor") || "floor1", hasServer = false;
+/** What this floor's furniture holds, by room name (the sim's fixed contents). Empty on Floor 1. */
+let holds = {};
 let vis = {}, lock = {}, active = "board", tool = {};
-let sel = null, mode = "edit", undoStack = [], dirty = false;
+let sel = null, mode = MODES.includes(localStorage.getItem("dungeon.mode")) ? localStorage.getItem("dungeon.mode") : "edit";
+let undoStack = [], dirty = false;
 let paintMode = localStorage.getItem("dungeon.paintMode") || "rect";
 let drag = null;                      // {x0,y0,x1,y1} while dragging out a rectangle
-let play = { round:1, count:22 };
+let play = { round:1, count:null };   // count starts from the floor's own cap, filled in on load
 
 const $ = s => document.querySelector(s);
 const el = (t, a = {}, kids = []) => {
@@ -524,6 +541,8 @@ async function boot() {
       for (const n of names) sel.append(el("option", { value:n }, n));
       if (names.includes(name)) sel.value = name; else name = names[0];
       await loadMap(name);
+      // Restored into the Sim tab: roll a rules game (instant), but never start a Jev game without being asked.
+      if (mode === "sim" && sim.brain === "rules") simRun();
       return;
     }
   } catch (e) { /* no server: standalone */ }
@@ -542,8 +561,17 @@ function blankMap() {
 async function loadMap(n) {
   const r = await fetch("/api/map/" + n);
   if (!r.ok) { status("could not load " + n, "bad"); return; }
-  map = await r.json(); name = n; afterLoad();
+  map = await r.json(); name = n; localStorage.setItem("dungeon.floor", n); afterLoad();
 }
+async function loadHolds() {
+  holds = {};
+  if (!hasServer) return;
+  try {
+    const r = await fetch("/api/contents/" + name);
+    if (r.ok) { holds = await r.json(); if (mode === "dm") render(); }
+  } catch { /* the DM view just won't show contents */ }
+}
+
 function afterLoad() {
   // Each edge gets one canonical record: the upper/left square, facing E or S.
   F().doors = (F().doors || []).map(d => ({ ...d, ...normDoor(d.x, d.y, d.dir) }));
@@ -555,6 +583,7 @@ function afterLoad() {
   tool.furniture ??= "blocker"; tool.traps ??= "pit"; tool.monsters ??= "goblin";
   F().monsters ??= [];
   render(); status("loaded " + name, "good");
+  loadHolds();
 }
 async function save() {
   if (!hasServer) {
@@ -575,7 +604,10 @@ const playKey = () => "dungeon.play." + name;
 function loadPlay() {
   try { play = JSON.parse(localStorage.getItem(playKey())) || play; }
   catch { /* keep defaults */ }
-  play.round ??= 1; play.count ??= 22;
+  const cap = F().cap ?? 22;
+  // A floor whose cap has changed since this browser last played it starts over, rather than counting down from a stale number.
+  if (play.cap !== cap) { play.cap = cap; play.round = 1; play.count = cap; savePlay(); }
+  play.round ??= 1; play.count ??= cap;
 }
 function savePlay() { localStorage.setItem(playKey(), JSON.stringify(play)); }
 
@@ -1096,6 +1128,9 @@ function drawDmCell(pane, x, y) {
   if (fi >= 0) {
     const f = F().features[fi], FF = FEATURES[f.kind];
     section(`${FF.g} ${f.label || FF.n}${(f.w || 1) > 1 || (f.h || 1) > 1 ? ` · ${f.w || 1}×${f.h || 1}` : ""}`, DM_FEATURES[f.kind]);
+    // What the DM hands over when it is used: the fixed contents from the sim, so nothing has to be remembered.
+    const held = r && holds[r.name];
+    if (held) pane.append(el("p", { class:"disp", style:`font-size:16px;margin-top:4px;color:${/Password/i.test(held) ? "var(--amber)" : "var(--ink)"}` }, "Hand over: " + held));
   }
   for (const dir of ["N", "E", "S", "W"]) {
     const di = findDoor(x, y, dir);
@@ -1142,24 +1177,24 @@ function drawClock() {
   const pane = $("#clockPane");
   pane.hidden = mode !== "dm";
   if (mode !== "dm") return;
+  const cap = F().cap ?? 22, fuse = F().fuse ?? null;
   pane.innerHTML = "";
   pane.append(el("h2", {}, "The clock"));
   const c = play.count;
   const die = el("div", { class:"die" + (c <= 0 ? " fire" : c <= 5 ? " warn" : "") }, c <= 0 ? "0" : String(c));
   const info = el("div", { style:"flex:1" });
   info.append(el("div", { class:"disp", style:"font-size:19px" }, "Round " + play.round));
-  const dmg = [1,1,2,2,3][Math.min(4, -c)];
   info.append(el("p", { class:"hint", style:"margin-top:2px" },
-    c > 0 ? `${c} round${c===1?"":"s"} to the collapse`
-          : c > -5 ? `Collapse — ${dmg} damage to everyone still up here`
-          : "The floor is gone."));
+    c > 0 ? `${c} round${c === 1 ? "" : "s"} to the collapse`
+          : "The floor comes down. Everyone still up here dies."));
   pane.append(el("div", { class:"clock" }, [die, info]));
-  pane.append(el("div", { class:"tools", style:"margin-top:9px" }, [
+  const tools = el("div", { class:"tools", style:"margin-top:9px" }, [
     el("button", { onclick: () => { play.round++; play.count--; savePlay(); render(); } }, "End round"),
-    el("button", { class:"on", onclick: () => { play.count = Math.min(play.count, 5); savePlay(); render(); } }, "Reset! (→5)"),
-    el("button", { onclick: () => { play.round = 1; play.count = 22; savePlay(); render(); } }, "New floor"),
-  ]));
-  pane.append(el("p", { class:"hint" }, "Each round: heroes (cooldowns down, move + action) → monsters (4.3) → loot rolls as they die → End round: die down, collapse damage at zero, Viewers draw."));
+  ]);
+  if (fuse) tools.append(el("button", { class:"on", onclick: () => { play.count = Math.min(play.count, fuse); savePlay(); render(); } }, `Reset! (→${fuse})`));
+  tools.append(el("button", { onclick: () => { play.round = 1; play.count = cap; savePlay(); render(); } }, `New floor (${cap})`));
+  pane.append(tools);
+  pane.append(el("p", { class:"hint" }, "Each round: heroes (cooldowns down, move + action) → monsters (4.3) → loot rolls as they die → End round: die down, Viewers draw. At zero the floor comes down on anyone still up here."));
 }
 
 /* ---------- Intro and Guide views ---------- */
@@ -1469,7 +1504,8 @@ function apply(c, dragging = false) {
 }
 
 /* ---------- Sim view: one recorded game, step by step ---------- */
-let sim = { data:null, i:0, loading:false, error:null, timer:null, speed:+(localStorage.getItem("dungeon.simSpeed") || 700), stale:false };
+let sim = { data:null, i:0, loading:false, error:null, timer:null, speed:+(localStorage.getItem("dungeon.simSpeed") || 700), stale:false,
+  brain: localStorage.getItem("dungeon.simBrain") || "rules", streaming:false, abort:null };
 const HERO_COLORS = ["#2f6fdb", "#1a9a5a", "#a24bd0", "#c77712"];
 const SIM_GLYPH = { ...MONSTER_GLYPH, fedSmall:"b", fedMedium:"C", fedLarge:"F", custodian:"★" };
 const simFrame = () => sim.data?.frames[sim.i] || null;
@@ -1489,21 +1525,46 @@ const heroColor = name => HERO_COLORS[Math.max(0, sim.data?.party.names.indexOf(
 async function simRun(seed) {
   if (!hasServer) { sim.error = "The Sim needs the map server (bun run map)."; render(); return; }
   simStop();
-  sim.loading = true; sim.error = null; render();
+  sim.abort?.abort();                    // a Jev game still playing: stop it (the server stops asking)
+  const abort = sim.abort = new AbortController();
+  sim.loading = true; sim.error = null; sim.streaming = false; render();
   try {
-    const r = await fetch("/api/sim", { method:"POST", headers:{ "content-type":"application/json" },
-      body: JSON.stringify({ map, seed: seed ?? Math.floor(Math.random() * 1e6) }) });
-    const j = await r.json();
-    if (!r.ok) throw new Error(j.error || "sim failed");
-    sim.data = j; sim.i = 0; sim.stale = false;
-  } catch (e) { sim.error = e.message; }
-  sim.loading = false; render();
+    const r = await fetch("/api/sim", { method:"POST", headers:{ "content-type":"application/json" }, signal: abort.signal,
+      body: JSON.stringify({ map, brain: sim.brain, seed: seed ?? Math.floor(Math.random() * 1e6) }) });
+    if (!(r.headers.get("content-type") || "").includes("ndjson")) {
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.error || "sim failed");
+      sim.data = j; sim.i = 0; sim.stale = false; sim.loading = false; render();
+      return;
+    }
+    // Jev: frames arrive while the heroes are still deciding. The game is watchable from the first one.
+    sim.streaming = true;
+    const reader = r.body.getReader(), dec = new TextDecoder();
+    let buf = "", pending = 0;
+    const flush = () => { pending = 0; if (sim.abort === abort) render(); };
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      let nl;
+      while ((nl = buf.indexOf("\n")) >= 0) {
+        const msg = JSON.parse(buf.slice(0, nl)); buf = buf.slice(nl + 1);
+        if (sim.abort !== abort) return;
+        if (msg.type === "start") { sim.data = { ...msg, result: null, frames: [] }; sim.i = 0; sim.loading = false; }
+        else if (msg.type === "frame") sim.data.frames.push(msg.frame);
+        else if (msg.type === "done") sim.data.result = msg.result;
+        else if (msg.type === "error") sim.error = "Jev game stopped: " + msg.error;
+      }
+      if (!pending) pending = requestAnimationFrame(flush);   // one redraw per animation frame, however many frames arrived
+    }
+  } catch (e) { if (e.name !== "AbortError") sim.error = e.message; }
+  if (sim.abort === abort) { sim.loading = false; sim.streaming = false; render(); }
 }
 function simGo(i) {
   if (!sim.data) return;
   sim.i = Math.max(0, Math.min(sim.data.frames.length - 1, i));
   render();
-  if (sim.i === sim.data.frames.length - 1) simStop();
+  if (sim.i === sim.data.frames.length - 1 && !sim.streaming) simStop();   // while Jev is still playing, autoplay waits for more
 }
 /** Jump to the first frame of the next (or this/previous) round. */
 function simRound(dir) {
@@ -1615,6 +1676,13 @@ function simControls(ctl) {
   scrub.addEventListener("input", () => { simStop(); simGo(+scrub.value); });
   ctl.append(
     el("h2", {}, "Simulate one game"),
+    el("div", { class:"simbar", style:"margin-bottom:8px" }, [
+      el("span", { class:"hint", style:"margin:0" }, "Heroes played by"),
+      el("div", { class:"seg", id:"simBrain" }, [
+        el("button", { "data-brain":"rules", title:"The fixed policy the batch reports use (BEHAVIOUR.md). Instant." }, "Rules"),
+        el("button", { "data-brain":"jev", title:"Jev picks each hero's turn as sensible team play. Takes a minute; frames arrive as it plays." }, "Jev"),
+      ]),
+    ]),
     el("div", { class:"simbar" }, [
       el("button", { class:"on", onclick: () => simRun(), title:"New random game (N)" }, "New game"),
       seedIn,
@@ -1630,9 +1698,57 @@ function simControls(ctl) {
         speed,
       ]),
       scrub,
+      el("div", { id:"simTensionBox" }),
     ]),
     el("div", { id:"simNow" }),
   );
+  for (const b of ctl.querySelectorAll("#simBrain button")) b.addEventListener("click", () => {
+    sim.brain = b.dataset.brain; localStorage.setItem("dungeon.simBrain", sim.brain); simRun();
+  });
+}
+
+/** What Jev was offered on a hero turn and what got rolled. The current step shows every option worth a percent. */
+function decisionBlock(dc, full) {
+  const box = el("div", { class:"decide" });
+  const pct = p => Math.round(p * 100) + "%";
+  const bits = [];
+  if (dc.error) bits.push("Jev failed: " + dc.error);
+  else {
+    if (!dc.favourite) bits.push("rolled a less likely pick");
+    if (dc.tension != null) bits.push(`tension ${dc.tension.toFixed(1)}/2`);
+    if (dc.engaged != null) bits.push(`kids into it ${pct(dc.engaged)}`);
+    bits.push(dc.cached ? "cached" : dc.ms + " ms");
+  }
+  box.append(el("div", { class:"why" }, bits.join(" · ")));
+  const shown = dc.options.filter((o, i) => o.key === dc.chosen || (full ? o.p >= .01 : i < 3 && o.p >= .05));
+  for (const o of shown) box.append(el("div", { class:"opt" + (o.key === dc.chosen ? " pick" : "") }, [
+    el("b", {}, pct(o.p)),
+    el("span", {}, [el("i", { style:`width:${Math.round(o.p * 100)}%` }), el("em", {}, (o.key === dc.chosen ? "▸ " : "") + o.label)]),
+  ]));
+  if (full && dc.options.length > shown.length) box.append(el("div", { class:"why", style:"margin:2px 0 0" }, `+${dc.options.length - shown.length} other options under 1%`));
+  return box;
+}
+
+/** Jev games: how tense each hero turn looked from the table, across the whole game so far. Click to jump. */
+function drawTension(box) {
+  const d = sim.data, fs = d?.frames || [];
+  const pts = fs.map((f, i) => f.decision?.tension != null ? [i, f.decision.tension, f.decision.engaged] : null).filter(Boolean);
+  if (d?.brain !== "jev" || pts.length < 2) { box.innerHTML = ""; return; }
+  const W = 240, H = 34, n = Math.max(1, fs.length - 1 + (sim.streaming ? 6 : 0));
+  const x = i => (i / n) * W, y = t => H - 3 - (t / 2) * (H - 8);
+  const line = pts.map(([i, t]) => `${x(i).toFixed(1)},${y(t).toFixed(1)}`).join(" ");
+  const bored = pts.filter(p => p[2] != null && p[2] < .35).map(([i]) => `<rect x="${x(i)-1}" y="${H-3}" width="2" height="3" fill="var(--muted)"/>`).join("");
+  box.innerHTML = `<svg id="simTension" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+    <rect x="0" y="0" width="${W}" height="${H}" fill="var(--paper)" stroke="var(--line)"/>
+    <line x1="0" x2="${W}" y1="${y(1)}" y2="${y(1)}" stroke="var(--line)" stroke-dasharray="2 3"/>
+    <polyline points="${line}" fill="none" stroke="var(--danger)" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+    ${bored}
+    <line x1="${x(sim.i)}" x2="${x(sim.i)}" y1="0" y2="${H}" stroke="var(--amber)" stroke-width="2" vector-effect="non-scaling-stroke"/>
+  </svg><p class="hint" style="margin:0 0 4px">Tension as Jev reads the table (top = nail-biter); grey ticks: kids probably bored.</p>`;
+  box.querySelector("svg").addEventListener("click", e => {
+    const r = e.currentTarget.getBoundingClientRect();
+    simStop(); simGo(Math.round((e.clientX - r.left) / r.width * n));
+  });
 }
 
 function drawSim() {
@@ -1640,8 +1756,9 @@ function drawSim() {
   simControls(ctl);
   const now = $("#simNow");
   now.innerHTML = ""; log.innerHTML = ""; party.innerHTML = "";
+  for (const b of ctl.querySelectorAll("#simBrain button")) b.classList.toggle("on", b.dataset.brain === sim.brain);
   $("#simTransport").hidden = !sim.data || sim.loading;
-  if (sim.loading) { now.append(el("p", { class:"hint" }, "Rolling dice…")); return; }
+  if (sim.loading) { now.append(el("p", { class:"hint" }, sim.brain === "jev" ? "Setting up the table…" : "Rolling dice…")); return; }
   if (sim.error) now.append(el("p", { class:"hint", style:"color:var(--danger)" }, sim.error));
   if (!sim.data) { now.append(el("p", { class:"hint" }, "Plays one game with the floor's real ruleset on the map as it stands in the editor, saved or not.")); return; }
 
@@ -1652,37 +1769,53 @@ function drawSim() {
   scrub.max = String(last); if (+scrub.value !== sim.i) scrub.value = String(sim.i);
   $("#simBack").disabled = sim.i === 0; $("#simFwd").disabled = sim.i === last;
   $("#simPlay").textContent = sim.timer ? "❚❚ Pause" : "▶ Play"; $("#simPlay").classList.toggle("on", !!sim.timer);
+  drawTension($("#simTensionBox"));
   now.append(el("div", { class:"simnow" }, frameTitle(f)));
+  if (sim.streaming) now.append(el("p", { class:"hint", style:"margin:0;color:var(--ink)" }, [el("span", { class:"simlive" }),
+    `Jev is playing: round ${d.frames[last].round} so far`]));
   now.append(el("p", { class:"hint", style:"margin-top:0" }, `step ${sim.i + 1} of ${last + 1} · ← → step · ↑ ↓ round · Space play · N new game`));
 
   const facts = el("div", { class:"simfacts" });
   const fact = (t, hot) => facts.append(el("span", { class: hot ? "hot" : "" }, t));
   if (f.collapsing) fact(`collapsing · gone after round ${f.deadline}`, true);
   else if (f.collapseBegins != null) fact(`collapse at round ${f.collapseBegins}`, f.collapseBegins - f.round <= 3);
-  if (f.urgent) fact("heading for the stairs", true);
-  if (f.goalRoom != null) fact("goal: " + (F().rooms.find(r => r.id === f.goalRoom)?.name ?? "room " + f.goalRoom));
+  if (f.urgent && d.brain !== "jev") fact("heading for the stairs", true);
+  if (f.goalRoom != null && d.brain !== "jev") fact("goal: " + (F().rooms.find(r => r.id === f.goalRoom)?.name ?? "room " + f.goalRoom));
   if (d.floor === 2) {
     fact(`corpses ${f.corpses.length}`, f.corpses.length >= 3);
     fact(`grubs queued ${f.queue}`);
     const grubs = f.monsters.filter(m => m.alive && m.janitor === "grub").length, fed = f.monsters.filter(m => m.alive && m.janitor === "fed").length;
     if (grubs) fact(`grubs out ${grubs}`);
-    if (fed) fact(`fed janitors ${fed}`, true);
+    if (fed) fact(`fed janitors hunting ${fed}`, true);
+    // running totals up to this step: how much of the Cleanup Crew actually happened
+    const upTo = d.frames.slice(0, sim.i + 1).flatMap(q => q.lines);
+    const fedSoFar = upTo.filter(l => /hunts the party/.test(l)).length, squashed = upTo.filter(l => /kills a Grub/.test(l)).length;
+    if (fedSoFar || squashed) fact(`so far: ${fedSoFar} fed · ${squashed} grub${squashed === 1 ? "" : "s"} squashed`, fedSoFar > 0);
   }
   const kills = f.monsters.filter(m => !m.alive && !m.janitor).length;
   fact(`kills ${kills}`);
   now.append(facts);
 
   const r = d.result;
-  now.append(el("p", { class:"hint", style:"margin-top:10px" },
+  if (d.brain !== "jev") now.append(el("p", { class:"hint", style:"margin-top:10px" },
     (d.party.kits ? `Kits: ${d.party.kits.join(", ")}. ` : "") +
     `Side rooms this party wants: ${d.party.optionalRooms.map(o => o.name).join(", ") || "none"}.`));
-  const ending = el("details", { style:"margin-top:8px; font-size:12px" }, [
-    el("summary", { style:"cursor:pointer; color:var(--muted)" }, "How it ends (spoiler)"),
-    el("p", { style:"margin:4px 0" }, `${OUTCOME[r.outcome] || r.outcome} in ${r.rounds} rounds` + (r.deadNames.length ? ` · died: ${r.deadNames.join(", ")}` : "")),
-    el("button", { onclick: () => { simStop(); simGo(Infinity); } }, "Jump to the end"),
-  ]);
-  ending.open = sim.showEnd; ending.addEventListener("toggle", () => { sim.showEnd = ending.open; });
-  now.append(ending);
+  if (d.brain === "jev") {
+    const ds = d.frames.map(q => q.decision).filter(Boolean);
+    const errors = ds.filter(x => x.error).length, fresh = ds.filter(x => !x.cached);
+    const ms = fresh.length ? Math.round(fresh.reduce((a, x) => a + x.ms, 0) / fresh.length) : 0;
+    now.append(el("p", { class:"hint", style:"margin-top:4px" }, `${ds.length} Jev decisions` + (fresh.length ? `, ${ms} ms on average` : "") +
+      (ds.length - fresh.length ? `, ${ds.length - fresh.length} replayed from cache` : "") + (errors ? ` · ${errors} failed (fell back to the first option)` : "")));
+  }
+  if (r) {
+    const ending = el("details", { style:"margin-top:8px; font-size:12px" }, [
+      el("summary", { style:"cursor:pointer; color:var(--muted)" }, "How it ends (spoiler)"),
+      el("p", { style:"margin:4px 0" }, `${OUTCOME[r.outcome] || r.outcome} in ${r.rounds} rounds` + (r.deadNames.length ? ` · died: ${r.deadNames.join(", ")}` : "")),
+      el("button", { onclick: () => { simStop(); simGo(Infinity); } }, "Jump to the end"),
+    ]);
+    ending.open = sim.showEnd; ending.addEventListener("toggle", () => { sim.showEnd = ending.open; });
+    now.append(ending);
+  }
 
   // the story of this round so far, newest step highlighted
   log.append(el("h2", {}, "What happened"));
@@ -1692,6 +1825,7 @@ function drawSim() {
     const q = d.frames[k];
     const fr = el("div", { class:"fr" + (k === sim.i ? " cur" : "") });
     fr.append(el("h3", { onclick: () => { simStop(); simGo(k); } }, frameTitle(q)));
+    if (q.decision) fr.append(decisionBlock(q.decision, k === sim.i));
     if (!q.lines.length) fr.append(el("p", { class:"none" }, q.phase === "start" ? "Everyone on the entrance." : "Nothing to report."));
     for (const line of q.lines) {
       const cls = /^\s/.test(line) ? "sub" : /DOWNED|DIES|KILLS THE BOSS|FALLING BLOCK|ceiling|EATEN|hunts the party/.test(line) ? "bad" : /Achievement|PASSWORD|takes the stairs|picks up/.test(line) ? "good" : "";
@@ -1724,11 +1858,17 @@ function drawSim() {
 }
 
 /* ---------- chrome ---------- */
-$("#mEdit").onclick = () => { mode = "edit"; sel = null; render(); };
-$("#mDM").onclick = () => { mode = "dm"; sel = null; render(); };
-$("#mIntro").onclick = () => { mode = "intro"; sel = null; render(); };
-$("#mGuide").onclick = () => { mode = "guide"; sel = null; render(); };
-$("#mSim").onclick = () => { mode = "sim"; sel = null; drag = null; render(); if (!sim.data && !sim.loading) simRun(); };
+function setMode(m) {
+  mode = m; sel = null; drag = null;
+  localStorage.setItem("dungeon.mode", m);
+  render();
+  if (m === "sim" && !sim.data && !sim.loading) simRun();
+}
+$("#mEdit").onclick = () => setMode("edit");
+$("#mDM").onclick = () => setMode("dm");
+$("#mIntro").onclick = () => setMode("intro");
+$("#mGuide").onclick = () => setMode("guide");
+$("#mSim").onclick = () => setMode("sim");
 $("#save").onclick = save;
 
 // Side panels: each side toggles on its own, remembered per device.

@@ -74,15 +74,15 @@ On your turn, hand any card to an adjacent player. Free out of combat; in combat
 1. Each hero: turn down cooldowns, then move and one action (attack, cast, search for traps, open chest, disarm, use rack, or swap gear or trade while in combat) in either order.
 2. Announcer runs monsters using the rules in section 4.3, so the boys can predict them and the simulator can copy them.
 3. Loot rolls happen the moment a monster dies.
-4. End of round: turn the countdown die down one. At zero, the collapse deals its damage (1.7). Viewers draw.
+4. End of round: turn the countdown die down one. At zero, the floor comes down on anyone still up here (1.7). Viewers draw.
 
 ### 1.7 The clock
 
 Two timers, one clock. The countdown lives on the iPad DM view (the map editor in DM mode, which also holds the announcer speeches and the round checklist). Bring a d12 out onto the table once the count is 12 or under, so the slam to 5 happens in front of everyone.
 
 - **Floor cap: 22 rounds.** Announced at the start and counted down out loud every round. It exists so the party can't clear every room at leisure. In most games it never actually binds. A threat, not a guillotine. (It was 26 before the walls forced the route; the shorter route needed a shorter cap to stay a threat at all.)
-- **Emergency Floor Reset: 5 rounds.** The moment the Manager's Office door opens, the countdown drops to 5, or stays put if it's already lower. The die visibly slamming from 12 to 5 is the drama beat. Announcer: "Attention, Crawlers. The Floor Manager has initiated an Emergency Floor Reset. This is a standard retention measure and is not a reflection on your performance. You have five rounds. Cheers!"
-- **The collapse is a ramp.** When the count hits zero the floor starts coming down. At the end of each round, every hero still on the floor takes 1, 1, 2, 2, then 3 damage. After the fifth round, nobody left up there is walking down the stairs.
+- **Emergency Floor Reset: 9 rounds.** The moment the Manager's Office door opens, the countdown drops to 9, or stays put if it's already lower. The die visibly slamming from 12 to 9 is the drama beat. Announcer: "Attention, Crawlers. The Floor Manager has initiated an Emergency Floor Reset. This is a standard retention measure and is not a reflection on your performance. You have nine rounds. Cheers!" (It was five rounds when the collapse was a ramp that gave you a few more rounds of grace. As a hard collapse, five rounds meant the party almost never got Greg down and out in time: the simulator won 7% of games. Nine rounds puts it back where five used to land.)
+- **The collapse is one round, and it is final.** When the count hits zero the floor comes down at the end of that round, and every hero still on it dies. No ramp, no damage to soak: you are on the stairs or you are not. Say the number out loud every round so nobody can claim they were surprised.
 - **You can leave without killing Greg.** Any hero on a stairs square at the end of a round has escaped. Escaping with the boss alive forfeits the Boss Box. Say this out loud before the fight, so the last three rounds are a decision and not arithmetic.
 - **What the collapse means.** Heroes who reached the stairs continue to Floor 2 as they are. Heroes who died, in the collapse or before it, are revived on Floor 2 at a cost decided when that floor is generated. Greg, if alive, remembers all of this.
 
@@ -90,15 +90,17 @@ On the real Side A map with the forced route, final furniture, placed monsters, 
 
 | Measure | Result |
 |---|---|
-| Party wins (Greg dead, everyone alive down the stairs) | 81% |
-| Escaped down the stairs with Greg alive | 14% |
-| Games where the clock never mattered | 0% |
-| Games where someone dies | 37% |
+| Party wins (Greg dead, everyone alive down the stairs) | 83% |
+| Escaped down the stairs with Greg alive | 9% |
+| Floor came down on somebody | 7.5% |
+| Games where the clock never mattered | 24% |
+| Games where someone dies | 30% |
 | Full wipe | under 1% |
-| Round the Office door opens, on average | 14.5 |
-| Rounds to finish, median | 20 |
+| Round the Office door opens, on average | 11 |
+| Rounds to finish, median | 16 |
+| The floor cap, not the Office fuse, set the deadline | 10% |
 
-Eighty percent is the chosen target: nearly every game is decided in the last two rounds, a death is common enough to fear, and a wipe is a story. The two dials that move this most are the fuse length (6 rounds instead of 5 is worth about eight points) and how many squares Greg can be attacked from (he stands against the back wall with two, and one row forward would be worth about five). Re-run whenever the route or the furniture changes; geometry moves these numbers more than anything else.
+Eighty percent is the chosen target: nearly every game is decided in the last two rounds, a death is common enough to fear, and a wipe is a story. The dial that moves this most is the fuse length: with a hard collapse, 10 rounds instead of 9 is worth about seven points of win rate, and 5 rounds (the old ramp number) is unplayable at 7%. After that comes how many squares Greg can be attacked from (he stands against the back wall with two, and one row forward would be worth about five). The hard collapse also made the party quicker and less bloody than the ramp did: the Office opens on round 11 instead of 14.5 and someone dies in 30% of games instead of 37%, because nobody takes ramp damage on the way out any more. Re-run whenever the route or the furniture changes; geometry moves these numbers more than anything else.
 
 ---
 

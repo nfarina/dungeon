@@ -17,9 +17,12 @@ export const FIXED_LOOT: Record<string, string> = {
   "Records": "Industrial Bleach",
   "Laundry": "Wizard's Bathrobe",
   "Cafeteria": "Industrial Bleach",
-  "Lockup": "Password of the Day",
+  "Dormitory": "Juice Box",
+  "Locker Room": "Scroll: Heal",
+  "Tool Crib": "Skeleton Key",
+  "Lockup": "Orc Chainmail Bib",
   "Kennels": "Password of the Day",
-  "Incinerator": "Orc Chainmail Bib",
+  "Incinerator": "Password of the Day",
 };
 
 const named = (name: string): Item => {

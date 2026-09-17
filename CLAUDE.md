@@ -32,8 +32,8 @@ being tuned between plays.
 - The "real" ruleset is `RECOMMENDED` in `sim/src/run.ts`. `bun run src/run.ts report 3000`
   is the balance report; `bun run src/tools/content.ts 2000 rec` is the card/room usage
   report (the `rec` argument is required or it runs the bare rules).
-- Current tuning: 22-round floor cap plus a 5-round fuse that starts when the Office door
-  opens, soft collapse. Target is ~80% win rate. Monster placements on the map are a real
+- Current tuning: 22-round floor cap plus a 9-round fuse that starts when the Office door
+  opens, hard collapse (at zero everyone still on the floor dies). Target is ~80% win rate. Monster placements on the map are a real
   balance dial; furniture that seals a room changes results a lot.
 - Importing `./src/run` from any script runs its CLI (it reads `process.argv`). For A/B
   experiments write a throwaway `.ts` inside `sim/` that imports `./src/run`, run it with
@@ -49,8 +49,14 @@ being tuned between plays.
   `record: true`. Play-by-play lines go through `this.cfg.record && this.say(...)` so batches never
   build the strings; any new engine narration must not draw from `this.rng`. `RECOMMENDED` and the
   party samplers live in `src/presets.ts` (safe to import; `run.ts` re-exports `RECOMMENDED`).
+- `src/brains/jev.ts` plays heroes with TypeSafe Jev (key in `.typesafe.key`, gitignored) via
+  `Game.runAsync(brain)`. Code lists legal options with precomputed distances; Jev only picks, so a
+  bad option list (unusable furniture, a square on the wrong side of a wall) shows up as silly play,
+  not as an error. Answers cache in `sim/.cache/jev/`; `bun run src/replay.ts <seed> <floor> jev`
+  replays a cached game instantly. `heroTurn` = `beginHeroTurn` (shared) + the fixed policy.
 - Floor 1's regression check after any engine change: `bun run src/run.ts report 3000` should
-  still say about 81% win, 37% someone dies.
+  still say about 84% win, 30% someone dies. Floor 2 (`bun run src/floor2.ts report 3000`): 86% win,
+  21% someone dies.
 
 ## Keeping the three sources aligned
 

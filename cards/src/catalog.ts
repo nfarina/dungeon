@@ -459,6 +459,16 @@ const f2pockets: Card[] = ([
     rules: "Obliterate a corpse on your square or adjacent to you. One use. Or drink it: lose 1 Health. Why would you.",
     flavor: "DO NOT DRINK. Seriously.",
     art: "a big white plastic jug of industrial bleach with a red skull warning label and a splash cap, slightly dented" },
+  { id: "juice-box-f2-placed", name: "Juice Box", deck: "pockets", type: "consumable", placed: "the Bunk",
+    rules: "Heal 3. One use.", flavor: "Warm. Nobody minds.",
+    art: "a dented cardboard juice box with a bendy straw, cartoon fruit on the label" },
+  { id: "scroll-heal-f2-placed", name: "Scroll: Heal", deck: "pockets", type: "scroll", placed: "the Bench",
+    rules: "Heal 4 to you or an adjacent player.", flavor: "Taped inside a locker, next to the eye wash.",
+    art: "an unrolled parchment scroll glowing warm gold with a heart and a plus sign drawn on it" },
+  { id: "skeleton-key-f2-placed", name: "Skeleton Key", deck: "biggear", type: "item", slot: "Trinket", placed: "the Tool rack",
+    rules: "Opens one locked chest. Then it crumbles. On this floor the Fire Axe opens nothing locked.",
+    flavor: "Hanging on the tool rack where a key should never hang.",
+    art: "an ornate iron key with a tiny skull for a bow, bits crumbling off it, hanging from a nail on a pegboard" },
   // Reprints that go back into the Floor 2 Pockets deck (same art as the Floor 1 cards).
   { id: "gold-2-f2", name: "Gold (2)", deck: "pockets", type: "consumable", qty: 2, rules: "2 gold. Spend at the Stairwell Shop.", flavor: "Slightly sticky.",
     art: "a small handful of gold coins spilling out of a torn pocket" },
@@ -501,7 +511,7 @@ const f2biggear: Card[] = ([
     rules: "Opens a locked chest or door as your action. Three uses. Tick the boxes. ☐ ☐ ☐ Does not know the password.",
     flavor: "Forty keys. Three that work.",
     art: "a huge steel ring crowded with dozens of mismatched keys, hanging from a belt clip" },
-  { id: "mop-up", name: "Spellbook: Mop-Up", deck: "biggear", type: "spell", mind: 4, cooldown: 2,
+  { id: "mop-up", name: "Spellbook: Mop-Up", deck: "biggear", type: "spell", mind: 4, cooldown: 3,
     rules: "Obliterate a corpse in line of sight.",
     art: "a small leather spellbook, open, with a glowing blue mop and bucket floating above the page" },
   { id: "static", name: "Spellbook: Static", deck: "biggear", type: "spell", mind: 4, cooldown: 3,
@@ -532,7 +542,7 @@ const f2biggear: Card[] = ([
 ] as Card[]).map(f2);
 
 const f2extras: Card[] = ([
-  { id: "password", name: "Password of the Day", deck: "junk", type: "text", qty: 3, placed: "the Shift Lead, the Evidence locker and the Feed trough",
+  { id: "password", name: "Password of the Day", deck: "junk", type: "text", qty: 3, placed: "the Shift Lead, the Feed trough and the ash shelf",
     rules: "Today's password is whatever the announcer says it is. Read it aloud at the Sump door. Do not write it down.",
     flavor: "Signed, the Shift Lead. Underlined twice.",
     art: "a yellow sticky note with a scribbled word crossed out and rewritten, stuck to a clipboard" },
@@ -562,6 +572,7 @@ const f2monsters: Card[] = ([
     special: [
       "Ignores heroes. Moves 4 toward the nearest corpse and eats it on arrival.",
       "Then flip it: small corpse → Bloated Grub, medium → Custodian, large → Facilities Manager.",
+      "Squashed: back to the stairwell queue. It will be back.",
       "Janitors leave no corpse.",
     ],
     rules: "", flavor: "Facilities. Please do not interact with the staff.",

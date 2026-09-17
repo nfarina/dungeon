@@ -19,7 +19,8 @@ Everything in `floor-1.md` still applies unless this table says otherwise: stats
 | Dead monsters vanish | Dead monsters leave a **corpse tile** on the board. See 1.1. |
 | No background threat | **The Cleanup Crew.** Grubs arrive on a schedule, eat corpses, and become something worse. See 1.2 to 1.4. |
 | Emergency Floor Reset when the boss door opens | **All Hands.** Opening the boss door empties the stairwell queue at once. The floor cap stays. See 1.6. |
-| Boss door is locked | Boss door wants a **password**, carried by a named monster. No key, no axe. See 1.5. |
+| Boss door is locked | Boss door wants a **password**, carried by a named monster. No key, no axe. See 1.5. The door also shuts behind the party once everyone is inside. |
+| Fire Axe opens locked chests | **Skeleton Key only.** The axe opens nothing locked on this floor. Both chests (the Filing cabinet and the Evidence locker) need a key: the party carries one and a second hangs on the Tool Crib's tool rack. |
 | HeroQuest monsters | Three custom monsters, small, medium, large, each with a fed janitor form. Section 4. |
 | Sir Reginald dies at 0 Health | Reginald is **Downed** at 0, same rules as a hero: revived by an adjacent action or a Juice Box, dead if still down at the end of the next round. |
 | Furniture yields a fixed draw | Same. Every piece has a fixed result on the DM sheet, flip the tile when used. The new consumable, Industrial Bleach, is only found this way. |
@@ -33,16 +34,19 @@ A corpse is either **cleaned** (obliterated, tile removed) or it is **food**. Th
 | Method | Rule |
 |---|---|
 | **Industrial Bleach** | Consumable. Obliterate a corpse on your square or adjacent to you. Or drink it: lose 1 Health. Why would you. |
-| **Spark** | Cast it at a corpse in line of sight instead of a monster. Normal cast, normal cooldown, costs the action like any spell. |
+| **Spark** | Cast it at a **small** corpse in line of sight instead of a monster. Normal cast, normal cooldown, costs the action like any spell. |
 | **Sir Reginald** | As his person's action, the goose eats an adjacent small corpse. Free, disgusting, no bleach spent. With the Pet Biscuit (section 7) he can manage a medium one. |
+
+Medium and large corpses need bleach (or the Mop, once, or Spellbook: Mop-Up). Bleach is scarce on purpose: the party should be choosing which bodies to deal with, not wiping the floor clean.
 
 Janitors never leave corpses. Grubs dissolve, fed janitors get flushed, whatever the announcer feels like saying. This is the rule that keeps the floor from eating itself.
 
 ### 1.2 Grubs
 
-The Cleanup Crew are grubs: fat, blind, slow. Flat tiles, not standees; eight of them, and eight is all the floor gets, ever. When the eighth tile is on the board or eaten and flipped, the queue stops.
+The Cleanup Crew are grubs: fat, blind, slow. Flat tiles, not standees; eight of them, and eight is all the floor gets. Once all eight have joined the queue the schedule stops, but a squashed grub doesn't use one up (below).
 
-- **They ignore heroes.** No attack, Defend 0, 1 Health. Killing one costs an action and yields nothing. The only reason to hit one is that it is in your way or about to reach a corpse you care about.
+- **They ignore heroes.** No attack, Defend 0, 1 Health. Squashing one costs an action and yields nothing.
+- **Squashed grubs go back to the stairwell.** Put the tile back and add one to the queue die: it comes out again the next time the queue leaves the stairs. Squashing buys time for a corpse you care about; it does not shrink the Crew. You are beating back the tide, not ending it.
 - **They want corpses.** On the monster turn each grub moves **4 squares, no roll**, toward the nearest corpse it can reach by open doors. No corpse on the board: it stays where it is.
 - **They eat on arrival.** A grub that ends its move on a corpse eats it. Remove both, put down the fed form (1.3) on that square. One corpse per grub, ever.
 - **They do not open doors.** Corpses only exist where heroes have been, so doors are already open.
@@ -67,7 +71,8 @@ Grubs arrive on the clock, not on the corpses. Keep the queue on a spindown die 
 
 - **Schedule: one grub joins the queue at the end of round 2, and every third round after that** (5, 8, 11, ...), until eight have joined. So the party has two or three rooms of freedom before the first one is even waiting, and the eighth arrives around round 23 of a forty-round floor.
 - At the start of the monster turn, if any corpse is on the board, every grub in the queue steps onto the stairs and starts walking. Otherwise they wait, and the queue die keeps climbing where everyone can see it.
-- Eight grubs per floor is the budget, not a cap on how many are alive at once. The simulator tried "six alive at once" on a long floor and the Crew never stopped coming: nine fed janitors a game and a wipe in one game of nine. Six ever, with three password copies on the floor, was a 94% walk; eight is the number.
+- **Eight grub tiles, eight joins.** The schedule adds one grub to the queue at a time until all eight have joined, then stops for the floor. A squashed grub goes back into the queue (1.2) without counting as a new join, so the Crew can be pushed back but never grows past eight. (The simulator first tried a limit of six on the board at once, with no total: on a forty-round floor the Crew never stopped coming, nine fed janitors a game and a wipe in one game of nine. Six in total, with three password copies on the floor, was a 94% walk; eight in total is the number.)
+- **The schedule adds grubs; corpses let them out.** A grub in the queue, new or squashed, leaves the stairs on the very next monster turn that has a corpse on the board. A grub squashed on your turn is walking back out of the stairwell that same round.
 
 **Announcer, when the first grub leaves the stairs:** "Facilities has been notified of a mess on Floor 2. A member of staff is on the way. Please do not interact with the staff."
 
@@ -75,33 +80,43 @@ Grubs arrive on the clock, not on the corpses. Keep the queue on a spindown die 
 
 The boss room door has no lock. It has a speaker. It opens for the **Password of the Day**. The Skeleton Key does nothing, the Fire Axe does nothing, knocking gets you a recorded message about business hours.
 
-Three copies of the password are on the floor, in three corners, so the hunt is fair whichever way the party wanders and nobody has to double back across the whole board: the **Shift Lead**, a named medium monster in the Shift Office, carries one as a guaranteed drop and leaves a medium corpse, the one corpse the party most wants to clean and can least afford the time for. The other two are sticky notes, posted against policy, in the Lockup's Evidence locker and the Kennels' Feed trough, found by using the furniture. One copy is enough. The announcer should be visibly annoyed that the password is written down anywhere.
+Three copies of the password are on the floor, in three corners, so the hunt is fair whichever way the party wanders and nobody has to double back across the whole board: the **Shift Lead**, a named medium monster in the Shift Office, carries one as a guaranteed drop and leaves a medium corpse, the one corpse the party most wants to clean and can least afford the time for. The other two are sticky notes, posted against policy, on the Kennels' Feed trough and the Incinerator's ash shelf, found by using the furniture. Neither is behind a lock: with the password copies in the chests, a party that had spent its keys elsewhere had to go the long way round and the floor came down on somebody in one game in five. One copy is enough. The announcer should be visibly annoyed that the password is written down anywhere.
+
+**The door shuts behind you.** The moment the last member of the party is inside the Sump, close the door: put the standee back across the doorway. Nothing on staff can open a door, so the boss fight is the party, the boss and whatever walked in with them. Fed janitors already inside stay inside; the ones still chasing pile up in the corridor. The party can open it again from inside (they have the password) if they would rather run, and if they do it stays open.
 
 Print a big standee for the Sump door itself, so it reads as the boss door from across the table: riveted steel, a speaker, AUTHORIZED PERSONNEL ONLY.
 
 ### 1.6 The clock
 
-- **Floor cap: 40 rounds.** Announced and counted down every round, same as Floor 1. This is a long floor by design: the party has to find the password before it can do anything else, and the Shift Office is in the far corner. The simulator's parties finish in 36 rounds at the median and the cap catches one game in eight. The Cleanup Crew is the pressure that grows; the cap is the wall at the end.
+- **Floor cap: 44 rounds.** Announced and counted down every round, same as Floor 1. This is a long floor by design: the party has to find the password before it can do anything else, and the Shift Office is in the far corner. The simulator's parties finish in 35 rounds at the median and the cap catches about one game in eight. The Cleanup Crew is the pressure that grows; the cap is the wall at the end. (It was 40 rounds when the collapse was a ramp. A cliff needed 42, and locking the chests to a key pushed it to 44: every route change that slows the password hunt costs rounds here.)
 - **All Hands.** The moment the boss door opens, every grub still in the queue leaves the stairs at once and the schedule doubles: a grub every round. With corpses around, they head for corpses. With none, they head for the boss room. Announcer: "Attention, Crawlers. Facilities has declared an All Hands. This is a standard cleanliness measure and not a reflection on your hygiene. Please enjoy the remainder of your visit."
-- **The collapse** is the Floor 1 ramp: 1, 1, 2, 2, 3 damage at the end of each round past zero.
+- **The collapse** is the Floor 1 rule: at the end of round 44 the floor comes down and everyone still on it dies.
 - **You can leave without killing the boss.** Same rule, same forfeit, say it out loud before the fight.
 
-**Where the simulator stands** (3,000 runs of the current layout, the real party, rules as written above, a "blind" party that opens the nearest unexplored door until it holds a password, then heads for the Sump with a random appetite for one to four more rooms, and bleaches medium and large corpses on quiet turns while the goose eats the small ones):
+**Where the simulator stands** (3,000 runs of the current layout, the real party, rules as written above (Spark cleans small corpses only, squashed grubs go back to the queue, the Sump door shuts behind the party, healing in three pieces of furniture), a "blind" party that opens the nearest unexplored door until it holds a password, then heads for the Sump with a random appetite for one to four more rooms, and bleaches medium and large corpses on quiet turns while the goose eats the small ones and Spark gets the rest):
 
 | Measure | Result |
 |---|---|
-| Party wins (boss dead, everyone down the stairs) | 88% |
-| Escaped with the boss alive | 3% |
-| Floor came down on somebody | 2.5% |
-| Full wipe | 6% |
-| Games where someone dies | 35% (Ethan most often, then Vicki) |
-| Rounds to finish, median | 37 |
-| Password found, median round | 20 |
+| Party wins (boss dead, everyone down the stairs) | 86% |
+| Escaped with the boss alive | 1.2% |
+| Floor came down on somebody | 11% |
+| Full wipe | 1.2% |
+| Games where someone dies | 21% |
+| Rounds to finish, median | 35 |
+| Password found, median round | 21 |
 | Sump door opens, average round | 28 |
-| Rooms opened | 9.5 of 14 |
-| Corpses made / cleaned / left at the end | 20 / 8 / 3 |
-| Fed janitors per game | 7.2, in every game; the party kills 6.2 of them |
+| Rooms opened | 9 of 14 |
+| Corpses made / cleaned / left at the end | 20 / 10 / 2.5 |
+| Bleach found / used | 4.2 / 3.6, against 8.5 medium and 1.3 large corpses a game |
+| Fed janitors per game | 6.1, in every game; the party kills 4.6 of them |
+| Rounds with a janitor chasing someone | 9 |
 | Boss snacks per game | 1.7 |
+
+**What the recent changes were each worth.** Closing the Sump door: about two points of win rate and five points off "someone dies", because the boss fight stops being a three-way fight with the Crew. Healing in the furniture: about four points of win rate and three points off the wipe rate. Those two took the floor to 91% wins with the old ramp collapse, which was kinder than the 80-to-88 band the earlier drafts sat in. Making the collapse hard moved the failure mode from "the ramp chewed somebody up" to "somebody was still up here at zero": wipes fell to about 1% while the floor coming down on at least one hero rose to 11%. Locking the chests to a key then cost about five points, because a party that has spent its keys explores fewer rooms; the cap went to 44 to pay that back. Each round of cap is worth roughly two points of win rate, which is the dial to move if 86% is the wrong number.
+
+The table's party never squashes grubs. A party played by the Jev brain in the map editor's Sim tab (sensible play, judged turn by turn) squashes them on the way past, which is what a real table will do. Under the old rule, where a squashed grub left the floor, that party saw two fed janitors a game instead of seven and was almost never chased. With squashed grubs going back to the queue it saw four or five, was chased for about eight rounds a game instead of three or four, and lost time to squashing the same grubs over and over: in six games it squashed eight grubs a game and won once, four games running out of clock. The furniture healing did not change that party's time spent hurt (a fifth of its turns, either way, in six games). Six games is a small sample, but beating back the tide now costs the party something.
+
+The two rule changes together cost the table's party about four points of win rate (88% to 84%); that party almost never squashes, so nearly all of it is Spark losing medium and large corpses. Bleach is short on purpose: about four bottles a game against ten medium and large corpses, so the party can clean roughly half of the dangerous bodies at most.
 
 The first draft of this floor had the Shift Office beside the forced path and a party that knew where it was. It looked fine on paper (85% win) and was wrong in the way that matters: a real table does not know which door the password is behind. The blind party on that layout still found it by round 9, because the room was right there; moved to the far corner it takes twenty rounds, which is the hunt this floor is about. One copy of the password in one corner then made the floor a lottery on which way the party wandered: one game in eight ran out of clock without ever finding it. Three copies in three corners fixed that (collapses fell to one game in seventy) and made the floor too easy, so the Crew grew from six grubs to eight.
 
@@ -150,8 +165,9 @@ The Shift Office's position is the floor's main dial. With it next to the forced
 3. **The Shift Lead's room is required by content, not by walls.** Put it far from the forced rooms, so the party has to hunt for it, and then carry the password back across the floor with a medium corpse behind them.
 4. **The scroll before the robe.** Scroll: Restructuring on the Shift Lead's desk. The Wizard's Bathrobe on the Laundry shelf, near the Sump. Ethan should own an unreadable scroll for a while.
 5. **Five bleach, two on the required path.** Reception's front desk and the Supply Closet's shelving, so the mechanic gets taught on the first corpse and there is a second bottle before the Shift Lead. The other three sit in optional rooms (Boiler Room, Records, Cafeteria). With only one on the path the party found 1.6 bottles a game and left twice as many bodies.
-6. **Far more rooms than they can open.** Twenty rooms and a 26-round cap means most stay shut. That is fine. The announcer should say so.
-7. **Monsters at least two squares from their door**, like Floor 1. That rule was worth thirteen points of win rate.
+6. **Healing and a spare key in the furniture.** A Juice Box on the Dormitory bunk, a Scroll: Heal on the Locker Room bench, and the second Skeleton Key on the Tool Crib's tool rack. The party spends most of the floor hurt and Floor 2's decks only hold four Juice Boxes and a Bandage or two, so the side rooms need to be worth the detour. The key is what makes the second chest openable at all.
+7. **Far more rooms than they can open.** Fourteen rooms in play and a 40-round cap means several stay shut. That is fine. The announcer should say so.
+8. **Monsters at least two squares from their door**, like Floor 1. That rule was worth thirteen points of win rate.
 
 Room table, monster count and trap placement fill in from the map file once it exists. Corridor traps and secret doors: at least one pit somewhere useful, because a corpse Shoved into a pit is the cheapest clean on the floor.
 
@@ -222,7 +238,7 @@ Floor 1's Pockets deck with the cards the party is holding taken out (Bandage, W
 | **Scroll: Heal** | 1 | Floor 1 card |
 | **Bandage** | 1 | reprint |
 
-Not shuffled: **Industrial Bleach** ×5, set out in furniture (section 3). "Obliterate a corpse on your square or adjacent to you. One use. Or drink it: lose 1 Health. Why would you."
+Not shuffled, all set out in furniture (section 3): **Industrial Bleach** ×5 ("Obliterate a corpse on your square or adjacent to you. One use. Or drink it: lose 1 Health. Why would you."), plus one **Juice Box** on the Dormitory bunk, one **Scroll: Heal** on the Locker Room bench, and a second **Skeleton Key** on the Tool Crib's tool rack.
 
 ### 6.2 Gear deck (14 cards)
 
@@ -253,7 +269,7 @@ Every Floor 1 Big Gear card is in someone's hands or was sold, so this deck is n
 |---|---|---|
 | **Cattle Prod** | Main hand | Attack +1. A monster you damage with it skips its next activation. |
 | **Janitor's Keyring** | Trinket | Opens a locked chest or door as your action. Three uses. Does not know the password. |
-| **Spellbook: Mop-Up** | Learned | Mind 4+. Obliterate a corpse in line of sight. Cooldown 2. Frees Spark to be a weapon again. |
+| **Spellbook: Mop-Up** | Learned | Mind 4+. Obliterate a corpse in line of sight. Cooldown 3. Frees Spark to be a weapon again. |
 | **Spellbook: Static** | Learned | Mind 4+. 1 damage to every monster adjacent to you, no defence roll. Cooldown 3. |
 | **Steel Lunchbox** | Trinket | Once per floor, heal 3. |
 | **Wizard's Bathrobe** | Body | Mind +1. On the Laundry shelf. |
@@ -317,9 +333,9 @@ All in the card workshop under the **Floor 2** filter, so the print run is just 
 |---|---|
 | Monster cards: Cave Rat, Kobold Miner, Cave Bear, Shift Lead, Grub, Bloated Grub, Custodian, Facilities Manager, Senior Custodian | 9 |
 | Standees: rat, kobold, bear, Shift Lead, three fed forms, boss, Sir Reginald for the biscuit, and the Sump door | 10 designs |
-| Pockets: Bleach ×5, reprints ×4 | 9 |
+| Pockets: Bleach ×5, healing in furniture ×2 (Juice Box, Scroll: Heal), reprints ×4 | 11 |
 | Gear: eight new cards | 8 |
-| Big Gear: ten cards | 10 |
+| Big Gear: ten cards, plus the Skeleton Key on the tool rack | 11 |
 | Password of the Day ×3, Pet Biscuit | 4 |
 | Envelope labels | 7 |
 | Furniture tiles, sized from the map, with used backs | 15 fronts, 13 backs |
