@@ -35,7 +35,7 @@ A corpse is either **cleaned** (obliterated, tile removed) or it is **food**. Th
 |---|---|
 | **Industrial Bleach** | Consumable. Obliterate a corpse on your square or adjacent to you. Or drink it: lose 1 Health. Why would you. |
 | **Spark** | Cast it at a **small** corpse in line of sight instead of a monster. Normal cast, normal cooldown, costs the action like any spell. |
-| **Sir Reginald** | As his person's action, the goose eats an adjacent small corpse. Free, disgusting, no bleach spent. With the Pet Biscuit (section 7) he can manage a medium one. |
+| **Sir Reginald** | As his person's action, the goose eats an adjacent small corpse. Free, disgusting, no bleach spent. Small only, biscuit or no biscuit. |
 
 Medium and large corpses need bleach (or the Mop, once, or Spellbook: Mop-Up). Bleach is scarce on purpose: the party should be choosing which bodies to deal with, not wiping the floor clean.
 
@@ -113,7 +113,6 @@ Print a big standee for the Sump door itself, so it reads as the boss door from 
 | Facilities Managers (a large corpse eaten) | 1.5 a game, in 91% of games |
 | The doorstep beat: the Sump guard's body eaten | 79% of games, median the same round the door opens |
 | Boss snacks per game | 0.8, in 76% of games |
-| Boss snacks per game | 1.7 |
 
 **What the recent changes were each worth.** Closing the Sump door: about two points of win rate and five points off "someone dies", because the boss fight stops being a three-way fight with the Crew. Healing in the furniture: about four points of win rate and three points off the wipe rate. Those two took the floor to 91% wins with the old ramp collapse, which was kinder than the 80-to-88 band the earlier drafts sat in. Making the collapse hard moved the failure mode from "the ramp chewed somebody up" to "somebody was still up here at zero": wipes fell to about 1% while the floor coming down on at least one hero rose to 11%. Locking the chests to a key then cost about five points, because a party that has spent its keys explores fewer rooms; the cap went to 44 to pay that back. Sending grubs after the largest corpse rather than the nearest cost another two points and changed what the Crew is made of: fewer Bloated Grubs, more Custodians and Facilities Managers, and a big body now drags the whole Crew across the floor. The doorstep bear and the All Hands door-grub then turned the Facilities Manager from a coin flip into the floor's signature beat: one appears in 91% of games, and the guard's own body is eaten in 79% — a median of zero rounds from the party getting the Sump door open, so the thing usually stands up as they file through and the door shuts on it. That cost about six points, paid back with four more rounds of cap. Deaths went from a fifth of games to a third in the process: that corridor fight lands with the party's bleach spent and the clock short. Each round of cap is worth roughly two points of win rate, which is the dial to move if 82% is the wrong number, and the doorstep bear is the dial for how mean the Sump approach feels.
 
@@ -282,7 +281,7 @@ Every Floor 1 Big Gear card is in someone's hands or was sold, so this deck is n
 | **Goblin Shortbow** | Both hands | 2 dice at range, can't shoot adjacent, replaces your Attack. In the Nice Shot envelope. |
 | **Leaf Blower** | Both hands | Action: Shove. Push a monster or a corpse in line of sight up to 3 squares away. Into a pit, it goes in. A monster into a wall or another monster takes 1. In the Trap Chef envelope. Shove for people who can't read. |
 
-**Carried, not drawn:** the Password of the Day ×3 (Junk: one on the Shift Lead, one in the Evidence locker, one in the Feed trough) and the Pet Biscuit (Companion upgrade, in the Good Boy envelope). Sir Reginald gets a standee of his own once the biscuit is under him.
+**Carried, not drawn:** the Password of the Day ×3 (Junk: one on the Shift Lead, one in the Evidence locker, one in the Feed trough) and the Pet Biscuit (Companion upgrade, in the Good Boy envelope). The biscuit lets Sir Reginald go apart from his person, so he gets a standee.
 
 **Retired for good:** Orc Monocle, Trash Can Lid, Torch, Frying Pan, Broken Table Leg. Torch stays retired so the Bathrobe isn't competing with a Head item and secret doors are search-only this floor.
 
@@ -304,7 +303,15 @@ Seven envelopes. Every trigger is something the announcer will see happen, so no
 
 Cut from the first draft: First Blood and Cartographer (Floor 1 did those), Password Accepted (opening the door is its own reward), Hoarder and Bookworm (nobody wants to count cards mid-fight).
 
-**Pet Biscuit:** slide it under Sir Reginald. He gets his own standee and square: Health 3, 2 attack dice, moves 6 with his person's turn. Attacks on his person hit the goose instead, no roll. He can eat a medium corpse.
+**Pet Biscuit:** slide it under Sir Reginald. He has become a person. He is not happier about it. Health 3, and he still eats small corpses only.
+
+- **Together** (the default; he rides on his person's standee, no square of his own): his person attacks with **+1 die**, one roll. When a monster's attack gets damage through to his person, they may shout **"Reginald!"** and the goose takes that damage instead. No roll, no limit, until he runs out of Health. This replaces the Floor 1 skull roll.
+- **Apart** (his own standee): on his person's turn he moves up to 6 and attacks an adjacent monster with 2 dice. That is all he does. He cannot open doors, search furniture, pick anything up or hand cards over. Fed janitors hunt the nearest hero, and a lone goose in a corridor counts. He is bait if you want him to be.
+- **Throw him:** his person's action, same wording as the Frying Pan. Pick a monster in line of sight: 2 attack dice, and Reginald lands on a square beside it. He is now apart, and that throw was his attack for the turn.
+- **Rejoin:** either of them ends a move on the other's square. Free.
+- **Downed** at 0 Health wherever he is, hero rules (section 1.1). Apart, that means somebody walks over to pick him up.
+
+The point of the split is that Lucas's turn stays one roll on most turns. Apart is the expensive mode, and it costs him the +1 die and the Bodyguard while the goose is away.
 
 ---
 
@@ -365,7 +372,7 @@ Behind a `floor2` config so Floor 1 numbers stay intact.
 - Fed janitors: fixed move 6 toward nearest hero by open route, no loot, no corpse.
 - All Hands on boss door open; the password gate on the boss door; Shift Lead guaranteed drop.
 - The boss's Snack and Understaffed rules.
-- Reginald's Downed state, the Pet Biscuit form.
+- Reginald's Downed state. The Pet Biscuit in its together mode only: +1 die, and the brain always shouts "Reginald!" while he is up. Apart and the throw are not simulated, so real play runs a little easier whenever Lucas splits them.
 - Two hero policies, not one: a **cleaner** (bleach the nearest medium or large corpse when no grub is within eight squares and nobody is in combat) and a **runner** (never clean, keep moving). Tune the schedule and the bleach count until both land near 80% with different failure stories.
 - Report: win rate, deaths, corpses cleaned, janitors fed by size, rounds the party spent within reach of a fed janitor, and how often the boss got a Snack.
 

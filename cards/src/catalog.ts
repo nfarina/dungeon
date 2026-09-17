@@ -547,7 +547,7 @@ const f2extras: Card[] = ([
     flavor: "Signed, the Shift Lead. Underlined twice.",
     art: "a yellow sticky note with a scribbled word crossed out and rewritten, stuck to a clipboard" },
   { id: "pet-biscuit", name: "Pet Biscuit", deck: "companion", type: "item", slot: "Companion upgrade", envelope: "Good Boy",
-    rules: "Slide under Sir Reginald. He gets his own standee and square: Health 3, 2 attack dice, moves 6 with his person's turn. Attacks on his person hit the goose instead, no roll. He can eat a medium corpse.",
+    rules: "Slide under Sir Reginald. Health 3. Together: his person attacks with +1 die, and when a monster hurts his person they may shout \"Reginald!\" and the goose takes the damage instead. Apart, on his own standee: on his person's turn he moves up to 6 and attacks an adjacent monster with 2 dice. He opens, searches and carries nothing. Throw him as an action: 2 attack dice at a monster in line of sight, and he lands beside it, apart. Rejoin by ending a move on each other's square.",
     flavor: "Who's a good boy. He is. He knows.",
     art: "a large bone-shaped dog biscuit with a tiny crown stamped into it, resting on a red velvet cushion" },
   { id: "reginald-standee", name: "Sir Reginald", deck: "standee", type: "standee", tile: { w: 0.75, h: 1 + STANDEE_TAB, kind: "standee" }, rules: "", ref: "sir-reginald",

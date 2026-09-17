@@ -525,7 +525,8 @@ export class Game {
   sum(h: Hero, k: "atk" | "def" | "mind" | "move"): number {
     return this.items(h).reduce((a, i) => a + (i[k] ?? 0), 0);
   }
-  atk(h: Hero) { return this.cfg.heroAtk + this.sum(h, "atk"); }
+  /** Pet Biscuit, together: Sir Reginald adds a die to his person's attack while he is up. */
+  atk(h: Hero) { return this.cfg.heroAtk + this.sum(h, "atk") + (h.biscuit && h.goose > 0 ? 1 : 0); }
   def(h: Hero) { return this.cfg.heroDef + this.sum(h, "def") + (h.stoneSkin ? 2 : 0); }
   mind(h: Hero) { return 3 + this.sum(h, "mind"); }
   moveDice(h: Hero) { return Math.max(1, this.rng.d6() + this.rng.d6() + this.sum(h, "move")); }
@@ -930,7 +931,7 @@ export class Game {
     let best: { corpse: Corpse; spot: Pt | null; dist: number } | null = null;
     const sparkSmall = method === "spark" && this.cfg.sparkSmallOnly;
     for (const c of this.corpses) {
-      if (method === "goose" && !(c.size === "small" || (h.biscuit && c.size === "medium"))) continue;
+      if (method === "goose" && c.size !== "small") continue;
       if (sparkSmall && c.size !== "small") continue;
       // Otherwise small corpses aren't worth bleach or a cast.
       if (method !== "goose" && !sparkSmall && c.size === "small") continue;
@@ -1943,8 +1944,8 @@ export class Game {
   private monsterAttack(m: Monster, h: Hero, diceOverride?: number) {
     // A Viewer takes one attack off the table (Banana Peel, Slow Clap, Boo!).
     if (this.fanShield > 0) { this.fanShield--; this.cfg.record && this.say(`${m.def.name} swings at ${h.name}; a Viewer's card stops it`); return; }
-    // Goose: soaks a hit on a skull (every hit, with the Pet Biscuit). Floor 2: at 0 he is Downed, not dead.
-    if (h.goose > 0 && (h.biscuit || rollSkulls(this.rng, 1) > 0)) {
+    // Goose without the biscuit: soaks the whole attack on a skull. Floor 2: at 0 he is Downed, not dead.
+    if (h.goose > 0 && !h.biscuit && rollSkulls(this.rng, 1) > 0) {
       h.goose--;
       if (h.goose === 0 && this.cfg.floor === 2) h.gooseDown = this.round;
       this.cfg.record && this.say(`${m.def.name} swings at ${h.name}; Sir Reginald takes it (${h.goose} left)`);
@@ -1957,6 +1958,14 @@ export class Game {
     const dmg = Math.max(0, skulls - shields);
     if (m.def.janitor || m.def.boss) this.log(`  ${m.def.name} hits ${h.name} for ${dmg} (${h.hp - dmg} left)`);
     else this.cfg.record && this.say(`${m.def.name} attacks ${h.name}: ${skulls} skull${skulls === 1 ? "" : "s"} vs ${shields} shield${shields === 1 ? "" : "s"}, ${dmg ? `${dmg} damage (${h.hp - dmg} left)` : "no damage"}`);
+    // Bodyguard (Pet Biscuit, together): his person may shout "Reginald!" and the goose takes the damage instead.
+    // The fixed brain always shouts while the goose is up.
+    if (dmg > 0 && h.biscuit && h.goose > 0) {
+      h.goose = Math.max(0, h.goose - dmg);
+      if (h.goose === 0) h.gooseDown = this.round;
+      this.cfg.record && this.say(`  "Reginald!" Sir Reginald takes it (${h.goose} left)`);
+      return;
+    }
     if (dmg > 0) this.damage(h, dmg);
   }
 

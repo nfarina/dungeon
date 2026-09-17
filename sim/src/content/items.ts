@@ -17,7 +17,8 @@ export type Item = {
   needMind?: number;
   /** Floor 2: the boss door opens for whoever carries this. */
   password?: boolean;
-  /** Floor 2: Pet Biscuit. Sir Reginald gets Health 3, 2 dice, and soaks every attack on his person. */
+  /** Floor 2: Pet Biscuit. Sir Reginald gets Health 3; together he adds a die to his person's attack and takes damage for them
+   *  (Bodyguard). The apart mode (his own figure, the throw) is not simulated. */
   biscuit?: boolean;
   // persistent specials
   torch?: boolean;         // auto-reveal traps on room entry, finds secret doors
