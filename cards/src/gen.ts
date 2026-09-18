@@ -57,7 +57,7 @@ export function fullPrompt(c: Card): string {
   }
   const same = !c.ref ? ""
     : c.type === "tile" ? " The second reference image shows this exact object before it was used: keep the same object, colours, materials, viewpoint and framing, and change only what the description says."
-    : " The second reference image shows this exact character: match their face, hair, skin, build and clothing, but take ONLY the character from it, not its background or framing.";
+    : " The second reference image shows this exact character: match their face, colouring, markings, build, gear and clothing, but take ONLY the character from it, not its background or framing.";
   if (c.type === "standee") {
     return `${style}\n\nThis is a stand-up game figure: one character shown full length, standing upright and facing the viewer, head near the top of the frame and feet near the bottom, nothing cropped. Portrait (tall) composition.\n\nSubject: ${c.art}.${same}\n\nBACKGROUND OVERRIDE: ignore the dungeon background described in the style above. The background here must be a plain, flat, uniform pale cream parchment colour, edge to edge, with only a soft ground shadow under the feet. No stone, no walls, no scenery, no gradient.`;
   }

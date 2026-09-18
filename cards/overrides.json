@@ -148,5 +148,14 @@
   },
   "standee-kobold": {
     "art": "full-body figure of a wiry red-scaled kobold in a miner's helmet with a headlamp, holding a pickaxe, dusty overalls, facing the viewer, whole body visible"
+  },
+  "standee-facilities-manager": {
+    "art": "full-body figure of an enormous bloated grub with patches of bear fur and bear claws, a janitor's cap and a clip-on tie, facing the viewer, whole body visible"
+  },
+  "tile-evidence-locker": {
+    "art": "a steel evidence locker seen from directly above, padlocked, with a chain"
+  },
+  "tile-evidence-locker-used": {
+    "art": "the same locker forced open, the chain cut, empty inside"
   }
 }

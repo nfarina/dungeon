@@ -1113,5 +1113,325 @@
     "model": "gemini-3.1-flash-image",
     "at": "2026-09-17T23:49:21.817Z",
     "size": "512px"
+  },
+  "reginald-standee": {
+    "file": "reginald-standee.387a6d6065.png",
+    "hash": "387a6d6065",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a stand-up game figure: one character shown full length, standing upright and facing the viewer, head near the top of the frame and feet near the bottom, nothing cropped. Portrait (tall) composition.\n\nSubject: full-body figure of a furious white goose with an orange beak, wings half spread, wearing a tiny crooked knight's helmet, standing facing the viewer, whole body visible. The second reference image shows this exact character: match their face, colouring, markings, build, gear and clothing, but take ONLY the character from it, not its background or framing.\n\nBACKGROUND OVERRIDE: ignore the dungeon background described in the style above. The background here must be a plain, flat, uniform pale cream parchment colour, edge to edge, with only a soft ground shadow under the feet. No stone, no walls, no scenery, no gradient.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:51:57.082Z",
+    "size": "512px"
+  },
+  "standee-rat": {
+    "file": "standee-rat.82b9a4175b.png",
+    "hash": "82b9a4175b",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a stand-up game figure: one character shown full length, standing upright and facing the viewer, head near the top of the frame and feet near the bottom, nothing cropped. Portrait (tall) composition.\n\nSubject: full-body figure of a large scruffy brown cave rat standing on its hind legs wearing a lanyard, facing the viewer, whole body visible. The second reference image shows this exact character: match their face, colouring, markings, build, gear and clothing, but take ONLY the character from it, not its background or framing.\n\nBACKGROUND OVERRIDE: ignore the dungeon background described in the style above. The background here must be a plain, flat, uniform pale cream parchment colour, edge to edge, with only a soft ground shadow under the feet. No stone, no walls, no scenery, no gradient.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:52:03.984Z",
+    "size": "512px"
+  },
+  "standee-bear": {
+    "file": "standee-bear.ded8e31eda.png",
+    "hash": "ded8e31eda",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a stand-up game figure: one character shown full length, standing upright and facing the viewer, head near the top of the frame and feet near the bottom, nothing cropped. Portrait (tall) composition.\n\nSubject: full-body figure of a huge shaggy dark brown cave bear rearing up on its hind legs, facing the viewer, whole body visible. The second reference image shows this exact character: match their face, colouring, markings, build, gear and clothing, but take ONLY the character from it, not its background or framing.\n\nBACKGROUND OVERRIDE: ignore the dungeon background described in the style above. The background here must be a plain, flat, uniform pale cream parchment colour, edge to edge, with only a soft ground shadow under the feet. No stone, no walls, no scenery, no gradient.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:52:13.481Z",
+    "size": "512px"
+  },
+  "standee-shift-lead": {
+    "file": "standee-shift-lead.beac5a31b3.png",
+    "hash": "beac5a31b3",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a stand-up game figure: one character shown full length, standing upright and facing the viewer, head near the top of the frame and feet near the bottom, nothing cropped. Portrait (tall) composition.\n\nSubject: full-body figure of a tall kobold in a short-sleeved dress shirt and a hard hat, holding a clipboard and a coffee mug, facing the viewer, whole body visible. The second reference image shows this exact character: match their face, colouring, markings, build, gear and clothing, but take ONLY the character from it, not its background or framing.\n\nBACKGROUND OVERRIDE: ignore the dungeon background described in the style above. The background here must be a plain, flat, uniform pale cream parchment colour, edge to edge, with only a soft ground shadow under the feet. No stone, no walls, no scenery, no gradient.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:52:21.328Z",
+    "size": "512px"
+  },
+  "standee-bloated-grub": {
+    "file": "standee-bloated-grub.7fbc66e43e.png",
+    "hash": "7fbc66e43e",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a stand-up game figure: one character shown full length, standing upright and facing the viewer, head near the top of the frame and feet near the bottom, nothing cropped. Portrait (tall) composition.\n\nSubject: full-body figure of a swollen pale grub with a rat's tail hanging out of its mouth, wearing a tiny janitor's cap, facing the viewer. The second reference image shows this exact character: match their face, colouring, markings, build, gear and clothing, but take ONLY the character from it, not its background or framing.\n\nBACKGROUND OVERRIDE: ignore the dungeon background described in the style above. The background here must be a plain, flat, uniform pale cream parchment colour, edge to edge, with only a soft ground shadow under the feet. No stone, no walls, no scenery, no gradient.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:52:28.663Z",
+    "size": "512px"
+  },
+  "standee-custodian": {
+    "file": "standee-custodian.1c819d3059.png",
+    "hash": "1c819d3059",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a stand-up game figure: one character shown full length, standing upright and facing the viewer, head near the top of the frame and feet near the bottom, nothing cropped. Portrait (tall) composition.\n\nSubject: full-body figure of a large upright grub with a kobold's helmet fused to its head and a pickaxe in stubby arms, janitor's cap, facing the viewer, whole body visible. The second reference image shows this exact character: match their face, colouring, markings, build, gear and clothing, but take ONLY the character from it, not its background or framing.\n\nBACKGROUND OVERRIDE: ignore the dungeon background described in the style above. The background here must be a plain, flat, uniform pale cream parchment colour, edge to edge, with only a soft ground shadow under the feet. No stone, no walls, no scenery, no gradient.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:52:37.957Z",
+    "size": "512px"
+  },
+  "standee-sump-door": {
+    "file": "standee-sump-door.683bdf0600.png",
+    "hash": "683bdf0600",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a stand-up game figure: one character shown full length, standing upright and facing the viewer, head near the top of the frame and feet near the bottom, nothing cropped. Portrait (tall) composition.\n\nSubject: a massive riveted steel industrial door with a big red AUTHORIZED PERSONNEL ONLY sign, a rusty intercom speaker grille with a glowing green button beside it, a small drain at the bottom, seen straight on, whole door visible.\n\nBACKGROUND OVERRIDE: ignore the dungeon background described in the style above. The background here must be a plain, flat, uniform pale cream parchment colour, edge to edge, with only a soft ground shadow under the feet. No stone, no walls, no scenery, no gradient.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:52:51.180Z",
+    "size": "512px"
+  },
+  "standee-senior-custodian": {
+    "file": "standee-senior-custodian.5d1bd7ebb2.png",
+    "hash": "5d1bd7ebb2",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a stand-up game figure: one character shown full length, standing upright and facing the viewer, head near the top of the frame and feet near the bottom, nothing cropped. Portrait (tall) composition.\n\nSubject: full-body figure of a colossal ancient pale wrinkled grub wearing a ragged janitor's cap and a name badge, holding a giant mop, facing the viewer, whole body visible. The second reference image shows this exact character: match their face, colouring, markings, build, gear and clothing, but take ONLY the character from it, not its background or framing.\n\nBACKGROUND OVERRIDE: ignore the dungeon background described in the style above. The background here must be a plain, flat, uniform pale cream parchment colour, edge to edge, with only a soft ground shadow under the feet. No stone, no walls, no scenery, no gradient.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:52:58.421Z",
+    "size": "512px"
+  },
+  "standee-facilities-manager": {
+    "file": "standee-facilities-manager.9d033647aa.png",
+    "hash": "9d033647aa",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a stand-up game figure: one character shown full length, standing upright and facing the viewer, head near the top of the frame and feet near the bottom, nothing cropped. Portrait (tall) composition.\n\nSubject: full-body figure of an enormous bloated grub with patches of bear fur and bear claws, a janitor's cap and a clip-on tie, facing the viewer, whole body visible. The second reference image shows this exact character: match their face, colouring, markings, build, gear and clothing, but take ONLY the character from it, not its background or framing.\n\nBACKGROUND OVERRIDE: ignore the dungeon background described in the style above. The background here must be a plain, flat, uniform pale cream parchment colour, edge to edge, with only a soft ground shadow under the feet. No stone, no walls, no scenery, no gradient.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:53:06.422Z",
+    "size": "512px"
+  },
+  "tile-front-desk": {
+    "file": "tile-front-desk.badf2dc84c.png",
+    "hash": "badf2dc84c",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game furniture token: high-angle three-quarter view, camera tilted about 60 degrees down and looking straight at the FRONT of the object (no diagonal rotation, the footprint stays a rectangle aligned with the frame), so the top surface AND the front side and legs are visible. No walls, no horizon. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: a chipped laminate reception desk seen from directly above, with a bell, a sign-in sheet and a dead potted plant.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:53:23.506Z",
+    "size": "512px"
+  },
+  "tile-shelving": {
+    "file": "tile-shelving.6c85739300.png",
+    "hash": "6c85739300",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game furniture token: high-angle three-quarter view, camera tilted about 60 degrees down and looking straight at the FRONT of the object (no diagonal rotation, the footprint stays a rectangle aligned with the frame), so the top surface AND the front side and legs are visible. No walls, no horizon. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: a steel utility shelving unit seen from directly above, stacked with cleaning supplies, jugs and rags.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:53:29.912Z",
+    "size": "512px"
+  },
+  "tile-shift-desk": {
+    "file": "tile-shift-desk.1ed2a60d59.png",
+    "hash": "1ed2a60d59",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game furniture token: high-angle three-quarter view, camera tilted about 60 degrees down and looking straight at the FRONT of the object (no diagonal rotation, the footprint stays a rectangle aligned with the frame), so the top surface AND the front side and legs are visible. No walls, no horizon. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: a battered metal office desk seen from directly above, covered in clipboards, a rotary phone and a sticky note.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:53:36.935Z",
+    "size": "512px"
+  },
+  "tile-bench": {
+    "file": "tile-bench.cfe279fcfe.png",
+    "hash": "cfe279fcfe",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game furniture token: high-angle three-quarter view, camera tilted about 60 degrees down and looking straight at the FRONT of the object (no diagonal rotation, the footprint stays a rectangle aligned with the frame), so the top surface AND the front side and legs are visible. No walls, no horizon. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: a wooden locker room bench seen from directly above, a towel and a single boot left on it.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:53:43.162Z",
+    "size": "512px"
+  },
+  "tile-feed-trough": {
+    "file": "tile-feed-trough.d10b2e778c.png",
+    "hash": "d10b2e778c",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game furniture token: high-angle three-quarter view, camera tilted about 60 degrees down and looking straight at the FRONT of the object (no diagonal rotation, the footprint stays a rectangle aligned with the frame), so the top surface AND the front side and legs are visible. No walls, no horizon. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: a long wooden feed trough seen from directly above, half full of suspicious kibble.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:53:49.458Z",
+    "size": "512px"
+  },
+  "tile-tool-rack": {
+    "file": "tile-tool-rack.28c6f24e17.png",
+    "hash": "28c6f24e17",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game furniture token: high-angle three-quarter view, camera tilted about 60 degrees down and looking straight at the FRONT of the object (no diagonal rotation, the footprint stays a rectangle aligned with the frame), so the top surface AND the front side and legs are visible. No walls, no horizon. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: a pegboard tool rack seen from directly above, lying flat, hung with wrenches, a hammer and a coil of rope.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:53:55.015Z",
+    "size": "512px"
+  },
+  "tile-pipe-rack": {
+    "file": "tile-pipe-rack.57c56b06b3.png",
+    "hash": "57c56b06b3",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game furniture token: high-angle three-quarter view, camera tilted about 60 degrees down and looking straight at the FRONT of the object (no diagonal rotation, the footprint stays a rectangle aligned with the frame), so the top surface AND the front side and legs are visible. No walls, no horizon. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: a rack of rusted iron pipes and valves seen from directly above, steam leaking from one joint.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:54:01.246Z",
+    "size": "512px"
+  },
+  "tile-filing-cabinet": {
+    "file": "tile-filing-cabinet.cf780195a0.png",
+    "hash": "cf780195a0",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game furniture token: high-angle three-quarter view, camera tilted about 60 degrees down and looking straight at the FRONT of the object (no diagonal rotation, the footprint stays a rectangle aligned with the frame), so the top surface AND the front side and legs are visible. No walls, no horizon. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: a tall grey steel filing cabinet seen from directly above, one drawer slightly open with papers sticking out.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:54:07.244Z",
+    "size": "512px"
+  },
+  "tile-laundry-shelf": {
+    "file": "tile-laundry-shelf.ba530e18ed.png",
+    "hash": "ba530e18ed",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game furniture token: high-angle three-quarter view, camera tilted about 60 degrees down and looking straight at the FRONT of the object (no diagonal rotation, the footprint stays a rectangle aligned with the frame), so the top surface AND the front side and legs are visible. No walls, no horizon. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: a wooden laundry shelf seen from directly above, stacked with folded towels and one fluffy purple bathrobe.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:54:13.535Z",
+    "size": "512px"
+  },
+  "tile-lunch-table": {
+    "file": "tile-lunch-table.396171205e.png",
+    "hash": "396171205e",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game furniture token: high-angle three-quarter view, camera tilted about 60 degrees down and looking straight at the FRONT of the object (no diagonal rotation, the footprint stays a rectangle aligned with the frame), so the top surface AND the front side and legs are visible. No walls, no horizon. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: a square cafeteria table seen from directly above, with trays, a spilled drink and a half-eaten sandwich.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:54:20.026Z",
+    "size": "512px"
+  },
+  "tile-ash-shelf": {
+    "file": "tile-ash-shelf.c91cf14698.png",
+    "hash": "c91cf14698",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game furniture token: high-angle three-quarter view, camera tilted about 60 degrees down and looking straight at the FRONT of the object (no diagonal rotation, the footprint stays a rectangle aligned with the frame), so the top surface AND the front side and legs are visible. No walls, no horizon. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: a soot-stained stone shelf seen from directly above, with urns, a shovel and a pile of grey ash.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:54:26.690Z",
+    "size": "512px"
+  },
+  "tile-bunk": {
+    "file": "tile-bunk.279cc19bec.png",
+    "hash": "279cc19bec",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game furniture token: high-angle three-quarter view, camera tilted about 60 degrees down and looking straight at the FRONT of the object (no diagonal rotation, the footprint stays a rectangle aligned with the frame), so the top surface AND the front side and legs are visible. No walls, no horizon. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: a rickety wooden bunk bed seen from directly above, a thin mattress and a chewed blanket.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:54:34.624Z",
+    "size": "512px"
+  },
+  "tile-sump-pump": {
+    "file": "tile-sump-pump.09e617fd6d.png",
+    "hash": "09e617fd6d",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game furniture token: high-angle three-quarter view, camera tilted about 60 degrees down and looking straight at the FRONT of the object (no diagonal rotation, the footprint stays a rectangle aligned with the frame), so the top surface AND the front side and legs are visible. No walls, no horizon. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: a huge rusted industrial sump pump seen from directly above, with pipes, a wheel valve and a puddle of dark water.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:54:40.936Z",
+    "size": "512px"
+  },
+  "tile-corpse-small": {
+    "file": "tile-corpse-small.f55aa06693.png",
+    "hash": "f55aa06693",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game floor tile seen DIRECTLY FROM ABOVE: flat top-down orthographic view of a floor feature, no horizon, no walls, no perspective. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: a dead cave rat lying on a stone floor square seen from directly above, X eyes, lanyard beside it.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:54:46.954Z",
+    "size": "512px"
+  },
+  "tile-corpse-medium": {
+    "file": "tile-corpse-medium.e593d2fb73.png",
+    "hash": "e593d2fb73",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game floor tile seen DIRECTLY FROM ABOVE: flat top-down orthographic view of a floor feature, no horizon, no walls, no perspective. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: a dead kobold miner lying on a stone floor square seen from directly above, X eyes, helmet rolled off, pickaxe dropped.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:54:53.932Z",
+    "size": "512px"
+  },
+  "tile-corpse-large": {
+    "file": "tile-corpse-large.8dc1fd06db.png",
+    "hash": "8dc1fd06db",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game floor tile seen DIRECTLY FROM ABOVE: flat top-down orthographic view of a floor feature, no horizon, no walls, no perspective. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: a dead cave bear slumped on a stone floor square seen from directly above, X eyes, one paw over the edge of the square.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:55:00.308Z",
+    "size": "512px"
+  },
+  "tile-grub-tile": {
+    "file": "tile-grub-tile.9def004f30.png",
+    "hash": "9def004f30",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game floor tile seen DIRECTLY FROM ABOVE: flat top-down orthographic view of a floor feature, no horizon, no walls, no perspective. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: a fat pale blind grub curled on a stone floor square seen from directly above, wearing a tiny janitor's cap.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:55:07.305Z",
+    "size": "512px"
+  },
+  "tile-front-desk-used": {
+    "file": "tile-front-desk-used.18021bcb98.png",
+    "hash": "18021bcb98",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game furniture token: high-angle three-quarter view, camera tilted about 60 degrees down and looking straight at the FRONT of the object (no diagonal rotation, the footprint stays a rectangle aligned with the frame), so the top surface AND the front side and legs are visible. No walls, no horizon. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: the same reception desk ransacked, drawers pulled out, the bell knocked over, papers everywhere. The second reference image shows this exact object before it was used: keep the same object, colours, materials, viewpoint and framing, and change only what the description says.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:55:14.568Z",
+    "size": "512px"
+  },
+  "tile-shelving-used": {
+    "file": "tile-shelving-used.51fbbef7ea.png",
+    "hash": "51fbbef7ea",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game furniture token: high-angle three-quarter view, camera tilted about 60 degrees down and looking straight at the FRONT of the object (no diagonal rotation, the footprint stays a rectangle aligned with the frame), so the top surface AND the front side and legs are visible. No walls, no horizon. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: the same shelving unit stripped bare, one shelf collapsed, a single empty jug on its side. The second reference image shows this exact object before it was used: keep the same object, colours, materials, viewpoint and framing, and change only what the description says.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:55:23.043Z",
+    "size": "512px"
+  },
+  "tile-shift-desk-used": {
+    "file": "tile-shift-desk-used.5b802e5edb.png",
+    "hash": "5b802e5edb",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game furniture token: high-angle three-quarter view, camera tilted about 60 degrees down and looking straight at the FRONT of the object (no diagonal rotation, the footprint stays a rectangle aligned with the frame), so the top surface AND the front side and legs are visible. No walls, no horizon. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: the same desk with every clipboard flung off, the phone off the hook, a sticky note torn away. The second reference image shows this exact object before it was used: keep the same object, colours, materials, viewpoint and framing, and change only what the description says.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:55:29.879Z",
+    "size": "512px"
+  },
+  "tile-bench-used": {
+    "file": "tile-bench-used.bf2cffcac9.png",
+    "hash": "bf2cffcac9",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game furniture token: high-angle three-quarter view, camera tilted about 60 degrees down and looking straight at the FRONT of the object (no diagonal rotation, the footprint stays a rectangle aligned with the frame), so the top surface AND the front side and legs are visible. No walls, no horizon. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: the same bench tipped on its side, the towel on the floor. The second reference image shows this exact object before it was used: keep the same object, colours, materials, viewpoint and framing, and change only what the description says.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:55:36.550Z",
+    "size": "512px"
+  },
+  "tile-feed-trough-used": {
+    "file": "tile-feed-trough-used.6e12d0aef4.png",
+    "hash": "6e12d0aef4",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game furniture token: high-angle three-quarter view, camera tilted about 60 degrees down and looking straight at the FRONT of the object (no diagonal rotation, the footprint stays a rectangle aligned with the frame), so the top surface AND the front side and legs are visible. No walls, no horizon. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: the same trough overturned and empty, kibble scattered across the floor. The second reference image shows this exact object before it was used: keep the same object, colours, materials, viewpoint and framing, and change only what the description says.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:55:43.764Z",
+    "size": "512px"
+  },
+  "tile-tool-rack-used": {
+    "file": "tile-tool-rack-used.80898a9f6b.png",
+    "hash": "80898a9f6b",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game furniture token: high-angle three-quarter view, camera tilted about 60 degrees down and looking straight at the FRONT of the object (no diagonal rotation, the footprint stays a rectangle aligned with the frame), so the top surface AND the front side and legs are visible. No walls, no horizon. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: the same pegboard with every tool gone, only outlines and empty pegs. The second reference image shows this exact object before it was used: keep the same object, colours, materials, viewpoint and framing, and change only what the description says.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:55:51.961Z",
+    "size": "512px"
+  },
+  "tile-pipe-rack-used": {
+    "file": "tile-pipe-rack-used.e9fa32c5ac.png",
+    "hash": "e9fa32c5ac",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game furniture token: high-angle three-quarter view, camera tilted about 60 degrees down and looking straight at the FRONT of the object (no diagonal rotation, the footprint stays a rectangle aligned with the frame), so the top surface AND the front side and legs are visible. No walls, no horizon. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: the same pipe rack with a valve wrenched off, steam gushing, a pipe lying loose. The second reference image shows this exact object before it was used: keep the same object, colours, materials, viewpoint and framing, and change only what the description says.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:55:59.434Z",
+    "size": "512px"
+  },
+  "tile-filing-cabinet-used": {
+    "file": "tile-filing-cabinet-used.b08a5d6116.png",
+    "hash": "b08a5d6116",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game furniture token: high-angle three-quarter view, camera tilted about 60 degrees down and looking straight at the FRONT of the object (no diagonal rotation, the footprint stays a rectangle aligned with the frame), so the top surface AND the front side and legs are visible. No walls, no horizon. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: the same filing cabinet with every drawer yanked out and papers heaped around it. The second reference image shows this exact object before it was used: keep the same object, colours, materials, viewpoint and framing, and change only what the description says.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:56:06.820Z",
+    "size": "512px"
+  },
+  "tile-laundry-shelf-used": {
+    "file": "tile-laundry-shelf-used.eee189b799.png",
+    "hash": "eee189b799",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game furniture token: high-angle three-quarter view, camera tilted about 60 degrees down and looking straight at the FRONT of the object (no diagonal rotation, the footprint stays a rectangle aligned with the frame), so the top surface AND the front side and legs are visible. No walls, no horizon. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: the same laundry shelf with the towels toppled and the bathrobe gone. The second reference image shows this exact object before it was used: keep the same object, colours, materials, viewpoint and framing, and change only what the description says.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:56:13.958Z",
+    "size": "512px"
+  },
+  "tile-lunch-table-used": {
+    "file": "tile-lunch-table-used.859ce8d243.png",
+    "hash": "859ce8d243",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game furniture token: high-angle three-quarter view, camera tilted about 60 degrees down and looking straight at the FRONT of the object (no diagonal rotation, the footprint stays a rectangle aligned with the frame), so the top surface AND the front side and legs are visible. No walls, no horizon. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: the same cafeteria table with the trays swept off and every chair knocked over. The second reference image shows this exact object before it was used: keep the same object, colours, materials, viewpoint and framing, and change only what the description says.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:56:21.043Z",
+    "size": "512px"
+  },
+  "tile-ash-shelf-used": {
+    "file": "tile-ash-shelf-used.e6e10b6136.png",
+    "hash": "e6e10b6136",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game furniture token: high-angle three-quarter view, camera tilted about 60 degrees down and looking straight at the FRONT of the object (no diagonal rotation, the footprint stays a rectangle aligned with the frame), so the top surface AND the front side and legs are visible. No walls, no horizon. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: the same shelf with the urns tipped and ash spilled everywhere. The second reference image shows this exact object before it was used: keep the same object, colours, materials, viewpoint and framing, and change only what the description says.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:56:28.291Z",
+    "size": "512px"
+  },
+  "tile-evidence-locker-used": {
+    "file": "tile-evidence-locker-used.c7b22b87f0.png",
+    "hash": "c7b22b87f0",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game furniture token: high-angle three-quarter view, camera tilted about 60 degrees down and looking straight at the FRONT of the object (no diagonal rotation, the footprint stays a rectangle aligned with the frame), so the top surface AND the front side and legs are visible. No walls, no horizon. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: the same locker forced open, the chain cut, empty inside. The second reference image shows this exact object before it was used: keep the same object, colours, materials, viewpoint and framing, and change only what the description says.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:58:15.201Z",
+    "size": "512px"
+  },
+  "tile-bunk-used": {
+    "file": "tile-bunk-used.77130d5fd6.png",
+    "hash": "77130d5fd6",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game furniture token: high-angle three-quarter view, camera tilted about 60 degrees down and looking straight at the FRONT of the object (no diagonal rotation, the footprint stays a rectangle aligned with the frame), so the top surface AND the front side and legs are visible. No walls, no horizon. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: the same bunk with the mattress dragged off and the blanket in a heap. The second reference image shows this exact object before it was used: keep the same object, colours, materials, viewpoint and framing, and change only what the description says.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:56:46.580Z",
+    "size": "512px"
+  },
+  "tile-evidence-locker": {
+    "file": "tile-evidence-locker.7102fbaa13.png",
+    "hash": "7102fbaa13",
+    "prompt": "Cartoony, stylized fantasy illustration in the exact style of the reference image: clean graphic linework, bold dark outlines, flat cel shading with soft highlights, playful exaggerated proportions, warm saturated colors against a dark blue-grey stone dungeon background.\n\nMatch the reference image's rendering style, line weight and palette exactly.\n\nDo NOT include any text, letters, card frame, border, banner, ribbon or logo. Single subject, centered, filling most of the frame.\n\nThis is a board game furniture token: high-angle three-quarter view, camera tilted about 60 degrees down and looking straight at the FRONT of the object (no diagonal rotation, the footprint stays a rectangle aligned with the frame), so the top surface AND the front side and legs are visible. No walls, no horizon. The object is cropped TIGHT and fills the frame edge to edge with almost no floor margin, like a token cut out to fit its footprint exactly; dark grey stone flagstones show only in the small gaps around it.\n\nSubject: a steel evidence locker seen from directly above, padlocked, with a chain.",
+    "model": "gemini-3.1-flash-image",
+    "at": "2026-09-17T23:58:04.199Z",
+    "size": "512px"
   }
 }
