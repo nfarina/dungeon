@@ -60,6 +60,8 @@ export type Card = {
   art: string;
   /** Id of a card whose current art is sent along as a second reference image: "this exact character" (or object). */
   ref?: string;
+  /** Spellbooks only: what the five ticks buy, printed under the boxes (floor-1.md 6.3). */
+  mastery?: string;
   /** Tiles: this card is the printed back of that tile (the looted or used state). It follows that tile's size and count. */
   backOf?: string;
   /** Name of the matching entry in the sim, when it differs. */
@@ -206,13 +208,16 @@ const biggear: Card[] = [
     rules: "Opens one locked chest or door. Then it crumbles.",
     art: "an ornate iron key with a tiny skull for a bow, bits crumbling off it" },
   { id: "spark", name: "Spellbook: Spark", deck: "biggear", type: "spell", mind: 4, cooldown: 2,
-    rules: "2 attack dice at a monster in line of sight.",
+    rules: "2 attack dice at a monster in line of sight. The monster defends normally.",
+    mastery: "3 attack dice instead of 2.",
     art: "a small leather spellbook, open, with a crackling blue-white spark of lightning leaping off the page" },
   { id: "shove", name: "Spellbook: Shove", deck: "biggear", type: "spell", mind: 4, cooldown: 2,
-    rules: "Push a monster in line of sight up to 3 squares directly away from you. Into a trap: it triggers. Into a wall or another monster: 1 damage.",
+    rules: "Push a monster in line of sight up to 3 squares directly away from you. Into a trap: it triggers. Into a wall or another monster: 1 damage, no defence roll.",
+    mastery: "Push up to 4 squares.",
     art: "a small leather spellbook, open, with a big glowing green cartoon hand bursting out of it palm-first" },
   { id: "patch-up", name: "Spellbook: Patch Up", deck: "biggear", type: "spell", mind: 4, cooldown: 3,
     rules: "Heal 2 to you or an adjacent player.",
+    mastery: "Heal 3 instead of 2.",
     art: "a small leather spellbook, open, with golden sparkles and a band-aid drawn on the glowing page" },
   { id: "sponsored-cape", name: "Sponsored Cape", deck: "biggear", type: "item", slot: "Trinket",
     rules: "Once per floor, when you would die, you're Downed with 1 Health instead.", flavor: "The logo is enormous.",
@@ -228,6 +233,7 @@ const extras: Card[] = [
     art: "a worn leather bookmark with a frayed gold tassel, glowing faintly, lying across an open spellbook" },
   { id: "nope", name: "Spellbook: Nope", deck: "biggear", type: "spell", mind: 4, cooldown: 3, envelope: "Boss Box",
     rules: "After a monster rolls an attack against anyone in your room, cancel it.", flavor: "The announcer sighs.",
+    mastery: "Cancel an attack in any room you can see into.",
     art: "a small black leather spellbook, open, with a single glowing red stop-sign hand hovering above the page" },
   { id: "sir-reginald", name: "Sir Reginald", deck: "companion", type: "companion", envelope: "Sir Reginald",
     rules: "Companion. Moves with the player who freed him, occupies no square. Once per turn, 1 attack die at a monster adjacent to his person. When a monster attacks his person, roll 1 die: on a skull it attacks the goose instead. Health 2. He does not come back.",
@@ -510,9 +516,11 @@ const f2biggear: Card[] = ([
     art: "a huge steel ring crowded with dozens of mismatched keys, hanging from a belt clip" },
   { id: "mop-up", name: "Spellbook: Mop-Up", deck: "biggear", type: "spell", mind: 4, cooldown: 3,
     rules: "Obliterate a corpse in line of sight.",
+    mastery: "Also obliterates a second corpse next to the first.",
     art: "a small leather spellbook, open, with a glowing blue mop and bucket floating above the page" },
   { id: "static", name: "Spellbook: Static", deck: "biggear", type: "spell", mind: 4, cooldown: 3,
     rules: "1 damage to every monster adjacent to you. No defence roll.",
+    mastery: "Reaches 2 squares, not just adjacent.",
     art: "a small leather spellbook, open, with a crackling ring of static electricity radiating out from the page" },
   { id: "lunchbox", name: "Steel Lunchbox", deck: "biggear", type: "item", slot: "Trinket",
     rules: "Once per floor, heal 3. Tick the box. ☐", flavor: "There is always something in it.",

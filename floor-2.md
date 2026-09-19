@@ -23,6 +23,7 @@ Everything in `floor-1.md` still applies unless this table says otherwise: stats
 | Fire Axe opens locked chests | **Skeleton Key only.** The axe opens nothing locked on this floor. Both chests (the Filing cabinet and the Evidence locker) need a key: the party carries one and a second hangs on the Tool Crib's tool rack. |
 | HeroQuest monsters | Three custom monsters, small, medium, large, each with a fed janitor form. Section 4. |
 | The stride: with no monster revealed on the board, walk 8 instead of your roll | Same rule, and **grubs do not count as monsters for it.** They ignore you, so they do not stop you striding. A fed janitor does, and so does anything else awake and revealed. Without this ruling the stride would cover a tenth of your move turns instead of half, and the floor would crawl. |
+| Spellbooks just have five empty boxes | **Mastery** (Floor 1, section 6.3): five casts and the book does one more, for good, printed on each card. Ethan's Spark is already there and rolls 3 dice. Mastery never shortens a cooldown; Spark's cooldown is what this floor's corpse budget is built on. Mop-Up mastered takes a second corpse next to the first, which is the one mastery that touches the Crew. |
 | Sir Reginald dies at 0 Health | Reginald is **Downed** at 0, same rules as a hero: revived by an adjacent action or a Juice Box, dead if still down at the end of the next round. |
 | Furniture gives a deck draw by type (rack: Gear, table: Pockets, shelf: Gear or Big Gear) | **Every piece holds one named card**, no deck draw. Searching it is an action; the announcer hands over the card the DM view (or the room table in section 3) lists for that room, and the tile flips. Chests still need a Skeleton Key, spent. Industrial Bleach is only found this way. |
 
@@ -100,18 +101,18 @@ Print a big standee for the Sump door itself, so it reads as the boss door from 
 
 | Measure | Result |
 |---|---|
-| Party wins (boss dead, everyone down the stairs) | 84% |
+| Party wins (boss dead, everyone down the stairs) | 85.5% |
 | Escaped with the boss alive | 1.7% |
 | Floor came down on somebody | 12% |
-| Full wipe | 2% |
-| Games where someone dies | 30% |
-| Rounds to finish, median | 35 |
+| Full wipe | 2.2% |
+| Games where someone dies | 27% |
+| Rounds to finish, median | 34 |
 | Password found, median round | 20 |
 | Sump door opens, average round | 28 |
 | Rooms opened | 9 of 14 |
 | Corpses made / cleaned / left at the end | 20 / 10 / 2.5 (the goose eats 4.7, Spark 2.0, bleach the rest) |
 | Bleach found / used | 4.1 / 3.5, against 8.4 medium and 2.6 large corpses a game |
-| Fed janitors per game | 5.9, in every game; the party kills 4.2 of them |
+| Fed janitors per game | 5.9, in every game; the party kills 4.1 of them |
 | Rounds with a janitor chasing someone | 10 |
 | Facilities Managers (a large corpse eaten) | 1.5 a game, in 91% of games |
 | The doorstep beat: the Sump guard's body eaten | 79% of games, median the same round the door opens |
@@ -125,7 +126,7 @@ The two rule changes together cost the table's party about four points of win ra
 
 The first draft of this floor had the Shift Office beside the forced path and a party that knew where it was. It looked fine on paper (85% win) and was wrong in the way that matters: a real table does not know which door the password is behind. The blind party on that layout still found it by round 9, because the room was right there; moved to the far corner it takes twenty rounds, which is the hunt this floor is about. One copy of the password in one corner then made the floor a lottery on which way the party wandered: one game in eight ran out of clock without ever finding it. Three places in three corners fixed that (collapses fell to one game in seventy) and made the floor too easy, so the Crew grew from six grubs to eight.
 
-Without the Cleanup Crew the floor is a 95% walk, so the grubs are the whole difficulty. The dials, in order of effect: where the password copies are; fed janitor Health (about ten points); the grub budget (each grub is worth about two and a half points of win rate and a few deaths); the floor cap (about two points a round, mostly as collapses). The grub schedule barely matters once the budget is fixed. If the table wants it harder, take a grub away or a round off the cap; easier, the reverse.
+Without the Cleanup Crew the floor is a 95% walk, so the grubs are the whole difficulty. The dials, in order of effect: anything that lets Spark be cast more often (a mastered Spark at one round shorter cooldown was worth seven and a half points, which is why mastery adds a die instead); where the password copies are; fed janitor Health (about ten points); the grub budget (each grub is worth about two and a half points of win rate and a few deaths); the floor cap (about two points a round, mostly as collapses). The grub schedule barely matters once the budget is fixed. If the table wants it harder, take a grub away or a round off the cap; easier, the reverse.
 
 
 ---

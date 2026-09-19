@@ -40,6 +40,8 @@ export const CARD_CSS = `
 .card .die { width:.34in; height:.34in; border:.02in solid var(--line); border-radius:.06in; background:#fff; display:flex; align-items:center; justify-content:center; font-family:'Cinzel'; font-weight:800; font-size:13pt; }
 .card .cdlabel { font-family:'Alegreya SC'; font-size:7pt; letter-spacing:.06em; color:var(--muted); text-align:left; line-height:1.2; }
 .card .ticks { display:flex; gap:.05in; justify-content:center; margin-top:.04in; }
+.card .mastery { font-size:7.4pt; line-height:1.25; text-align:center; margin-top:.035in; }
+.card .mastery span { font-family:'Alegreya SC', Georgia, serif; letter-spacing:.06em; color:var(--muted); }
 .card .tick { width:.16in; height:.16in; border:.014in solid var(--line); border-radius:.02in; background:#fff; }
 .card .stats { display:flex; gap:.04in; justify-content:center; margin-top:.2in; }
 .card .stat { flex:1; border:.016in solid var(--line); border-radius:.04in; background:#fff; text-align:center; padding:.02in 0 .015in; }
@@ -157,7 +159,7 @@ export function renderFront(c: Card, artUrl: string | null): string {
   }
   const cooldown = c.type === "spell"
     ? `<div class="cd"><div class="die">${c.cooldown}</div><div class="cdlabel">Cooldown<br>set a die here</div></div>
-       <div class="ticks">${"<div class=\"tick\"></div>".repeat(5)}</div>`
+       <div class="ticks">${"<div class=\"tick\"></div>".repeat(5)}</div>${c.mastery ? `<div class="mastery"><span>Mastered</span> ${esc(c.mastery)}</div>` : ""}`
     : "";
   return `<div class="${cls}" style="${style}">${artBlock(c, artUrl)}
     <div class="meta">${chips(c)}</div>

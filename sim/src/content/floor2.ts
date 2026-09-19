@@ -36,6 +36,8 @@ export type Carry = {
   equip: Partial<Record<"main" | "off" | "body" | "head" | "feet", string>>;
   trinkets: string[];
   learned: string[];
+  /** Books already at five ticks when they come down the stairs. */
+  mastered?: string[];
   pack: string[];
   goose?: number;
 };
@@ -46,6 +48,7 @@ export const CARRYOVER: Carry[] = [
     pack: ["Slingshot", "Bandage", "Scroll: Stone Skin"] },
   { name: "Ethan", equip: { head: "Homework Glasses" }, trinkets: ["Bookmark", "Skeleton Key"],
     learned: ["Spellbook: Spark", "Spellbook: Nope", "Spellbook: Shove", "Spellbook: Patch Up"],
+    mastered: ["Spellbook: Spark"],
     pack: ["Energy Drink"] },
   { name: "Lucas", equip: { main: "Fire Axe" }, trinkets: ["Sponsored Cape", "Goblin Ear Necklace"], learned: [],
     pack: ["Whistle of Doubtful Value", "Scroll: Sleep"], goose: 2 },

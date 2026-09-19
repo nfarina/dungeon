@@ -309,6 +309,23 @@ Box contents that duplicate a card already in a deck: pull that card out of the 
 
 **Spellbook: Nope** (Mind 4+, Cooldown 3): after a monster rolls an attack against anyone in your room, cancel it. The announcer sighs.
 
+**Do monsters defend against spells?** Yes, whenever the card says *attack dice*. Spark, Firebolt and Restructuring are ordinary attacks that happen to come out of a book, so the monster rolls its Defend dice exactly as it would against the axe. Spark kills a Cave Rat two times in three, not automatically, and a Kobold Miner three times in five. Only the spells that name a flat number skip the roll, and they are the small ones: Static's 1 damage to everyone adjacent, and the 1 damage Shove does when it slams something into a wall. Those two say so on the card.
+
+**Mastery: the five boxes.** Every Spellbook is printed with five checkboxes. Tick one each time you cast it. On the fifth tick the book is **mastered**, and from then on it does **one more** of whatever it does. It is printed on each card:
+
+| Spellbook | Mastered |
+|---|---|
+| **Spark** | 3 attack dice instead of 2 |
+| **Shove** | Push up to 4 squares |
+| **Patch Up** | Heal 3 instead of 2 |
+| **Nope** | Cancel an attack in any room you can see into |
+| **Static** | Reaches 2 squares, not just adjacent |
+| **Mop-Up** | Also obliterates a second corpse next to the first |
+
+Mastery is per book and permanent, it never changes a cooldown, and a book someone else learns starts at zero boxes. Later Spellbooks can afford to be printed weak, because mastery is what makes them worth the slot.
+
+Cooldowns deliberately stay out of it. The simulator says a mastered Spark at one round shorter is worth seven and a half points of win rate on Floor 2, because Spark cleans corpses there and the whole floor is balanced on how many it can clean. One more die is worth about one point, which is the size an achievement should be.
+
 **The Save-the-Date:** a printed card. "Congratulations on surviving Floor 1. Class selection is available at the bottom of Floor 2. This offer is non-transferable and the company is not responsible for what you choose." Classes get picked after Floor 2, like the book, so Floor 2 is still "you, but with stuff."
 
 ### 7.1 The Stairwell Shop

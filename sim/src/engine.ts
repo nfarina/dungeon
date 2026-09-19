@@ -45,6 +45,13 @@ export type Config = {
   /** HeroQuest First Light's out-of-combat stride: with nothing revealed on the board, you may walk 8 instead of
    *  your roll. You still roll, and a better roll stands, so the stride is a floor under 2d6, not a replacement for it
    *  (average 8.6 rather than 7). Gear move modifiers apply to both. Grubs never count; fed janitors always do. */
+  /** Spellbook mastery: five casts and the book's cooldown drops by one, permanently, never below 1. */
+  spellMastery: boolean;
+  masteryCasts: number;
+  /** What five ticks buy. "more" is the written rule: each book does one more of whatever it does.
+   *  "cooldown" (one round shorter) and "free" (one free cast a floor) were measured and rejected: both buy casts,
+   *  and on Floor 2 casts are corpse cleaning, so each is worth about seven points of win rate. */
+  masteryBonus: "cooldown" | "more" | "free";
   strideWhenClear: boolean;
   strideMove: number;
   /** Floor 2 ruling: do grubs stop the stride? Written rule says no, they are scenery with a timer. */
@@ -134,6 +141,7 @@ export const DEFAULT_CONFIG: Config = {
   reviveHp: 1,
   heroHp: 6,
   heroAtk: 2,
+  spellMastery: true, masteryCasts: 5, masteryBonus: "more",
   strideWhenClear: true, strideMove: 8, strideGrubsCount: false,
   heroDef: 2,
   bossHp: 4,
@@ -187,7 +195,8 @@ export type Hero = {
   equip: Record<string, Item | null>;
   trinkets: (Item | null)[];
   pack: Item[];
-  learned: { item: Item; cd: number }[];
+  /** `casts` ticks the five boxes printed on the card: at `masteryCasts` the book is mastered (floor-1.md 6.3). */
+  learned: { item: Item; cd: number; casts: number; freeUsed?: boolean }[];
   gold: number;
   downed: boolean; downedRound: number; exited: boolean; dead: boolean;
   inPit: boolean;
@@ -481,7 +490,7 @@ export class Game {
         h.name = c.name;
         for (const [slot, nm] of Object.entries(c.equip)) if (nm) h.equip[slot] = namedItem(nm);
         c.trinkets.forEach((nm, k) => { h.trinkets[k] = namedItem(nm); });
-        for (const nm of c.learned) h.learned.push({ item: namedItem(nm), cd: 0 });
+        for (const nm of c.learned) h.learned.push({ item: namedItem(nm), cd: 0, casts: (c.mastered ?? []).includes(nm) ? this.cfg.masteryCasts : 0 });
         for (const nm of c.pack) h.pack.push(namedItem(nm));
         if (c.goose) { h.goose = c.goose; h.gooseMax = c.goose; }
       } else {
@@ -744,7 +753,7 @@ export class Game {
         atk: this.atk(h), def: this.def(h), mind: this.mind(h),
         equip: [...SLOTS.map(s => h.equip[s]), ...h.trinkets].filter(Boolean).map(i => i!.name),
         pack: [...h.pack, ...h.pending].map(i => i.name),
-        learned: h.learned.map(l => l.item.name + (l.cd ? ` (${l.cd})` : "")),
+        learned: h.learned.map(l => l.item.name + (l.cd ? ` (${l.cd})` : "") + (this.mastered(l) ? " \u2605" : "")),
       })),
       monsters: this.monsters.map((m, i) => ({
         key: `m${i}`, id: m.def.id, name: m.def.name, x: m.pos.x, y: m.pos.y, hp: m.hp,
@@ -1000,7 +1009,13 @@ export class Game {
     for (const id of ["mopup", "spark"] as const) {
       const book = canCast ? h.learned.find(l => l.item.spell?.id === id && l.cd === 0) : undefined;
       const t = book && this.cleanTarget(h, f, id);
-      if (book && t) { book.cd = book.item.spell!.cooldown; this.removeCorpse(t.corpse, "spark"); return true; }
+      if (book && t) {
+        const second = id === "mopup" && this.more(book)
+          ? this.corpses.find(c => c !== t.corpse && this.melee(c.pos, t.corpse.pos)) : undefined;
+        this.spend(book); this.removeCorpse(t.corpse, "spark");
+        if (second) this.removeCorpse(second, "spark");   // mastered Mop-Up takes a second corpse next to the first
+        return true;
+      }
     }
     return false;
   }
@@ -1013,8 +1028,9 @@ export class Game {
     const who = [h, ...this.standing().filter(o => o !== h && this.melee(o.pos, h.pos))]
       .filter(o => o.hp <= 3 && o.hp < o.maxHp).sort((a, b) => a.hp - b.hp)[0];
     if (!who) return false;
-    pu.cd = pu.item.spell!.cooldown;
-    who.hp = Math.min(who.maxHp, who.hp + 2);
+    const heal = this.more(pu) ? 3 : 2;
+    this.spend(pu);
+    who.hp = Math.min(who.maxHp, who.hp + heal);
     this.cfg.record && this.say(`${h.name} casts Patch Up on ${who === h ? "themself" : who.name} (${who.hp}/${who.maxHp})`);
     return true;
   }
@@ -1132,8 +1148,11 @@ export class Game {
     // Static: 1 damage to every adjacent monster, worth it against two or more.
     if (this.cfg.floor === 2 && (!this.cfg.castNeedsMind || this.mind(h) >= 4)) {
       const st = h.learned.find(l => l.item.spell?.id === "static" && l.cd === 0);
-      const adj = this.monsters.filter(m => m.alive && m.def.janitor !== "grub" && this.melee(m.pos, h.pos));
-      if (st && adj.length >= 2) { st.cd = st.item.spell!.cooldown; this.cfg.record && this.say(`${h.name} casts Static: 1 damage to each of ${adj.length} adjacent monsters`); for (const m of adj) this.hurtMonster(m, 1, h); return; }
+      // Mastered Static arcs one square further.
+      const reach = st && this.more(st) ? 2 : 1;
+      const adj = this.monsters.filter(m => m.alive && m.def.janitor !== "grub"
+        && (reach === 1 ? this.melee(m.pos, h.pos) : dist1(m.pos, h.pos) <= 2 && los(this.board, h.pos, m.pos, this.openDoors)));
+      if (st && adj.length >= 2) { this.spend(st); this.cfg.record && this.say(`${h.name} casts Static: 1 damage to each of ${adj.length} adjacent monsters`); for (const m of adj) this.hurtMonster(m, 1, h); return; }
     }
     // Patch Up beats a swing when somebody is about to drop.
     if ((h.hp <= 2 || this.standing().some(o => o !== h && this.melee(o.pos, h.pos) && o.hp <= 2)) && this.tryPatchUp(h)) return;
@@ -1629,10 +1648,11 @@ export class Game {
     }
     // Rule 6.3: casting needs Mind 4+ every time, not just learning. Glasses off, book closed.
     const spark = (!this.cfg.castNeedsMind || this.mind(h) >= 4) ? h.learned.find(l => l.item.spell?.id === "spark" && l.cd === 0) : undefined;
-    if (spark && (!this.melee(h.pos, target.pos) || 2 > this.atk(h))) {
-      spark.cd = spark.item.spell!.cooldown;
+    if (spark && (!this.melee(h.pos, target.pos) || this.spellDice(spark, 2) > this.atk(h))) {
+      const dice = this.spellDice(spark, 2);
+      this.spend(spark);
       this.cfg.record && this.say(`${h.name} casts Spark at ${target.def.name}`);
-      this.resolveAttack(h, target, 2);
+      this.resolveAttack(h, target, dice);
       return true;
     }
     if (this.rng.next() > this.cfg.competence) return false;
@@ -1692,6 +1712,23 @@ export class Game {
     this.lastShotRanged = false;
   }
   lastShotRanged = false;
+
+  /** Five boxes ticked. The card is the tracker; the sim just counts. */
+  mastered(l: { casts: number }) { return this.cfg.spellMastery && l.casts >= this.cfg.masteryCasts; }
+  /** Spend a spellbook: tick a box, then set its cooldown, one shorter once it is mastered. */
+  private spend(l: { item: Item; cd: number; casts: number; freeUsed?: boolean }) {
+    l.casts++;
+    const base = l.item.spell!.cooldown;
+    if (!this.mastered(l)) { l.cd = base; return; }
+    if (this.cfg.masteryBonus === "cooldown") { l.cd = Math.max(1, base - 1); return; }
+    // "free": the first cast of the floor costs no cooldown at all. "die" changes damage, not timing.
+    if (this.cfg.masteryBonus === "free" && !l.freeUsed) { l.freeUsed = true; l.cd = 0; return; }
+    l.cd = base;
+  }
+  /** Attack dice for a mastered offensive book. */
+  private spellDice(l: { casts: number }, dice: number) { return this.more(l) ? dice + 1 : dice; }
+  /** Mastered under the written rule, so the book does one more of whatever it does. */
+  private more(l: { casts: number }) { return this.mastered(l) && this.cfg.masteryBonus === "more"; }
 
   resolveAttack(h: Hero, m: Monster, dice: number) {
     let skulls = rollSkulls(this.rng, dice);
@@ -1817,7 +1854,7 @@ export class Game {
     const bk = h.pack.find(i => i.slot === "learned");
     if (!bk) return false;
     h.pack = h.pack.filter(x => x !== bk);
-    h.learned.push({ item: bk, cd: 0 });
+    h.learned.push({ item: bk, cd: 0, casts: 0 });
     this.cfg.record && this.say(`${h.name} learns ${bk.name}`);
     this.award("Nerd", [{ name: "Scroll: Firebolt", slot: "pack", use: "firebolt" },
       { name: "Bookmark", slot: "trinket", resetCd: true }]);
@@ -1968,7 +2005,7 @@ export class Game {
       return;
     }
     const nope = this.living().filter(x => !this.cfg.castNeedsMind || this.mind(x) >= 4).flatMap(x => x.learned).find(l => l.item.spell?.id === "nope" && l.cd === 0);
-    if (nope && h.hp <= 2) { nope.cd = 3; this.cfg.record && this.say(`${m.def.name} swings at ${h.name}: NOPE`); return; }
+    if (nope && h.hp <= 2) { this.spend(nope); this.cfg.record && this.say(`${m.def.name} swings at ${h.name}: NOPE`); return; }
     const skulls = rollSkulls(this.rng, diceOverride ?? m.def.atk);
     const shields = rollShields(this.rng, this.def(h), false);
     const dmg = Math.max(0, skulls - shields);
