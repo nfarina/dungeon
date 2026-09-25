@@ -552,7 +552,7 @@ const f2extras: Card[] = ([
     flavor: "The offer is genuine. The classes are being drafted as we speak.",
     art: "an official-looking golden certificate with an embossed seal, a blank line where a name goes, and a small footnote in tiny print" },
   { id: "pet-biscuit", name: "Pet Biscuit", deck: "companion", type: "item", slot: "Companion upgrade", envelope: "Good Boy",
-    rules: "Reginald gains base Health of 3. <b>Together:</b> his person attacks with +1 die, and when a monster hurts his person they may shout \"Reginald!\" and the goose takes the damage instead. <b>Apart:</b> on his person's turn he moves up to 6 and attacks an adjacent monster with 2 dice. He opens, searches and carries nothing. <b>Throw him as an action:</b> 2 attack dice at a monster in line of sight, and he lands beside it, apart. Rejoin by ending a move on each other's square.",
+    rules: "Reginald gains base Health of 3. <b>Together:</b> his person attacks with +1 die, and when a monster hurts his person they may shout \"Reginald!\" and the goose takes the damage instead. <b>Apart:</b> he gets a square and Defend 1. On his person's turn he moves up to 6 and attacks an adjacent monster with 2 dice. He opens, searches and carries nothing. <b>Throw him as an action:</b> 2 attack dice at a monster in line of sight, and he lands beside it, apart. Rejoin by ending a move on each other's square.",
     flavor: "Who's a good boy. He is. He knows.",
     art: "a large bone-shaped dog biscuit with a tiny crown stamped into it, resting on a red velvet cushion" },
   { id: "reginald-standee", name: "Sir Reginald", deck: "standee", type: "standee", tile: { w: 0.75, h: 1 + STANDEE_TAB, kind: "standee" }, rules: "", ref: "sir-reginald",

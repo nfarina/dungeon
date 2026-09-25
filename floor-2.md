@@ -319,12 +319,14 @@ Cut from the first draft: First Blood and Cartographer (Floor 1 did those), Pass
 **Pet Biscuit:** slide it under Sir Reginald. He has become a person. He is not happier about it. Health 3, and he still eats small corpses only.
 
 - **Together** (the default; he rides on his person's standee, no square of his own): his person attacks with **+1 die**, one roll. When a monster's attack gets damage through to his person, they may shout **"Reginald!"** and the goose takes that damage instead. No roll, no limit, until he runs out of Health. This replaces the Floor 1 skull roll.
-- **Apart** (his own standee): on his person's turn he moves up to 6 and attacks an adjacent monster with 2 dice. That is all he does. He cannot open doors, search furniture, pick anything up or hand cards over. Fed janitors hunt the nearest hero, and a lone goose in a corridor counts. He is bait if you want him to be.
+- **Apart** (his own standee, a square of his own, **Defend 1**): on his person's turn he moves up to 6 and attacks an adjacent monster with 2 dice. He blocks on white shields like a hero, one die. That is all he does. He cannot open doors, search furniture, pick anything up or hand cards over. Fed janitors hunt the nearest hero, and a lone goose in a corridor counts. He is bait if you want him to be.
 - **Throw him:** his person's action, same wording as the Frying Pan. Pick a monster in line of sight: 2 attack dice, and Reginald lands on a square beside it. He is now apart, and that throw was his attack for the turn.
 - **Rejoin:** either of them ends a move on the other's square. Free.
 - **Downed** at 0 Health wherever he is, hero rules (section 1.1). Apart, that means somebody walks over to pick him up.
 
 The point of the split is that Lucas's turn stays one roll on most turns. Apart is the expensive mode, and it costs him the +1 die and the Bodyguard while the goose is away.
+
+**Why Defend 1 and not 2.** Together, Bodyguard hands the goose damage that has already got past his person's own Defend, so he never rolls a defence die at all. If Apart gave him a hero's two dice, sending him away would make him *safer*, which is backwards. At Defend 1 a Kobold Miner drops him in about two and a half swings and a Facilities Manager in under two, so a goose left alone in a corridor is a gamble, which is what Apart is for.
 
 ---
 
